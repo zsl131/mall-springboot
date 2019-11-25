@@ -5,6 +5,10 @@ import lombok.Data;
 
 import javax.persistence.*;
 
+/**
+ * 产品信息
+ *
+ */
 @Data
 @Entity
 @Table(name = "base_admin_menu")

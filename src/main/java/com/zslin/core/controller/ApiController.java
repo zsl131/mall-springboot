@@ -2,11 +2,11 @@ package com.zslin.core.controller;
 
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.dto.JsonResult;
+import com.zslin.core.exception.BusinessException;
 import com.zslin.core.tools.AuthCheckTools;
 import com.zslin.core.tools.Base64Utils;
 import com.zslin.core.tools.JsonParamTools;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +20,8 @@ import java.net.URLDecoder;
 
 @RestController
 @RequestMapping(value = "api")
+@Slf4j
 public class ApiController {
-
-    Logger logger = LoggerFactory.getLogger(ApiController.class);
 
     @Autowired
     private BeanFactory factory;
@@ -70,7 +69,7 @@ public class ApiController {
 //                logger.info(serviceName+"."+actionName+"，需要权限验证");
                 hasAuth = authCheckTools.hasAuth(token, authTime);
             } else {
-                logger.info(serviceName+"."+actionName+"， 不需要权限验证");
+                log.info(serviceName+"."+actionName+"， 不需要权限验证");
             }
 
             if(hasAuth) {
@@ -84,6 +83,9 @@ public class ApiController {
                 result = JsonResult.getInstance().failLogin("无权访问，请先登陆");
             }
             return result;
+        } catch (BusinessException e) {
+            e.printStackTrace();
+            return JsonResult.getInstance().fail("数据请求失败1："+e.getMessage());
         } catch (Exception e) {
             e.printStackTrace();
             return JsonResult.getInstance().fail("数据请求失败："+e.getMessage());

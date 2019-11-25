@@ -65,4 +65,8 @@ public class NormalTools {
         return Math.ceil(d);
     }
 
+    /** 判断是否为空 */
+    public static boolean isNull(String val) {
+        return (val==null || "".equals(val));
+    }
 }

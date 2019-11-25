@@ -1,0 +1,23 @@
+package ${pck};
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+
+import javax.persistence.*;
+
+/**
+ * ${name}
+ * @author ${author}
+ * @data generate on: ${date}
+ */
+@Data
+@Entity
+@Table(name = "${tableName}")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class ${clsName} {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+	${fields}
+}

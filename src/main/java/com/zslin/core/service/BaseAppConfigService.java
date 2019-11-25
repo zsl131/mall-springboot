@@ -3,11 +3,13 @@ package com.zslin.core.service;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
+import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dao.IAdminUserDao;
 import com.zslin.core.dao.IBaseAppConfigDao;
 import com.zslin.core.dto.JsonResult;
+import com.zslin.core.exception.BusinessException;
 import com.zslin.core.model.AdminUser;
 import com.zslin.core.model.BaseAppConfig;
 import com.zslin.core.tools.InitSystemTools;
@@ -45,7 +47,12 @@ public class BaseAppConfigService {
     }
 
     @NeedAuth(need = false)
-    @ExplainOperation(name = "初始化系统", back = {
+    @ExplainOperation(name = "初始化系统", params = {
+            @ExplainParam(value = "appName", name = "项目名称", require = true, example = "项目名称"),
+            @ExplainParam(value = "nickname", name = "管理员昵称", require = true, example = "系统管理员"),
+            @ExplainParam(value = "username", name = "管理员用户名", require = true, example = "admin"),
+            @ExplainParam(value = "password", name = "管理员密码", require = true, example = "123456")
+    }, back = {
             @ExplainReturn(field = "message", notes = "初始化结果信息")
     })
     public JsonResult initSystem(String params) {
@@ -63,9 +70,15 @@ public class BaseAppConfigService {
 
             AdminUser user = new AdminUser();
             user.setCreateDate(NormalTools.curDatetime());
+
             user.setNickname(JsonTools.getJsonParam(params, "nickname"));
             String username = JsonTools.getJsonParam(params, "username");
             String password = JsonTools.getJsonParam(params, "password");
+
+            if(NormalTools.isNull(username)) {
+                throw new BusinessException("用户名[username]不能为空");
+            }
+
             user.setPassword(SecurityUtil.md5(username, password));
             user.setStatus("1");
             user.setIsAdmin("1");
