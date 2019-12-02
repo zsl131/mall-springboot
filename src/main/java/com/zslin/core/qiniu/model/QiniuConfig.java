@@ -1,0 +1,44 @@
+package com.zslin.core.qiniu.model;
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.Data;
+
+import javax.persistence.*;
+import java.io.Serializable;
+
+/**
+ * 七牛配置
+ * @author 钟述林
+ * @data generate on: 2019-12-02
+ */
+@Data
+@Entity
+@Table(name = "qiniu_qiniu_config")
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class QiniuConfig implements Serializable {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
+	
+	/**
+	* 在七牛控制台在查看
+	*/
+	private String accessKey;
+
+	/**
+	* 在七牛控制台在查看
+	*/
+	private String secretKey;
+
+	/**
+	* domain文件域名
+	*/
+	private String url;
+
+	/**
+	* 
+	*/
+	private String bucketName;
+
+}

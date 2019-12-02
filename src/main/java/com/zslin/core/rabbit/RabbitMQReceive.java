@@ -3,6 +3,7 @@ package com.zslin.core.rabbit;
 import com.zslin.business.dao.ICustomerDao;
 import com.zslin.business.model.Customer;
 import com.zslin.core.common.NormalTools;
+import com.zslin.core.qiniu.tools.QiniuTools;
 import com.zslin.core.tools.MyBeanUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
@@ -35,10 +36,17 @@ public class RabbitMQReceive {
 
     @Autowired
     private ICustomerDao customerDao;
+    @Autowired
+    private QiniuTools qiniuTools;
     /** 处理小程序获取用户授权信息 */
     @RabbitHandler
     public void handlerCustomer(Customer customer) {
         Customer old = customerDao.findByOpenid(customer.getOpenid());
+        String headimg = customer.getHeadImgUrl();
+        if(customer.getHeadImgUrl()!=null && !"".equals(customer.getHeadImgUrl())) { //如果有头像
+            headimg = qiniuTools.uploadCustomerHeadImg(headimg, customer.getOpenid()+".jpg");
+        }
+        customer.setHeadImgUrl(headimg);
         if(old==null) { //如果不存在
             customer.setFirstFollowDay(NormalTools.curDate());
             customer.setFirstFollowTime(NormalTools.curDatetime());

@@ -152,7 +152,7 @@
             <version>4.1.1</version>
         </dependency>
 
-        <!-- velocity -->
+        <!-- velocity 用于模板生成代码 -->
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
