@@ -3,6 +3,7 @@ package com.zslin.code.tools;
 import com.zslin.code.dto.EntityDto;
 import com.zslin.code.dto.FieldDto;
 import com.zslin.core.common.NormalTools;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.regex.Pattern;
 /**
  * 代码生成变量配置
  */
+@Slf4j
 public class CodeGenerateCommon {
 
     private static final String TAB = "\t";
@@ -67,7 +69,7 @@ public class CodeGenerateCommon {
                 .append(getTab()).append("/**").append(getLine())
                 .append(getTab()).append("* ").append(fd.getDesc()).append(getLine());
         if(fd.getRemark()!=null && !"".equals(fd.getRemark())) {
-            sb.append(getTab()).append("* @remark ").append("中文显示名称").append(getLine());
+            sb.append(getTab()).append("* @remark ").append(fd.getRemark()).append(getLine());
         }
         sb.append(getTab()).append("*/").append(getLine());
         if("longString".equalsIgnoreCase(type)) {

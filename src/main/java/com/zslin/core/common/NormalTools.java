@@ -2,8 +2,8 @@ package com.zslin.core.common;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * 通用工具类
@@ -12,8 +12,11 @@ import java.util.Date;
 public class NormalTools {
 
     public static String getNow(String pattern) {
-        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        /*SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         String res =  sdf.format(new Date());
+        return res;*/
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
+        String res = df.format(LocalDateTime.now());
         return res;
     }
 
@@ -23,6 +26,8 @@ public class NormalTools {
 
     public static String curDate() {
         return getNow("yyyy-MM-dd");
+        /*LocalDate localDate = LocalDate.now();
+        return localDate.toString();*/
     }
 
     public static String getFileType(String fileName) {
@@ -47,10 +52,10 @@ public class NormalTools {
         return false;
     }
 
-    public static String curDate(String pattern) {
+    /*public static String curDate(String pattern) {
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         return sdf.format(new Date());
-    }
+    }*/
 
     /**
      * 生成两位小数的数字

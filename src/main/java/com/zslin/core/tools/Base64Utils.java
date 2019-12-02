@@ -1,5 +1,6 @@
 package com.zslin.core.tools;
 
+import java.net.URLDecoder;
 import java.util.Base64;
 
 /**
@@ -20,5 +21,22 @@ public class Base64Utils {
             }
         }
         return result;
+    }
+
+    /**
+     * 解密字符串
+     * 1、反转Base64
+     * 2、URLDecoder
+     * @param s 加密后的字符串
+     * @return
+     */
+    public static String unPassword(String s) {
+        try {
+            String real = getFromBase64(s);
+            real = URLDecoder.decode(real, "utf-8");
+            return real;
+        } catch (Exception e) {
+            return "";
+        }
     }
 }

@@ -14,7 +14,7 @@ import java.io.OutputStreamWriter;
 import java.util.Properties;
 
 /**
- * 生成Model
+ * 生成Dao
  */
 public class CodeGenerateDaoTools {
 

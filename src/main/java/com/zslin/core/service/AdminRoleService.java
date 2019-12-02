@@ -85,7 +85,7 @@ public class AdminRoleService {
     }
 
     @AdminAuth(name = "角色列表", orderNum = 1)
-    @ExplainOperation(name = "角色列表", value = "listUser", notes = "角色列表", params= {
+    @ExplainOperation(name = "角色列表", notes = "角色列表", params= {
             @ExplainParam(value = "page", name = "页码，从0开始，默认0", require = false, type = "int", example = "0"),
             @ExplainParam(value = "size", name = "每页条数，默认15答", require = false, type = "int", example = "15"),
             @ExplainParam(value = "sort", name = "排序，id_desc表示根据id降序", require = false, type = "String", example = "id_desc"),

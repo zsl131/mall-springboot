@@ -1,7 +1,6 @@
 package com.zslin.test.controller;
 
 import com.zslin.core.common.NormalTools;
-import com.zslin.core.rabbit.RabbitMQConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @Slf4j
@@ -31,7 +25,7 @@ public class TestController {
         return res;
     }
 
-    @GetMapping(value = "rabbit")
+    /*@GetMapping(value = "rabbit")
     public String rabbit(String msg, HttpServletRequest request) {
         String messageId = String.valueOf(UUID.randomUUID());
         String messageData = "test message, hello!";
@@ -46,7 +40,7 @@ public class TestController {
         //将消息携带绑定键值：TestDirectRouting 发送到交换机TestDirectExchange
         rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, map);
         return "ok";
-    }
+    }*/
 
     /*@GetMapping(value = "addUser")
     public String addUser(String username) {

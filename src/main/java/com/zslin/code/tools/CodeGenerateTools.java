@@ -73,12 +73,13 @@ public class CodeGenerateTools {
 
     private static void generateCode(String basePck, List<EntityDto> entList) {
         for(EntityDto ed : entList) {
-            //String filePath = buildPck(basePck, ed.getPck(), "model");
             String pck = basePck+"."+ed.getPck();
             generateModel(basePck, pck, ed);
             generateDao(basePck, pck, ed);
+            generateService(basePck, pck, ed);
         }
     }
+    //生成model
     private static void generateModel(String basePck, String pck, EntityDto ed) {
         try {
             String filePath = buildPck(basePck, ed.getPck(), "model");
@@ -87,6 +88,7 @@ public class CodeGenerateTools {
             e.printStackTrace();
         }
     }
+    //生成dao
     private static void generateDao(String basePck, String pck, EntityDto ed) {
         String daoClsName = "I"+ed.getCls()+"Dao";
         String filePath = buildPck(basePck, ed.getPck(), "dao");
@@ -97,23 +99,23 @@ public class CodeGenerateTools {
                 e.printStackTrace();
             }
         }
-//        StringBuffer sb = new StringBuffer();
-//        sb.append("I").append(clsName).append("Dao");
-//        return sb.toString();
+    }
+    //生成service
+    private static void generateService(String basePck, String pck, EntityDto ed) {
+        String daoClsName = ed.getCls()+"Service";
+        String filePath = buildPck(basePck, ed.getPck(), "service");
+        if(!existsFile(filePath, daoClsName)) { //如果不存在则生成
+            try {
+                CodeGenerateServiceTools.generate(filePath, pck, ed);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
     /** 检测是否存在 */
     private static boolean existsFile(String filePath, String javaName) {
         File f = new File(filePath+ File.separator + javaName+".java");
         return f.exists();
-    }
-
-    /**
-     * 通过Velocity生成代码
-     * @param back
-     * @param entityList
-     */
-    private static void generateCodeByVelocity(String back, List<EntityDto> entityList) {
-
     }
 
     private static EntityDto buildEntity(Row row) {
@@ -122,6 +124,8 @@ public class CodeGenerateTools {
         dto.setCls(getCellStringValue(row, 2));
         dto.setDesc(getCellStringValue(row, 3));
         dto.setAuthor(getCellStringValue(row, 4));
+        dto.setPModuleName(getCellStringValue(row, 5));
+        dto.setUrl(getCellStringValue(row, 6));
         return dto;
     }
 

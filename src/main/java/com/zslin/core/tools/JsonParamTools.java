@@ -26,13 +26,20 @@ public class JsonParamTools {
         ignoreNames.add("api-code");
         ignoreNames.add("connection");
         ignoreNames.add("host");
+        ignoreNames.add("pragma");
+        ignoreNames.add("content-type");
+        ignoreNames.add("cache-control");
 
         Enumeration<String> names = request.getHeaderNames();
         Map<String, Object> headerMap = new HashMap<>();
         while(names.hasMoreElements()) {
             String name = names.nextElement();
             if(!ignoreNames.contains(name)) {
-                headerMap.put(name, request.getHeader(name));
+                if("nickname".equalsIgnoreCase(name)) { //如果是nickname则需要解密
+                    headerMap.put(name, Base64Utils.unPassword(request.getHeader(name)));
+                } else {
+                    headerMap.put(name, request.getHeader(name));
+                }
             }
         }
 

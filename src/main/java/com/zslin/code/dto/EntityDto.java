@@ -22,6 +22,12 @@ public class EntityDto {
     /** 作者 */
     private String author;
 
+    /** 父模块名称 */
+    private String pModuleName;
+
+    /** 管理链接地址 */
+    private String url;
+
     /** 字段列表 */
     private List<FieldDto> fields;
 }
