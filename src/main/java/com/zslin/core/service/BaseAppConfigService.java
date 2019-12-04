@@ -37,6 +37,20 @@ public class BaseAppConfigService {
     private IAdminUserDao userDao;
 
     @NeedAuth(need = false)
+    @ExplainOperation(name = "检测是否初始化系统", back = {
+            @ExplainReturn(field = "message", type = "String", notes = "返回结果信息"),
+            @ExplainReturn(field = "res", type="Boolean", notes = "true-已初始化;false-未初始化")
+    })
+    public JsonResult checkInit(String params) {
+        BaseAppConfig ac = baseAppConfigDao.loadOne();
+        if(ac!=null && "1".equals(ac.getInitFlag())) {
+            return JsonResult.success("系统已初始化").set("res", true);
+        } else {
+            return JsonResult.success("系统未初始化").set("res", false);
+        }
+    }
+
+    @NeedAuth(need = false)
     @ExplainOperation(name = "获取系统配置", back = {
             @ExplainReturn(field = "size", type = "int", notes = "1：已经存在，0：不存在"),
             @ExplainReturn(field = "datas", type = "Object", notes = "配置对象")

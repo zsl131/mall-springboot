@@ -39,8 +39,8 @@ public class ApiController {
         }
 //        logger.info("请求AuthToken：： "+token);
         String apiCode = request.getHeader("api-code"); //接口访问编码
-        if(token == null || "".equals(token) || apiCode==null || "".equals(apiCode)) {
-            return JsonResult.getInstance().fail("auth-token或api-code为空");
+        if(apiCode==null || "".equals(apiCode)) {
+            return JsonResult.getInstance().fail("api-code为空");
         }
         try {
             String serviceName = apiCode.split("\\.")[0];
