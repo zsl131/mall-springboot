@@ -61,6 +61,10 @@ public class ApiController {
                 method = obj.getClass().getMethod(actionName, params.getClass());
                 hasParams = true;
             }
+
+            //输出的日志，方便查看
+            log.info(apiCode+"-->"+params);
+
             JsonResult result;
 
             NeedAuth needAuth = method.getDeclaredAnnotation(NeedAuth.class);

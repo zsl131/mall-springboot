@@ -20,7 +20,7 @@ public class TestController {
 
     @GetMapping(value = "index")
     public String index(String msg, HttpServletRequest request) {
-        String res = msg = request.getRequestedSessionId()+ "  test in TestController => " + NormalTools.curDatetime();
+        String res = msg + request.getRequestedSessionId()+ "  test in TestController => " + NormalTools.curDatetime();
         log.info(res);
         return res;
     }

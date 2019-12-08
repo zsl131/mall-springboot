@@ -68,6 +68,9 @@ public class ApiWeixinController {
             }
             JsonResult result;
 
+            //输出的日志，方便查看
+            log.info("移动端调用-->"+apiCode+"-->"+params);
+
             NeedAuth needAuth = method.getDeclaredAnnotation(NeedAuth.class);
             boolean hasAuth = true;
             if(needAuth!=null && needAuth.openid()) { //需要传入Openid

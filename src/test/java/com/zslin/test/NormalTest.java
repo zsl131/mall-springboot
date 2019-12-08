@@ -1,14 +1,21 @@
 package com.zslin.test;
 
+import com.zslin.business.mini.tools.AccessTokenTools;
+import com.zslin.business.mini.tools.MiniCommonTools;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.tools.Base64Utils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.net.URLDecoder;
 
 @SpringBootTest
@@ -17,6 +24,32 @@ import java.net.URLDecoder;
 public class NormalTest {
 
     private RestTemplate template = new RestTemplate();
+
+    @Autowired
+    private AccessTokenTools accessTokenTools;
+
+    @Autowired
+    private MiniCommonTools miniCommonTools;
+
+    @Test
+    public void test06() throws Exception {
+        BufferedInputStream bis = miniCommonTools.getUnlimited("id=123&p=aaa", true, false);
+        OutputStream os = new FileOutputStream(new File("D:/temp/1.png"));
+        int len;
+        byte[] arr = new byte[1024];
+        while ((len = bis.read(arr)) != -1)
+        {
+            os.write(arr, 0, len);
+            os.flush();
+        }
+        os.close();
+    }
+
+    @Test
+    public void test05() {
+        String token = accessTokenTools.getAccessToken();
+        System.out.println("------>"+token);
+    }
 
     @Test
     public void test04() {

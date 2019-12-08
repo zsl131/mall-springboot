@@ -80,7 +80,6 @@ public class BaseAppConfigService {
             ac.setAppName(JsonTools.getJsonParam(params, "appName"));
 //            ac.setCreateDate(NormalTools.curDatetime());
             ac.setInitFlag("1");
-            baseAppConfigDao.save(ac);
 
             AdminUser user = new AdminUser();
             user.setCreateDate(NormalTools.curDatetime());
@@ -92,6 +91,9 @@ public class BaseAppConfigService {
             if(NormalTools.isNull(username)) {
                 throw new BusinessException("用户名[username]不能为空");
             }
+            if(NormalTools.isNull(password)) {
+                throw new BusinessException("密码不能为空");
+            }
 
             user.setPassword(SecurityUtil.md5(username, password));
             user.setStatus("1");
@@ -99,6 +101,7 @@ public class BaseAppConfigService {
             user.setUsername(username);
             userDao.save(user);
 
+            baseAppConfigDao.save(ac);
             initSystemTools.initSystem(user.getId());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();

@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * 移动端首页大功能展示
  * @author 钟述林
- * @data generate on: 2019-12-02
+ * @data generate on: 2019-12-08
  */
 @Data
 @Entity
@@ -32,9 +32,9 @@ public class AppModule implements Serializable {
 	private String icon;
 
 	/**
-	* 名称（4个字）
+	* 名称
 	*/
-	private String name;
+	private String txt;
 
 	/**
 	* 背景色
@@ -43,9 +43,15 @@ public class AppModule implements Serializable {
 	private String bgColor;
 
 	/**
+	* 说明
+	* @remark 小字，几个字的说明
+	*/
+	private String smallTxt;
+
+	/**
 	* 跳转链接地址
 	*/
-	private String url;
+	private String path;
 
 	/**
 	* 显示状态
