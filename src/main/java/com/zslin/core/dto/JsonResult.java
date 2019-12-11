@@ -73,6 +73,10 @@ public class JsonResult {
         return that;
     }
 
+    public static JsonResult error(String errCode, String errMsg) {
+        return getInstance().fail(errCode, errMsg);
+    }
+
     public static JsonResult success() {
         return success(SUCCESS_REASON);
     }
@@ -118,11 +122,15 @@ public class JsonResult {
         return this;
     }
 
-    public JsonResult fail(String errMsg) {
+    public JsonResult fail(String errCode, String errMsg) {
         this.reason = errMsg;
-        this.errCode = BUSSINESS_ERR_CODE;
+        this.errCode = errCode;
         this.result.put("message", errMsg);
         return this;
+    }
+
+    public JsonResult fail(String errMsg) {
+        return fail(BUSSINESS_ERR_CODE, errMsg);
     }
 
     public JsonResult set(String key, Object data) {

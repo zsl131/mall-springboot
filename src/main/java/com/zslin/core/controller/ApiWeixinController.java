@@ -4,6 +4,7 @@ import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.exception.BusinessException;
+import com.zslin.core.exception.BusinessExceptionCode;
 import com.zslin.core.tools.AuthCheckTools;
 import com.zslin.core.tools.Base64Utils;
 import com.zslin.core.tools.JsonParamTools;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 
@@ -92,12 +95,23 @@ public class ApiWeixinController {
                 result = JsonResult.getInstance().failLogin("未检测到用户信息");
             }
             return result;
-        } catch (BusinessException e) {
+        } catch (NoSuchMethodException e) {
+            //e.printStackTrace();
+            return JsonResult.getInstance().fail(BusinessExceptionCode.NO_SUCH_METHOD, "未找到接口："+apiCode);
+        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+            return JsonResult.getInstance().fail(BusinessExceptionCode.ILLEGAL_ACCESS, "接口未公开："+e.getMessage());
+        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+            return JsonResult.getInstance().fail(BusinessExceptionCode.ENCODING, "字符编码异常");
+        } catch (InvocationTargetException e) {
             e.printStackTrace();
-            return JsonResult.getInstance().fail("数据请求失败1："+e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            return JsonResult.getInstance().fail("数据请求失败："+e.getMessage());
+            try {
+                BusinessException exc = (BusinessException) e.getTargetException();
+                return JsonResult.getInstance().fail(exc.getCode(), exc.getMsg());
+            } catch (Exception ex) {
+                return JsonResult.getInstance().fail("数据请求失败："+e.getMessage());
+            }
         }
     }
 }

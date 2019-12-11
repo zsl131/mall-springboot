@@ -12,6 +12,7 @@ import com.zslin.core.qiniu.tools.MyFileTools;
 import com.zslin.core.qiniu.tools.QiniuConfigTools;
 import com.zslin.core.qiniu.tools.QiniuTools;
 import com.zslin.core.tools.ConfigTools;
+import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,7 @@ import java.util.UUID;
  */
 @RestController
 @RequestMapping(value = "api/upload")
+@Slf4j
 public class UploadController {
 
     @Autowired
@@ -53,6 +55,7 @@ public class UploadController {
      */
     @RequestMapping(value = "normal")
     public UploadResult normalUpload(@RequestParam("files") MultipartFile[] files, String extra) {
+        log.info(extra);
         UploadResult result = upload(files, extra);
         return result;
     }
@@ -66,6 +69,7 @@ public class UploadController {
                 try {
                     //System.out.println("---->"+extra);
                     UploadParam param = UploadParamsTools.buildParams(extra); //参数DTO对象
+                    log.info(param.toString());
                     boolean isEditor = param.isEditor();
                     String objType = param.getObjClassName(); //上传的文件归属对象类型
                     String fileName = file.getOriginalFilename();

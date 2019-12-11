@@ -74,4 +74,13 @@ public class NormalTools {
     public static boolean isNull(String val) {
         return (val==null || "".equals(val));
     }
+
+    /** 有一个为空则为空 */
+    public static boolean isNullOr(String ...values) {
+        boolean res = false;
+        for(String val : values) {
+            if(isNull(val)) {res = true; break;}
+        }
+        return res;
+    }
 }

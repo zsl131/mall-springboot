@@ -28,4 +28,8 @@ public class NewCustomDto {
 
     /** 昵称 */
     private String nickName;
+
+    private String openId;
+
+    private String unionId;
 }

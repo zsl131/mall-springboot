@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * 代理申请审核
  * @author 钟述林
- * @data generate on: 2019-12-08
+ * @data generate on: 2019-12-09
  */
 @Data
 @Entity

@@ -159,6 +159,13 @@
             <version>1.7</version>
         </dependency>
 
+        <!--微信解密 -->
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-ext-jdk15on</artifactId>
+            <version>1.64</version>
+        </dependency>
+
     </dependencies>
 
     <build>

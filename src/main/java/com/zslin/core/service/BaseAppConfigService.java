@@ -10,6 +10,7 @@ import com.zslin.core.dao.IAdminUserDao;
 import com.zslin.core.dao.IBaseAppConfigDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.exception.BusinessException;
+import com.zslin.core.exception.BusinessExceptionCode;
 import com.zslin.core.model.AdminUser;
 import com.zslin.core.model.BaseAppConfig;
 import com.zslin.core.tools.InitSystemTools;
@@ -69,7 +70,7 @@ public class BaseAppConfigService {
     }, back = {
             @ExplainReturn(field = "message", notes = "初始化结果信息")
     })
-    public JsonResult initSystem(String params) {
+    public JsonResult initSystem(String params) throws BusinessException {
         BaseAppConfig ac = baseAppConfigDao.loadOne();
         if(ac!=null && "1".equals(ac.getInitFlag())) {
 //            return JsonResult.getInstance().fail("系统已经初始化，不可重复操作");
@@ -89,10 +90,10 @@ public class BaseAppConfigService {
             String password = JsonTools.getJsonParam(params, "password");
 
             if(NormalTools.isNull(username)) {
-                throw new BusinessException("用户名[username]不能为空");
+                throw new BusinessException(BusinessExceptionCode.PARAM_NULL, "用户名[username]不能为空");
             }
             if(NormalTools.isNull(password)) {
-                throw new BusinessException("密码不能为空");
+                throw new BusinessException(BusinessExceptionCode.PARAM_NULL, "密码不能为空");
             }
 
             user.setPassword(SecurityUtil.md5(username, password));

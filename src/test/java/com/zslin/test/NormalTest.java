@@ -1,7 +1,9 @@
 package com.zslin.test;
 
+import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.tools.AccessTokenTools;
 import com.zslin.business.mini.tools.MiniCommonTools;
+import com.zslin.business.mini.tools.MiniUtils;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.tools.Base64Utils;
 import org.junit.Test;
@@ -30,6 +32,17 @@ public class NormalTest {
 
     @Autowired
     private MiniCommonTools miniCommonTools;
+
+    @Test
+    public void test07() {
+        String enc = "HSu0ylkXSAPqgi8eZxSFdjlNUTvmU5d3zzj7Egd fDc2wty0vtiE2s3qyB/jN34GdOFgI3n1d7OLCYo1t/TGoM 7wWXGM1S qVfI9KYjqDuXhhTMBeJ2Ffl1Ahhw8 bfCnG9O IbutFXXYvceWnfDZH/RFIKHxfA katYBNH7oxLJx5/Z4E7nA3OuEpXVbLjJvGlSsuOPX16sT5q/73xmoR 53/tkhK06VWBlh9PyxOPTtYxw1aBWbU6qBPqWkNVQr1GVTa/yPTq8wkJW4eju2iRX4Iq9ZZauFzkebeElLWlo5dU J0r5aQpLBbBIT3MfttpGW iFQUW KCbE1Z3O2Vkm1QMjn1qAJPaH QUCXbH4NaFecMpW0veCTM4U25H1DlpnQcDG5/1qiUhk3dGEpJdJ2tH63xFkHze9 Hm0DwivYys3L41S/msndCTToxDkFQh03AQN5nO qABGLEm9ucr/q/2dxgMda6vq6r6th M7l2oFgk05GOhzjFeDxKKw2lCIUbFePAX C9XA26dmLW n8sGCzRbZDmPRSKBd1M=";
+        enc = enc.replaceAll(" ", "+");
+//               enc = "HSu0ylkXSAPqgi8eZxSFdjlNUTvmU5d3zzj7Egd+fDc2wty0vtiE2s3qyB/jN34GdOFgI3n1d7OLCYo1t/TGoM+7wWXGM1S+qVfI9KYjqDuXhhTMBeJ2Ffl1Ahhw8+bfCnG9O+IbutFXXYvceWnfDZH/RFIKHxfA+katYBNH7oxLJx5/Z4E7nA3OuEpXVbLjJvGlSsuOPX16sT5q/73xmoR+53/tkhK06VWBlh9PyxOPTtYxw1aBWbU6qBPqWkNVQr1GVTa/yPTq8wkJW4eju2iRX4Iq9ZZauFzkebeElLWlo5dU+J0r5aQpLBbBIT3MfttpGW+iFQUW+KCbE1Z3O2Vkm1QMjn1qAJPaH+QUCXbH4NaFecMpW0veCTM4U25H1DlpnQcDG5/1qiUhk3dGEpJdJ2tH63xFkHze9+Hm0DwivYys3L41S/msndCTToxDkFQh03AQN5nO+qABGLEm9ucr/q/2dxgMda6vq6r6th+M7l2oFgk05GOhzjFeDxKKw2lCIUbFePAX+C9XA26dmLW+n8sGCzRbZDmPRSKBd1M=";
+        String iv = "R5W2FVYMEDD29BHk0aDFlg==";
+        String sessionKey = "QbnmzydXklCXXNcIrhqw6A==";
+        NewCustomDto res = MiniUtils.decryptionUserInfo(enc, sessionKey, iv);
+        System.out.println("=========>"+res);
+    }
 
     @Test
     public void test06() throws Exception {

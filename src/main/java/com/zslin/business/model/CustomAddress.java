@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * 客户收货地址
  * @author 钟述林
- * @data generate on: 2019-12-08
+ * @data generate on: 2019-12-09
  */
 @Data
 @Entity

@@ -13,7 +13,7 @@ public class JsonParamTools {
 
     private static final String HEADER_PARAM_NAME = "headerParams";
 
-    public static String rebuildParams(String params, HttpServletRequest request) throws Exception {
+    public static String rebuildParams(String params, HttpServletRequest request)  {
 
         List<String> ignoreNames = new ArrayList<>();
 

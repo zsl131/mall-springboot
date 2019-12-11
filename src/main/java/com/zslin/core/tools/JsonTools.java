@@ -83,4 +83,23 @@ public class JsonTools {
             return null;
         }
     }
+
+    /**
+     * 获取openid
+     * @param params
+     * @return
+     */
+    public static String getOpenid(String params) {
+        String openid = getHeaderParams(params, "openid");
+        return openid;
+    }
+
+    /**
+     * 获取Nickname
+     * @param params
+     * @return
+     */
+    public static String getNickname(String params) {
+        return getHeaderParams(params, "nickname");
+    }
 }

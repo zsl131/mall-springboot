@@ -6,7 +6,7 @@ import lombok.Data;
  * 业务异常
  */
 @Data
-public class BusinessException extends RuntimeException {
+public class BusinessException extends Exception {
 
     private String code;
 
