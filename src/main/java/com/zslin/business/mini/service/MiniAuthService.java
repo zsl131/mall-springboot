@@ -6,6 +6,7 @@ import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.model.MiniConfig;
 import com.zslin.business.mini.tools.MiniUtils;
 import com.zslin.business.model.Customer;
+import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
@@ -24,6 +25,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Service
 @Slf4j
+@Explain(name = "小程序授权管理", notes = "获取小程序用户信息")
 public class MiniAuthService {
 
     @Autowired
