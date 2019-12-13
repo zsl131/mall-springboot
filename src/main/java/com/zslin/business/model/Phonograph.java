@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * 留声机
  * @author 钟述林
- * @data generate on: 2019-12-09
+ * @data generate on: 2019-12-13
  */
 @Data
 @Entity
@@ -18,7 +18,7 @@ import java.io.Serializable;
 public class Phonograph implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
 	/**
@@ -66,13 +66,14 @@ public class Phonograph implements Serializable {
 	private String nickname;
 
 	/**
-	* 留声人姓名
-	*/
-	private String name;
-
-	/**
 	* 录音地址
 	*/
 	private String url;
+
+	/**
+	* 上传录音的token
+	* @remark 用于获取具体的录音对象
+	*/
+	private String ticket;
 
 }

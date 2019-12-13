@@ -9,7 +9,7 @@ import java.io.Serializable;
 /**
  * 产品标签关系
  * @author 钟述林
- * @data generate on: 2019-12-09
+ * @data generate on: 2019-12-13
  */
 @Data
 @Entity
@@ -18,7 +18,7 @@ import java.io.Serializable;
 public class ProductTagRelation implements Serializable {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
 	/**
