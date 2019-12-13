@@ -126,6 +126,7 @@ public class CodeGenerateTools {
         dto.setAuthor(getCellStringValue(row, 4));
         dto.setPModuleName(getCellStringValue(row, 5));
         dto.setUrl(getCellStringValue(row, 6));
+        dto.setFuns(getCellStringValue(row, 7));
         return dto;
     }
 

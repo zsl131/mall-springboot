@@ -1,0 +1,17 @@
+    @AdminAuth(name = "添加${clsDesc}", orderNum = 2)
+    @ExplainOperation(name = "添加${clsDesc}", notes = "添加${clsDesc}信息", params = {
+            @ExplainParam(value = "id", name = "${clsDesc}id", require = true, type = "int", example = "1"),
+            @ExplainParam(value = "...", name = "其他信息", type = "Object", example = "对应其他数据")
+    }, back = {
+            @ExplainReturn(field = "obj", type = "Object", notes = "添加成功的对象信息")
+    })
+    public JsonResult add(String params) {
+        try {
+            ${clsName} obj = JSONObject.toJavaObject(JSON.parseObject(params), ${clsName}.class);
+            ${daoName}.save(obj);
+            return JsonResult.succ(obj);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return JsonResult.getInstance().fail(e.getMessage());
+        }
+    }

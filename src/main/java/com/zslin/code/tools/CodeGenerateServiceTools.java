@@ -7,10 +7,7 @@ import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.apache.velocity.app.VelocityEngine;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -27,6 +24,7 @@ public class CodeGenerateServiceTools {
      */
     public static void generate(String path, String pck, EntityDto ed) throws Exception {
 //        String sep = File.separator;
+        if(NormalTools.isNullOr(ed.getPModuleName())) {return ;} //如果没有父模块则不生成Service
         String outPath = CodeGenerateCommon.getVelocityPath();
         Properties pro = new Properties();
         pro.setProperty(Velocity.OUTPUT_ENCODING, "UTF-8");
@@ -35,6 +33,8 @@ public class CodeGenerateServiceTools {
         VelocityEngine ve = new VelocityEngine(pro);
 
         String clsName = ed.getCls();
+        String clsDesc = ed.getDesc();
+        String daoName = buildDaoName(clsName);
 
         VelocityContext context = new VelocityContext();
         context.put("pck",pck+".service");
@@ -44,12 +44,14 @@ public class CodeGenerateServiceTools {
         context.put("date", NormalTools.curDate());
         context.put("serviceClsName", buildClsName(clsName));
         context.put("entityPck", pck+".model");
-        context.put("clsDesc", ed.getDesc());
+        context.put("clsDesc", clsDesc);
         context.put("pModuleName", ed.getPModuleName());
         context.put("url", ed.getUrl());
         context.put("daoClsName", "I"+clsName+"Dao");
         context.put("daoClsPck", pck+".dao");
-        context.put("daoName", buildDaoName(clsName));
+        context.put("daoName", daoName);
+
+        context.put("functions", buildFuncStr(ve, ed.getFuns(), clsDesc, clsName, daoName));
 
         Template t = ve.getTemplate("serviceTemplate.vm", "UTF-8");
 
@@ -63,6 +65,51 @@ public class CodeGenerateServiceTools {
         sw.flush();
         sw.close();
         outStream.close();
+    }
+
+    private static String buildFuncStr(VelocityEngine ve, String funs, String clsDesc, String clsName, String daoName) {
+        StringBuffer sb = new StringBuffer();
+        VelocityContext context = new VelocityContext();
+        context.put("clsDesc", clsDesc);
+        context.put("clsName", clsName);
+        context.put("daoName", daoName);
+        String sep = "\n\n";
+        if(funs.contains("L")) { //如果包含List
+            sb.append(buildFunc(ve,"service-list.vm", context));
+            sb.append(sep);
+        }
+        if(funs.contains("C")) { //如果包含C，即add
+            sb.append(buildFunc(ve, "service-add.vm", context));
+            sb.append(sep);
+        }
+        if(funs.contains("U")) { //如果包含U，即update
+            sb.append(buildFunc(ve, "service-update.vm", context));
+            sb.append(sep);
+        }
+        if(funs.contains("R")) { //如果包含R，即loadOne
+            sb.append(buildFunc(ve, "service-load.vm", context));
+            sb.append(sep);
+        }
+        if(funs.contains("D")) { //如果包含D,即delete
+            sb.append(buildFunc(ve, "service-delete.vm", context));
+            sb.append(sep);
+        }
+        return sb.toString();
+    }
+
+    public static String buildFunc(VelocityEngine ve, String tmpName, VelocityContext context) {
+//        Properties pro = new Properties();
+
+        Template t = ve.getTemplate(tmpName, "UTF-8");
+        // 输出渲染后的结果
+        StringWriter sw = new StringWriter();
+
+        /*VelocityContext context = new VelocityContext();
+        for(ContextDto cd : ctx) {context.put(cd.getKey(), cd.getValue());}*/
+
+        t.merge(context, sw);
+        //System.out.println(sw.toString());
+        return sw.toString();
     }
 
     /**

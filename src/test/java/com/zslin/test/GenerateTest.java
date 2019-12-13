@@ -2,6 +2,7 @@ package com.zslin.test;
 
 import com.zslin.code.dto.EntityDto;
 import com.zslin.code.tools.CodeGenerateCommon;
+import com.zslin.code.tools.CodeGenerateServiceTools;
 import com.zslin.code.tools.CodeGenerateTools;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -21,6 +22,12 @@ import java.util.Properties;
 @RunWith(SpringRunner.class)
 @ActiveProfiles(value = "zsl")
 public class GenerateTest {
+
+    @Test
+    public void test04() {
+//        String res = CodeGenerateServiceTools.buildAdd("测试管理", "Test", "testDao");
+//        System.out.println("---->" + res);
+    }
 
     @Test
     public void test03() throws Exception {

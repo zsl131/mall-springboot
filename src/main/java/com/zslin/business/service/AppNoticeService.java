@@ -21,7 +21,7 @@ import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
 
 /**
- * Created by 钟述林 on 2019-12-01.
+ * Created by 钟述林 on 2019-12-13.
  */
 @Service
 @AdminAuth(name = "通知公告管理", psn = "移动端管理", orderNum = 2, type = "1", url = "/admin/appNotice")
@@ -33,21 +33,21 @@ public class AppNoticeService {
 
     @AdminAuth(name = "通知公告列表", orderNum = 1)
     @ExplainOperation(name = "通知公告列表", notes = "通知公告列表", params= {
-            @ExplainParam(value = "page", name = "页码，从0开始，默认0", require = false, type = "int", example = "0"),
-            @ExplainParam(value = "size", name = "每页条数，默认15答", require = false, type = "int", example = "15"),
-            @ExplainParam(value = "sort", name = "排序，id_desc表示根据id降序", require = false, type = "String", example = "id_desc"),
-            @ExplainParam(value = "conditions", name = "筛选条件，id_eq:5表示id=5", require = false, type = "String", example = "id_eq:5")
-    }, back = {
-            @ExplainReturn(field = "size", type = "int", notes = "通知公告数量"),
-            @ExplainReturn(field = "datas", type = "Object", notes = "通知公告数组对象")
-    })
-    public JsonResult list(String params) {
-        QueryListDto qld = QueryTools.buildQueryListDto(params);
-        Page<AppNotice> res = appNoticeDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList()),
-                SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
+             @ExplainParam(value = "page", name = "页码，从0开始，默认0", require = false, type = "int", example = "0"),
+             @ExplainParam(value = "size", name = "每页条数，默认15答", require = false, type = "int", example = "15"),
+             @ExplainParam(value = "sort", name = "排序，id_desc表示根据id降序", require = false, type = "String", example = "id_desc"),
+             @ExplainParam(value = "conditions", name = "筛选条件，id_eq:5表示id=5", require = false, type = "String", example = "id_eq:5")
+     }, back = {
+             @ExplainReturn(field = "size", type = "int", notes = "通知公告数量"),
+             @ExplainReturn(field = "datas", type = "Object", notes = "通知公告数组对象")
+     })
+     public JsonResult list(String params) {
+         QueryListDto qld = QueryTools.buildQueryListDto(params);
+         Page<AppNotice> res = appNoticeDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList()),
+                 SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
 
-        return JsonResult.getInstance().set("size", (int) res.getTotalElements()).set("datas", res.getContent());
-    }
+         return JsonResult.getInstance().set("size", (int) res.getTotalElements()).set("datas", res.getContent());
+     }
 
     @AdminAuth(name = "添加通知公告", orderNum = 2)
     @ExplainOperation(name = "添加通知公告", notes = "添加通知公告信息", params = {
@@ -87,6 +87,7 @@ public class AppNoticeService {
         }
     }
 
+    @AdminAuth(name = "获取通知公告", orderNum = 5)
     @ExplainOperation(name = "获取通知公告信息", notes = "通过ID获取角色对象", params = {
             @ExplainParam(value = "id", name = "通知公告ID", require = true, type = "int", example = "1")
     }, back = {
@@ -121,4 +122,6 @@ public class AppNoticeService {
             return JsonResult.error(e.getMessage());
         }
     }
+
+
 }

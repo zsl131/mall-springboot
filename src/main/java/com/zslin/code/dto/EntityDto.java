@@ -28,6 +28,9 @@ public class EntityDto {
     /** 管理链接地址 */
     private String url;
 
+    /** 生成功能CURDL */
+    private String funs;
+
     /** 字段列表 */
     private List<FieldDto> fields;
 }
