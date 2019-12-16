@@ -52,6 +52,9 @@ public class MiniAuthService {
         }
 
         MiniConfig config = miniConfigDao.loadOne();
+        if(config==null || NormalTools.isNullOr(config.getAppid(), config.getAppSecret())) {
+            throw new BusinessException(BusinessExceptionCode.CONFIG_NULL, "小程序未配置或Appid、AppSecret为空");
+        }
         //log.info("code:::"+code);
         //log.info(config.toString());
         RestTemplate template = new RestTemplate();

@@ -1,6 +1,7 @@
 package com.zslin.core.qiniu.tools;
 
-import com.zslin.core.exception.SystemException;
+import com.zslin.core.exception.BusinessException;
+import com.zslin.core.exception.BusinessExceptionCode;
 import com.zslin.core.qiniu.dao.IQiniuConfigDao;
 import com.zslin.core.qiniu.model.QiniuConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,11 @@ public class QiniuConfigTools {
 
     private static QiniuConfig instance;
 
-    public QiniuConfig getQiniuConfig() throws SystemException {
+    public QiniuConfig getQiniuConfig() throws BusinessException {
         if(instance==null) {
             instance = qiniuConfigDao.loadOne();
         }
-        if(instance==null) {throw new SystemException("未检测到七牛配置信息");}
+        if(instance==null) {throw new BusinessException(BusinessExceptionCode.CONFIG_NULL, "未检测到七牛配置信息");}
         return instance;
     }
 

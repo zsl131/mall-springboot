@@ -87,8 +87,8 @@ public class AdminUserService {
         }
     }
 
-    @AdminAuth(name = "修改用户", orderNum = 2)
-    @ExplainOperation(name = "修改用户", notes = "修改用户信息", params = {
+    @AdminAuth(name = "添加或修改用户", orderNum = 2)
+    @ExplainOperation(name = "添加或修改修改用户", notes = "添加或修改用户信息，有id则添加", params = {
             @ExplainParam(value = "id", name = "用户id", require = true, type = "int", example = "1"),
             @ExplainParam(value = "...", name = "其他用户信息", require = false, type = "Object", example = "对应用户数据")
     }, back = {

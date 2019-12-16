@@ -28,6 +28,7 @@ public class MiniUtils {
      */
     public static NewCustomDto decryptionUserInfo(String encryptedData, String sessionKey, String iv) {
         encryptedData = encryptedData.replaceAll(" ", "+"); //传入之后+号全部自动变成了空格
+        iv = iv.replaceAll(" ", "+");
         // 被加密的数据
         byte[] dataByte = Base64.decode(encryptedData);
         // 加密秘钥

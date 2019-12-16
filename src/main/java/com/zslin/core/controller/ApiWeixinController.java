@@ -35,7 +35,7 @@ public class ApiWeixinController {
 
     @GetMapping(value = "get")
     public JsonResult get(HttpServletRequest request, HttpServletResponse response) {
-        String token = request.getHeader("auth-token"); //身份认证token
+        String token = request.getHeader("auth_token"); //身份认证token
         String openid = request.getHeader("openid"); //微信端传入的Openid
         String nickname = Base64Utils.unPassword(request.getHeader("nickname")); //昵称
         //log.info("openid===>"+openid);
@@ -46,9 +46,9 @@ public class ApiWeixinController {
         } catch (Exception e) {
         }
 //        logger.info("请求AuthToken：： "+token);
-        String apiCode = request.getHeader("api-code"); //接口访问编码
-        if(token == null || "".equals(token) || apiCode==null || "".equals(apiCode)) {
-            return JsonResult.getInstance().fail("auth-token或api-code为空");
+        String apiCode = request.getHeader("api_code"); //接口访问编码
+        if(apiCode==null || "".equals(apiCode)) {
+            return JsonResult.getInstance().fail("api_code为空");
         }
         try {
             String serviceName = apiCode.split("\\.")[0];
@@ -106,6 +106,7 @@ public class ApiWeixinController {
             return JsonResult.getInstance().fail(BusinessExceptionCode.ENCODING, "字符编码异常");
         } catch (InvocationTargetException e) {
             e.printStackTrace();
+            log.error("数据请求异常！！", e);
             try {
                 BusinessException exc = (BusinessException) e.getTargetException();
                 return JsonResult.getInstance().fail(exc.getCode(), exc.getMsg());

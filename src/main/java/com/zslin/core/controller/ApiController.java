@@ -9,6 +9,7 @@ import com.zslin.core.tools.Base64Utils;
 import com.zslin.core.tools.JsonParamTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,16 +35,16 @@ public class ApiController {
 
     @GetMapping(value = "get")
     public JsonResult get(HttpServletRequest request, HttpServletResponse response) {
-        String token = request.getHeader("auth-token"); //身份认证token
+        String token = request.getHeader("auth_token"); //身份认证token
         Long authTime = null;
         try {
             authTime = Long.parseLong(request.getHeader("authTime")); //权限时间
         } catch (Exception e) {
         }
 //        logger.info("请求AuthToken：： "+token);
-        String apiCode = request.getHeader("api-code"); //接口访问编码
+        String apiCode = request.getHeader("api_code"); //接口访问编码
         if(apiCode==null || "".equals(apiCode)) {
-            return JsonResult.getInstance().fail("api-code为空");
+            return JsonResult.getInstance().fail("api_code为空");
         }
         try {
             String serviceName = apiCode.split("\\.")[0];
@@ -90,6 +91,11 @@ public class ApiController {
                 result = JsonResult.getInstance().failLogin("无权访问，请先登陆");
             }
             return result;
+        } catch(ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
+            return JsonResult.getInstance().fail(BusinessExceptionCode.API_ERR_FORMAT, "服务接口格式错误："+apiCode+"，必须有且只有一个“.”");
+        } catch (NoSuchBeanDefinitionException e) {
+            return JsonResult.getInstance().fail(BusinessExceptionCode.NO_BEAN_DEF, "未找到服务接口："+apiCode);
         } catch (NoSuchMethodException e) {
             //e.printStackTrace();
             return JsonResult.getInstance().fail(BusinessExceptionCode.NO_SUCH_METHOD, "未找到接口："+apiCode);
@@ -106,6 +112,9 @@ public class ApiController {
             } catch (Exception ex) {
                 return JsonResult.getInstance().fail("数据请求失败："+e.getMessage());
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return JsonResult.getInstance().fail("出现异常"+e.getMessage());
         }
     }
 }

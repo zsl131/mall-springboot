@@ -7,19 +7,25 @@ import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
+import com.zslin.core.dao.IAdminMenuDao;
 import com.zslin.core.dao.IAdminRoleDao;
 import com.zslin.core.dao.IRoleMenuDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
+import com.zslin.core.dto.TreeRootDto;
+import com.zslin.core.model.AdminMenu;
 import com.zslin.core.model.AdminRole;
 import com.zslin.core.model.RoleMenu;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
+import com.zslin.core.tools.MenuTools;
 import com.zslin.core.tools.PinyinToolkit;
 import com.zslin.core.tools.QueryTools;
+import com.zslin.core.tools.login.MenuTreeDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,6 +43,12 @@ public class AdminRoleService {
 
     @Autowired
     private IRoleMenuDao roleMenuDao;
+
+    @Autowired
+    private IAdminMenuDao menuDao;
+
+    @Autowired
+    private MenuTools menuTools;
 
     @ExplainOperation(name = "权限角色菜单", notes = "为角色授权菜单，存在则取消授权，不存在则添加授权", params = {
             @ExplainParam(value = "rid", name = "角色ID", type = "int", require = true, example = "1"),
@@ -82,6 +94,32 @@ public class AdminRoleService {
             e.printStackTrace();
             return JsonResult.getInstance().fail(e.getMessage());
         }
+    }
+
+    @AdminAuth(name = "菜单列表", orderNum = 1)
+    @ExplainOperation(name = "构建菜单树", notes = "获取子菜单列表", params = {
+            @ExplainParam(name = "父ID", value = "pid", type = "int", example = "1，不传则获取根菜单")
+    }, back = {
+            @ExplainReturn(field = "size", type = "int", notes = "菜单数量"),
+            @ExplainReturn(field = "mids", type = "Array", notes = "已拥有的菜单ID"),
+            @ExplainReturn(field = "tree", type = "Object", notes = "菜单树对象")
+    })
+    public JsonResult onAuth(String params) {
+        Integer pid = 0;
+        try { pid = Integer.parseInt(JsonTools.getJsonParam(params, "pid"));} catch (Exception e) {pid=0;}
+        List<MenuTreeDto> list = menuTools.buildMenuTree();
+        Sort sort = SimpleSortBuilder.generateSort("orderNo_a");
+        List<AdminMenu> menuList ;
+        if(pid==0) {
+            menuList = menuDao.findRootMenu(sort);
+        } else {
+            menuList = menuDao.findByParent(pid, sort);
+        }
+        TreeRootDto trd = new TreeRootDto(list, menuList);
+        Integer rid = Integer.parseInt(JsonTools.getJsonParam(params, "rid"));
+        List<Integer> mids = roleMenuDao.queryMenuIds(rid);
+
+        return JsonResult.getInstance().set("size", mids.size()).set("mids", mids).set("tree", trd);
     }
 
     @AdminAuth(name = "角色列表", orderNum = 1)

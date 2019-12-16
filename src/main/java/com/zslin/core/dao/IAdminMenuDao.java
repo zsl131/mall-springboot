@@ -14,9 +14,9 @@ import java.util.List;
 public interface IAdminMenuDao extends BaseRepository<AdminMenu, Integer>, JpaSpecificationExecutor<AdminMenu> {
 
 //    @Query("SELECT m FROM Menu m WHERE m.display=1 AND m.type='2' AND m.id in (SELECT rm.mid FROM RoleMenu rm WHERE rm.rid IN (SELECT ur.rid FROM UserRole ur where ur.uid=?1))")
-    //正面少了 AND m.type='2' 多了 AND m.href!='#'
+    //上面少了 AND m.type='2' 多了 AND m.href!='#'
     @Query("SELECT m FROM AdminMenu m WHERE m.display=1 AND m.href!='#' AND m.id in (SELECT rm.mid FROM RoleMenu rm WHERE rm.rid IN (SELECT ur.rid FROM UserRole ur where ur.uid=?1))")
-    List<AdminMenu> findAuthMenuByUser(Integer userId);
+    List<AdminMenu> findAuthMenuByUser(Integer userId, Sort sort);
 
     @Query("SELECT m FROM AdminMenu m WHERE m.display=1 AND m.type='1' AND m.id in (SELECT rm.mid FROM RoleMenu rm WHERE rm.rid IN (SELECT ur.rid FROM UserRole ur where ur.uid=?1))")
     List<AdminMenu> findByUser(Integer userId);

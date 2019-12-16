@@ -21,14 +21,18 @@ public class JsonParamTools {
         ignoreNames.add("accept-encoding");
         ignoreNames.add("referer");
         ignoreNames.add("accept");
-        ignoreNames.add("auth-token");
+        ignoreNames.add("auth_token"); //这两个不用传给实际服务接口
+        ignoreNames.add("api_code");
         ignoreNames.add("user-agent");
-        ignoreNames.add("api-code");
         ignoreNames.add("connection");
         ignoreNames.add("host");
         ignoreNames.add("pragma");
         ignoreNames.add("content-type");
         ignoreNames.add("cache-control");
+        ignoreNames.add("sec-fetch-mode");
+        ignoreNames.add("sec-fetch-site");
+        ignoreNames.add("same-origin");
+        ignoreNames.add("cookie");
 
         Enumeration<String> names = request.getHeaderNames();
         Map<String, Object> headerMap = new HashMap<>();
