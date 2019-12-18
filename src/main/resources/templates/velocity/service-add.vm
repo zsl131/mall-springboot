@@ -8,6 +8,10 @@
     public JsonResult add(String params) {
         try {
             ${clsName} obj = JSONObject.toJavaObject(JSON.parseObject(params), ${clsName}.class);
+            ValidationDto vd = ValidationTools.buildValidate(obj);
+            if(vd.isHasError()) { //如果有验证异常
+                return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
+            }
             ${daoName}.save(obj);
             return JsonResult.succ(obj);
         } catch (Exception e) {

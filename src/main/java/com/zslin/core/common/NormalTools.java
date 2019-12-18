@@ -11,6 +11,14 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class NormalTools {
 
+    public static boolean isNumeric(String s) {
+        if (s != null && !"".equals(s.trim()))
+//            return s.matches("^[0-9]*$");
+            return s.matches("([0-9]\\d*\\.?\\d*)|(0\\.\\d*[1-9])");
+        else
+            return false;
+    }
+
     public static String getNow(String pattern) {
         /*SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         String res =  sdf.format(new Date());

@@ -36,6 +36,7 @@ public class CodeGenerateModelTools {
         context.put("pck",pck+".model");
         context.put("name", ed.getDesc());
         context.put("author", ed.getAuthor());
+        context.put("validatePck", CodeGenerateCommon.buildValidatePck(ed.getFields()));
         context.put("tableName", CodeGenerateCommon.buildTableName(pck, ed.getCls()));
         context.put("clsName", ed.getCls());
         context.put("fields", CodeGenerateCommon.buildFields(ed.getFields()));

@@ -136,6 +136,7 @@ public class CodeGenerateTools {
         dto.setType(getCellStringValue(row, 2));
         dto.setDesc(getCellStringValue(row, 3));
         dto.setRemark(getCellStringValue(row, 4));
+        dto.setValidations(getCellStringValue(row, 6));
         return dto;
     }
 

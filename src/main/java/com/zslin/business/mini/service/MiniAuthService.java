@@ -13,7 +13,6 @@ import com.zslin.core.api.ExplainReturn;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.exception.BusinessException;
-import com.zslin.core.exception.BusinessExceptionCode;
 import com.zslin.core.qiniu.tools.QiniuTools;
 import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.MyBeanUtils;
@@ -48,12 +47,12 @@ public class MiniAuthService {
         String enc = JsonTools.getJsonParam(params, "encryptedData"); //
         String iv = JsonTools.getJsonParam(params, "iv");
         if(NormalTools.isNullOr(code, enc, iv)) {
-            throw new BusinessException(BusinessExceptionCode.PARAM_NULL, "code、encryptedData、iv三者均不能为空");
+            throw new BusinessException(BusinessException.Code.PARAM_NULL, "code、encryptedData、iv三者均不能为空");
         }
 
         MiniConfig config = miniConfigDao.loadOne();
         if(config==null || NormalTools.isNullOr(config.getAppid(), config.getAppSecret())) {
-            throw new BusinessException(BusinessExceptionCode.CONFIG_NULL, "小程序未配置或Appid、AppSecret为空");
+            throw new BusinessException(BusinessException.Code.CONFIG_NULL, "小程序未配置或Appid、AppSecret为空");
         }
         //log.info("code:::"+code);
         //log.info(config.toString());

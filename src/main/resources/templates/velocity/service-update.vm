@@ -8,6 +8,10 @@
     public JsonResult update(String params) {
         try {
             ${clsName} o = JSONObject.toJavaObject(JSON.parseObject(params), ${clsName}.class);
+            ValidationDto vd = ValidationTools.buildValidate(o);
+            if(vd.isHasError()) { //如果有验证异常
+                return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
+            }
             ${clsName} obj = ${daoName}.findOne(o.getId());
             MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay");
             ${daoName}.save(obj);

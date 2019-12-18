@@ -35,7 +35,8 @@ public class SimpleSortBuilder {
             }
             return order;
         }
-        order = new Order(f);
+//        order = new Order(f);
+        order = Order.by(f);
         return order;
     }
 

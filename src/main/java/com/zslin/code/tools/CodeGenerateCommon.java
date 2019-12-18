@@ -1,11 +1,11 @@
 package com.zslin.code.tools;
 
-import com.zslin.code.dto.EntityDto;
 import com.zslin.code.dto.FieldDto;
 import com.zslin.core.common.NormalTools;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,6 +76,10 @@ public class CodeGenerateCommon {
             sb.append(getTab()).append("@Lob").append(getLine());
             type = "String";
         }
+        String validation = buildValidate(fd.getValidations());
+        if(!NormalTools.isNullOr(validation)) {
+            sb.append(getTab()).append(buildValidate(fd.getValidations())).append(getLine()); //添加验证信息
+        }
         sb.append(getTab()).append("private").append(getBlank()).append(type)
                 .append(getBlank()).append(fd.getName()).append(";").append(getLine());
         return sb.toString();
@@ -126,5 +130,87 @@ public class CodeGenerateCommon {
             sb.append(matcher.end() == line.length() ? "" : "_");
         }
         return sb.toString();
+    }
+
+    private static String rebuildValidateStr(String validation) {
+        validation = validation.replaceAll("；", ";")
+                .replaceAll("_", "-")
+                .replaceAll("“", "\"");
+        return validation;
+    }
+
+    /**
+     * 构建表单验证
+     * @param validation 格式如：@NotBlank-街道不能为空；@Length-min=5-街道至少5个字
+     * @return
+     */
+    public static String buildValidate(String validation) {
+        if(NormalTools.isNullOr(validation)) {return null;}
+        validation = rebuildValidateStr(validation);
+        String [] array = validation.split(";");
+        StringBuffer sb = new StringBuffer();
+        boolean isFirst = true;
+        boolean isFirstRule = true;
+        for(String valid: array) {
+            String [] singleArray = valid.split("-");
+            for(String sa : singleArray) {
+                if(sa.startsWith("@")) {
+                    if(isFirst) {
+                        sb.append(sa).append("(");
+                        isFirst = false;
+                    } else {
+                        sb.append(")\n").append(sa).append("(");
+                    }
+                    isFirstRule = true;
+                } else {
+                    if(!isFirstRule) {sb.append(", ");}
+                    isFirstRule = false;
+                    String[]rule = sa.split("=");
+                    if(rule.length==1) {
+                        //@NotEmpty(message = "msgUrl不能为空")
+                        sb.append("message=").append(buildValidateValue(rule[0]));
+                    } else if(rule.length==2) {
+                        sb.append(rule[0]).append("=").append(buildValidateValue(rule[1]));
+                    }
+                }
+            }
+        }
+        sb.append(")");
+        return sb.toString();
+    }
+
+    /**
+     * 生成表单验证的包信息
+     * @param fieldDtoList
+     * @return
+     */
+    public static String buildValidatePck(List<FieldDto> fieldDtoList) {
+        StringBuffer sb = new StringBuffer();
+        List<String> tmpList = new ArrayList<>();
+        for(FieldDto dto : fieldDtoList) {
+            //@NotBlank-街道不能为空；@Length-min=5-街道至少5个字
+            String validation = rebuildValidateStr(dto.getValidations());
+            String [] array = validation.split(";");
+            for(String single:array) {
+                String [] temp = single.split("-");
+                for(String tmp : temp) {
+                    if(tmp.startsWith("@") && !tmpList.contains(tmp.substring(1))) {tmpList.add(tmp.substring(1));}
+                }
+            }
+        }
+        for(String t : tmpList) {
+            if("Range".equalsIgnoreCase(t) || "Length".equalsIgnoreCase(t)) {
+                sb.append("import org.hibernate.validator.constraints.").append(t).append(";\n");
+            } else {
+                sb.append("import javax.validation.constraints.").append(t).append(";\n");
+            }
+        }
+        log.info("--->"+sb.toString());
+        return sb.toString();
+    }
+
+    private static String buildValidateValue(String rule) {
+        boolean isNumber = NormalTools.isNumeric(rule);
+        return isNumber?rule:("\""+rule+"\"");
     }
 }

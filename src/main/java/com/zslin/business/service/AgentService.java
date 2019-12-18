@@ -15,13 +15,16 @@ import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.QueryTools;
+import com.zslin.core.validate.ValidationDto;
+import com.zslin.core.validate.ValidationTools;
+import com.zslin.core.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
 
 /**
- * Created by 钟述林 on 2019-12-13.
+ * Created by 钟述林 on 2019-12-18.
  */
 @Service
 @AdminAuth(name = "代理管理", psn = "销售管理", orderNum = 2, type = "1", url = "/admin/agent")
@@ -59,6 +62,10 @@ public class AgentService {
     public JsonResult update(String params) {
         try {
             Agent o = JSONObject.toJavaObject(JSON.parseObject(params), Agent.class);
+            ValidationDto vd = ValidationTools.buildValidate(o);
+            if(vd.isHasError()) { //如果有验证异常
+                return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
+            }
             Agent obj = agentDao.findOne(o.getId());
             MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay");
             agentDao.save(obj);

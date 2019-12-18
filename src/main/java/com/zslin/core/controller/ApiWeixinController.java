@@ -4,12 +4,12 @@ import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.exception.BusinessException;
-import com.zslin.core.exception.BusinessExceptionCode;
 import com.zslin.core.tools.AuthCheckTools;
 import com.zslin.core.tools.Base64Utils;
 import com.zslin.core.tools.JsonParamTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -95,24 +95,30 @@ public class ApiWeixinController {
                 result = JsonResult.getInstance().failLogin("未检测到用户信息");
             }
             return result;
+        } catch(ArrayIndexOutOfBoundsException e) {
+            e.printStackTrace();
+            return JsonResult.getInstance().fail(BusinessException.Code.API_ERR_FORMAT, BusinessException.Message.API_ERR_FORMAT);
+        } catch (NoSuchBeanDefinitionException e) {
+            return JsonResult.getInstance().fail(BusinessException.Code.NO_BEAN_DEF, BusinessException.Message.NO_BEAN_DEF);
         } catch (NoSuchMethodException e) {
             //e.printStackTrace();
-            return JsonResult.getInstance().fail(BusinessExceptionCode.NO_SUCH_METHOD, "未找到接口："+apiCode);
+            return JsonResult.getInstance().fail(BusinessException.Code.NO_SUCH_METHOD, BusinessException.Message.NO_SUCH_METHOD);
         } catch (IllegalAccessException e) {
 //            e.printStackTrace();
-            return JsonResult.getInstance().fail(BusinessExceptionCode.ILLEGAL_ACCESS, "接口未公开："+e.getMessage());
+            return JsonResult.getInstance().fail(BusinessException.Code.ILLEGAL_ACCESS, BusinessException.Message.ILLEGAL_ACCESS);
         } catch (UnsupportedEncodingException e) {
 //            e.printStackTrace();
-            return JsonResult.getInstance().fail(BusinessExceptionCode.ENCODING, "字符编码异常");
+            return JsonResult.getInstance().fail(BusinessException.Code.ENCODING, BusinessException.Message.ENCODING);
         } catch (InvocationTargetException e) {
-            e.printStackTrace();
-            log.error("数据请求异常！！", e);
             try {
                 BusinessException exc = (BusinessException) e.getTargetException();
-                return JsonResult.getInstance().fail(exc.getCode(), exc.getMsg());
+                return JsonResult.getInstance().fail(exc.getCode(), "异常："+exc.getMsg());
             } catch (Exception ex) {
                 return JsonResult.getInstance().fail("数据请求失败："+e.getMessage());
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return JsonResult.getInstance().fail("出现异常"+e.getMessage());
         }
     }
 }

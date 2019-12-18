@@ -3,6 +3,7 @@ package com.zslin.core.dto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.zslin.core.api.ExplainResult;
 import com.zslin.core.api.ExplainResultField;
+import com.zslin.core.exception.BusinessException;
 import lombok.Data;
 
 import java.util.HashMap;
@@ -18,7 +19,7 @@ public class JsonResult {
 
     public static final String SUCCESS_REASON = "请求成功";
     public static final String SUCCESS_CODE = "0";
-    public static final String BUSSINESS_ERR_CODE = "10001"; //业务错误代码
+    public static final String BUSINESS_ERR_CODE = BusinessException.Code.DEFAULT_ERR_CODE; //业务错误代码
 
     @ExplainResultField(name = "返回的结果信息", type = "String", notes = "结果信息")
     private String reason = SUCCESS_REASON;
@@ -103,6 +104,15 @@ public class JsonResult {
         return this;
     }
 
+    public JsonResult failFlag(String errCode, String msg, Object obj) {
+        this.reason = msg;
+        this.errCode = errCode;
+        if(this.result==null) {this.result = new HashMap<>();}
+        this.result.put("message", msg);
+        this.result.put("errors", obj);
+        return this;
+    }
+
     public JsonResult failLogin(String msg) {
         this.reason = SUCCESS_REASON;
         this.errCode = SUCCESS_CODE;
@@ -130,7 +140,7 @@ public class JsonResult {
     }
 
     public JsonResult fail(String errMsg) {
-        return fail(BUSSINESS_ERR_CODE, errMsg);
+        return fail(BUSINESS_ERR_CODE, errMsg);
     }
 
     public JsonResult set(String key, Object data) {

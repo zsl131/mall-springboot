@@ -5,11 +5,13 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
+
 
 /**
  * 移动端首页大功能展示
  * @author 钟述林
- * @data generate on: 2019-12-13
+ * @data generate on: 2019-12-18
  */
 @Data
 @Entity
@@ -34,6 +36,7 @@ public class AppModule implements Serializable {
 	/**
 	* 名称
 	*/
+	@NotBlank(message="模块名称不能为空")
 	private String txt;
 
 	/**

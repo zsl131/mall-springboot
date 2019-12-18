@@ -5,11 +5,13 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
+
 
 /**
  * 小程序配置
  * @author 钟述林
- * @data generate on: 2019-12-13
+ * @data generate on: 2019-12-18
  */
 @Data
 @Entity
@@ -24,11 +26,13 @@ public class MiniConfig implements Serializable {
 	/**
 	* 小程序Appid
 	*/
+	@NotBlank(message="appid不能为空")
 	private String appid;
 
 	/**
 	* 小程序密钥
 	*/
+	@NotBlank(message="appSecret不能为空")
 	private String appSecret;
 
 	/**

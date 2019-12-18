@@ -5,7 +5,7 @@ import com.zslin.core.repository.BaseRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 
 /**
- * Created by 钟述林 on 2019-12-01.
+ * Created by 钟述林 on 2019-12-18.
  */
 public interface IProductSpecsDao extends BaseRepository<ProductSpecs, Integer>, JpaSpecificationExecutor<ProductSpecs> {
 

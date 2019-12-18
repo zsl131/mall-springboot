@@ -5,11 +5,14 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.Length;
+
 
 /**
  * 客户收货地址
  * @author 钟述林
- * @data generate on: 2019-12-13
+ * @data generate on: 2019-12-18
  */
 @Data
 @Entity
@@ -34,6 +37,7 @@ public class CustomAddress implements Serializable {
 	/**
 	* 省级代码
 	*/
+	@NotBlank(message="省份不能为空")
 	private String provinceCode;
 
 	/**
@@ -44,6 +48,7 @@ public class CustomAddress implements Serializable {
 	/**
 	* 市级代码
 	*/
+	@NotBlank(message="市不能为空")
 	private String cityCode;
 
 	/**
@@ -54,6 +59,7 @@ public class CustomAddress implements Serializable {
 	/**
 	* 县级代码
 	*/
+	@NotBlank(message="县区不能为空")
 	private String countyCode;
 
 	/**
@@ -64,11 +70,20 @@ public class CustomAddress implements Serializable {
 	/**
 	* 街道地址
 	*/
+	@NotBlank(message="街道不能为空")
+@Length(min=5, message="街道至少5个字")
 	private String street;
+
+	/**
+	* 姓名
+	*/
+	@NotBlank(message="联系人不能为空")
+	private String name;
 
 	/**
 	* 联系电话
 	*/
+	@NotBlank(message="联系电话不能为空")
 	private String phone;
 
 	/**

@@ -1,13 +1,9 @@
 package com.zslin.test;
 
-import com.zslin.business.dao.IAgentDao;
-import com.zslin.business.dao.IAgentLevelDao;
 import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.tools.AccessTokenTools;
 import com.zslin.business.mini.tools.MiniCommonTools;
 import com.zslin.business.mini.tools.MiniUtils;
-import com.zslin.business.model.Agent;
-import com.zslin.business.model.AgentLevel;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.tools.Base64Utils;
 import org.junit.Test;
@@ -36,33 +32,6 @@ public class NormalTest {
 
     @Autowired
     private MiniCommonTools miniCommonTools;
-
-    @Autowired
-    private IAgentDao agentDao;
-
-    @Autowired
-    private IAgentLevelDao agentLevelDao;
-
-    @Test
-    public void test08() {
-        for(int i=0;i<20;i++) {
-            Agent agent = new Agent();
-            agent.setName("name:"+(i+1));
-            agentDao.save(agent);
-        }
-
-        for(int i=0;i<10;i++) {
-            AgentLevel al = new AgentLevel();
-            al.setName("name:"+(i+1));
-            agentLevelDao.save(al);
-        }
-
-        for(int i=0;i<20;i++) {
-            Agent agent = new Agent();
-            agent.setName("name:"+(i+1));
-            agentDao.save(agent);
-        }
-    }
 
     @Test
     public void test07() {

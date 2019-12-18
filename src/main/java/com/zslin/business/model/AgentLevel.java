@@ -5,11 +5,13 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
+
 
 /**
  * 代理等级
  * @author 钟述林
- * @data generate on: 2019-12-13
+ * @data generate on: 2019-12-18
  */
 @Data
 @Entity
@@ -25,6 +27,7 @@ public class AgentLevel implements Serializable {
 	* 等级名称
 	* @remark 如：铜牌代理、银牌代理、金牌代理
 	*/
+	@NotBlank(message="等级名称不能为空")
 	private String name;
 
 	/**

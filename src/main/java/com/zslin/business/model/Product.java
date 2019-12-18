@@ -5,11 +5,14 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.Length;
+
 
 /**
  * 产品信息
  * @author 钟述林
- * @data generate on: 2019-12-13
+ * @data generate on: 2019-12-18
  */
 @Data
 @Entity
@@ -25,12 +28,15 @@ public class Product implements Serializable {
 	* 产品名称
 	* @remark 如：昭通糖心苹果
 	*/
+	@NotBlank(message="产品名称不能为空")
+@Length(min=4, message="至少4个字")
 	private String title;
 
 	/**
 	* 产品图文内容
 	*/
 	@Lob
+	@NotBlank(message="产品内容不能为空")
 	private String content;
 
 	/**

@@ -5,11 +5,14 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
+import org.hibernate.validator.constraints.Range;
+
 
 /**
  * 产品规格
  * @author 钟述林
- * @data generate on: 2019-12-13
+ * @data generate on: 2019-12-18
  */
 @Data
 @Entity
@@ -25,6 +28,7 @@ public class ProductSpecs implements Serializable {
 	* 规格名称
 	* @remark 如：大果12斤装
 	*/
+	@NotBlank(message="规格名称不能为空")
 	private String name;
 
 	/**
@@ -42,11 +46,13 @@ public class ProductSpecs implements Serializable {
 	/**
 	* 原价
 	*/
+	@Range(min=1, message="价格不能小于等于0")
 	private Float oriPrice;
 
 	/**
 	* 现价
 	*/
+	@Range(min=1, message="价格不能小于等于0")
 	private Float price;
 
 	/**

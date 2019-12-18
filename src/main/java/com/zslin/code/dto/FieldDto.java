@@ -19,4 +19,7 @@ public class FieldDto {
 
     /** 备注 */
     private String remark;
+
+    /** 验证信息 */
+    private String validations;
 }

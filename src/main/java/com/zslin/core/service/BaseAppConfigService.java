@@ -10,7 +10,6 @@ import com.zslin.core.dao.IAdminUserDao;
 import com.zslin.core.dao.IBaseAppConfigDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.exception.BusinessException;
-import com.zslin.core.exception.BusinessExceptionCode;
 import com.zslin.core.model.AdminUser;
 import com.zslin.core.model.BaseAppConfig;
 import com.zslin.core.tools.InitSystemTools;
@@ -90,10 +89,10 @@ public class BaseAppConfigService {
             String password = JsonTools.getJsonParam(params, "password");
 
             if(NormalTools.isNull(username)) {
-                throw new BusinessException(BusinessExceptionCode.PARAM_NULL, "用户名[username]不能为空");
+                throw new BusinessException(BusinessException.Code.PARAM_NULL, "用户名[username]不能为空");
             }
             if(NormalTools.isNull(password)) {
-                throw new BusinessException(BusinessExceptionCode.PARAM_NULL, "密码不能为空");
+                throw new BusinessException(BusinessException.Code.PARAM_NULL, "密码不能为空");
             }
 
             user.setPassword(SecurityUtil.md5(username, password));

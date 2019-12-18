@@ -5,11 +5,13 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
+
 
 /**
  * 通知公告
  * @author 钟述林
- * @data generate on: 2019-12-13
+ * @data generate on: 2019-12-18
  */
 @Data
 @Entity
@@ -24,6 +26,7 @@ public class AppNotice implements Serializable {
 	/**
 	* 显示内容
 	*/
+	@NotBlank(message="公告内容不能为空")
 	private String content;
 
 	/**

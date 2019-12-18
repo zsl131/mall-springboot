@@ -4,6 +4,7 @@ import com.zslin.code.dto.EntityDto;
 import com.zslin.code.tools.CodeGenerateCommon;
 import com.zslin.code.tools.CodeGenerateServiceTools;
 import com.zslin.code.tools.CodeGenerateTools;
+import com.zslin.core.common.NormalTools;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
@@ -22,6 +23,58 @@ import java.util.Properties;
 @RunWith(SpringRunner.class)
 @ActiveProfiles(value = "zsl")
 public class GenerateTest {
+
+    @Test
+    public void test06() {
+        System.out.println(NormalTools.isNumeric("123"));
+        System.out.println(NormalTools.isNumeric("123.45"));
+        System.out.println(NormalTools.isNumeric("12df"));
+        System.out.println(NormalTools.isNumeric("s12"));
+    }
+
+    @Test
+    public void test05() {
+//        String str = "@NotBlank-message=产品名称不能为空；@Length-min=4-message=至少4个字";
+        String str = "@NotBlank-产品内容不能为空";
+        str = str.replaceAll("；", ";")
+                .replaceAll("_", "-")
+                .replaceAll("“", "\"");
+        String [] array = str.split(";");
+        StringBuffer sb = new StringBuffer();
+        boolean isFirst = true;
+        boolean isFirstRule = true;
+        for(String valid: array) {
+            String [] singleArray = valid.split("-");
+            for(String sa : singleArray) {
+                if(sa.startsWith("@")) {
+                    if(isFirst) {
+                        sb.append(sa).append("(");
+                        isFirst = false;
+                    } else {
+                        sb.append(")\n").append(sa).append("(");
+                    }
+                    isFirstRule = true;
+                } else {
+                    if(!isFirstRule) {sb.append(", ");}
+                    isFirstRule = false;
+                    String[]rule = sa.split("=");
+                    if(rule.length==1) {
+                        //@NotEmpty(message = "msgUrl不能为空")
+                        sb.append("message=").append(buildStr(rule[0]));
+                    } else if(rule.length==2) {
+                        sb.append(rule[0]).append("=").append(buildStr(rule[1]));
+                    }
+                }
+            }
+        }
+        sb.append(")");
+        System.out.println(sb.toString());
+    }
+
+    private String buildStr(String rule) {
+        boolean isNumber = NormalTools.isNumeric(rule);
+        return isNumber?rule:("\""+rule+"\"");
+    }
 
     @Test
     public void test04() {
@@ -84,7 +137,6 @@ public class GenerateTest {
 
     @Test
     public void test02() {
-        //E:\idea\2020\z_mall\src\main\java\com\zslin\business\model\ProductSpecs.java
         //E:\idea\2020\z_mall\src\main\java\com\zslin\business\
         String pck1 = "business";
         String basePck = "com.zslin";
@@ -96,7 +148,6 @@ public class GenerateTest {
 
     @Test
     public void test01() throws Exception {
-        //E:\idea\2020\z_mall\src\main\java\com\zslin\business\model\ProductSpecs.java
 //        String projectPath = System.getProperty("user.dir");
 //        System.out.println("projectPath==" + projectPath);
         FileInputStream fis = new FileInputStream(new File("G:\\钟述林\\X项目\\T特产\\model.xlsx"));

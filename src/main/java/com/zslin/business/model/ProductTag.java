@@ -5,11 +5,13 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
+
 
 /**
  * 产品标签
  * @author 钟述林
- * @data generate on: 2019-12-13
+ * @data generate on: 2019-12-18
  */
 @Data
 @Entity
@@ -24,6 +26,7 @@ public class ProductTag implements Serializable {
 	/**
 	* 标签名称
 	*/
+	@NotBlank(message="标签名称不能为空")
 	private String name;
 
 }

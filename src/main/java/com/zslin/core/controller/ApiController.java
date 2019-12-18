@@ -3,7 +3,6 @@ package com.zslin.core.controller;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.exception.BusinessException;
-import com.zslin.core.exception.BusinessExceptionCode;
 import com.zslin.core.tools.AuthCheckTools;
 import com.zslin.core.tools.Base64Utils;
 import com.zslin.core.tools.JsonParamTools;
@@ -72,6 +71,7 @@ public class ApiController {
             JsonResult result;
 
             NeedAuth needAuth = method.getDeclaredAnnotation(NeedAuth.class);
+            //System.out.println("---------->needAuth:::"+needAuth);
             boolean hasAuth = true;
             if(needAuth==null || needAuth.need()) { //需要权限验证
 //                logger.info(serviceName+"."+actionName+"，需要权限验证");
@@ -88,27 +88,28 @@ public class ApiController {
                 }
             } else {
 //                logger.info("需要重新登陆");
+                //System.out.println("-------->apiCode:" + apiCode);
                 result = JsonResult.getInstance().failLogin("无权访问，请先登陆");
             }
             return result;
         } catch(ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
-            return JsonResult.getInstance().fail(BusinessExceptionCode.API_ERR_FORMAT, "服务接口格式错误："+apiCode+"，必须有且只有一个“.”");
+            return JsonResult.getInstance().fail(BusinessException.Code.API_ERR_FORMAT, BusinessException.Message.API_ERR_FORMAT);
         } catch (NoSuchBeanDefinitionException e) {
-            return JsonResult.getInstance().fail(BusinessExceptionCode.NO_BEAN_DEF, "未找到服务接口："+apiCode);
+            return JsonResult.getInstance().fail(BusinessException.Code.NO_BEAN_DEF, BusinessException.Message.NO_BEAN_DEF);
         } catch (NoSuchMethodException e) {
             //e.printStackTrace();
-            return JsonResult.getInstance().fail(BusinessExceptionCode.NO_SUCH_METHOD, "未找到接口："+apiCode);
+            return JsonResult.getInstance().fail(BusinessException.Code.NO_SUCH_METHOD, BusinessException.Message.NO_SUCH_METHOD);
         } catch (IllegalAccessException e) {
 //            e.printStackTrace();
-            return JsonResult.getInstance().fail(BusinessExceptionCode.ILLEGAL_ACCESS, "接口未公开："+e.getMessage());
+            return JsonResult.getInstance().fail(BusinessException.Code.ILLEGAL_ACCESS, BusinessException.Message.ILLEGAL_ACCESS);
         } catch (UnsupportedEncodingException e) {
 //            e.printStackTrace();
-            return JsonResult.getInstance().fail(BusinessExceptionCode.ENCODING, "字符编码异常");
+            return JsonResult.getInstance().fail(BusinessException.Code.ENCODING, BusinessException.Message.ENCODING);
         } catch (InvocationTargetException e) {
             try {
                 BusinessException exc = (BusinessException) e.getTargetException();
-                return JsonResult.getInstance().fail(exc.getCode(), exc.getMsg());
+                return JsonResult.getInstance().fail(exc.getCode(), "异常："+exc.getMsg());
             } catch (Exception ex) {
                 return JsonResult.getInstance().fail("数据请求失败："+e.getMessage());
             }

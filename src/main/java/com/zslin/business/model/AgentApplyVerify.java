@@ -6,10 +6,11 @@ import lombok.Data;
 import javax.persistence.*;
 import java.io.Serializable;
 
+
 /**
  * 代理申请审核
  * @author 钟述林
- * @data generate on: 2019-12-13
+ * @data generate on: 2019-12-18
  */
 @Data
 @Entity

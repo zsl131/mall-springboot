@@ -5,11 +5,13 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import javax.validation.constraints.NotBlank;
+
 
 /**
  * 产品评论
  * @author 钟述林
- * @data generate on: 2019-12-13
+ * @data generate on: 2019-12-18
  */
 @Data
 @Entity
@@ -81,6 +83,7 @@ public class ProductComment implements Serializable {
 	* 评论内容
 	*/
 	@Lob
+	@NotBlank(message="评论内容不能为空")
 	private String commentContent;
 
 	/**
