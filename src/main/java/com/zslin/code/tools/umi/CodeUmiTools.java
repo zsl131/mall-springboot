@@ -15,6 +15,6 @@ public class CodeUmiTools {
      * @param entList Excel生成的DTO对象列表
      */
     public static void generateCode(String targetPath, List<EntityDto> entList) {
-
+        //生成Umi代码
     }
 }
