@@ -19,59 +19,7 @@ import java.util.List;
  */
 public class CodeGenerateTools {
 
-    public static void generate(String basePck, InputStream is) {
-        generate(basePck, is, 0, 0);
-    }
-
-    /**
-     * 生成代码
-     * @param is Excel文件输入流
-     * @param sheetIndex Excel的工作薄序号，从0开始
-     * @param startRow 数据开始行，默认从1开始
-     */
-    public static List<EntityDto> generate(String basePck, InputStream is, Integer sheetIndex, Integer startRow) {
-//        String basePackage =
-
-        List<EntityDto> result = new ArrayList<>();
-        try {
-            Workbook workbook = new XSSFWorkbook(is);
-            Sheet sheet = workbook.getSheetAt(sheetIndex==null?0:sheetIndex);
-
-            EntityDto eDto=null;
-            List<FieldDto> fieldList = null;
-            for(int i=startRow;i<=sheet.getLastRowNum();i++) {
-                Row row = sheet.getRow(i);
-                Cell c1 = row.getCell(0);
-                Cell c2 = row.getCell(1);
-                Cell c3 = row.getCell(2);
-                Cell c4 = row.getCell(3);
-                Cell c5 = row.getCell(4);
-                boolean isEntity = isTarget(c1, "类");
-                if(isEntity) { //如果是对象
-                    if(eDto!=null) { //添加
-                        eDto.setFields(fieldList);
-                        result.add(eDto);
-                    }
-                    eDto = buildEntity(row);
-                    fieldList = new ArrayList<>();
-                } else if(isTarget(c1, "字段")) { //如果是字段
-                    FieldDto fd = buildField(row);
-                    fieldList.add(fd);
-                }
-            }
-            if(eDto!=null) {
-                eDto.setFields(fieldList);
-                result.add(eDto);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        generateCode(basePck, result);
-        return result;
-    }
-
-    private static void generateCode(String basePck, List<EntityDto> entList) {
+    public static void generateCode(String basePck, List<EntityDto> entList) {
         for(EntityDto ed : entList) {
             String pck = basePck+"."+ed.getPck();
             generateModel(basePck, pck, ed);
@@ -116,41 +64,6 @@ public class CodeGenerateTools {
     private static boolean existsFile(String filePath, String javaName) {
         File f = new File(filePath+ File.separator + javaName+".java");
         return f.exists();
-    }
-
-    private static EntityDto buildEntity(Row row) {
-        EntityDto dto = new EntityDto();
-        dto.setPck(getCellStringValue(row, 1));
-        dto.setCls(getCellStringValue(row, 2));
-        dto.setDesc(getCellStringValue(row, 3));
-        dto.setAuthor(getCellStringValue(row, 4));
-        dto.setPModuleName(getCellStringValue(row, 5));
-        dto.setUrl(getCellStringValue(row, 6));
-        dto.setFuns(getCellStringValue(row, 7));
-        return dto;
-    }
-
-    private static FieldDto buildField(Row row) {
-        FieldDto dto = new FieldDto();
-        dto.setName(getCellStringValue(row, 1));
-        dto.setType(getCellStringValue(row, 2));
-        dto.setDesc(getCellStringValue(row, 3));
-        dto.setRemark(getCellStringValue(row, 4));
-        dto.setValidations(getCellStringValue(row, 6));
-        return dto;
-    }
-
-    private static String getCellStringValue(Row row, Integer cellIndex) {
-        Cell cell = row.getCell(cellIndex);
-        if(cell!=null) {return cell.getStringCellValue();}
-        else {return "";}
-    }
-
-    private static boolean isTarget(Cell cell, String val) {
-        if(cell!=null) {
-            return val.equals(cell.getStringCellValue());
-        }
-        return false;
     }
 
     /**

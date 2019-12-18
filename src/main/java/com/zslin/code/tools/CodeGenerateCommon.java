@@ -1,10 +1,18 @@
 package com.zslin.code.tools;
 
+import com.zslin.code.dto.EntityDto;
 import com.zslin.code.dto.FieldDto;
 import com.zslin.core.common.NormalTools;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -15,6 +23,93 @@ import java.util.regex.Pattern;
  */
 @Slf4j
 public class CodeGenerateCommon {
+
+    public static void generate(InputStream is) {
+        generate(is, 0, 0);
+    }
+
+    /**
+     * 生成代码
+     * @param is Excel文件输入流
+     * @param sheetIndex Excel的工作薄序号，从0开始
+     * @param startRow 数据开始行，默认从1开始
+     */
+    public static List<EntityDto> generate(InputStream is, Integer sheetIndex, Integer startRow) {
+//        String basePackage =
+
+        List<EntityDto> result = new ArrayList<>();
+        try {
+            Workbook workbook = new XSSFWorkbook(is);
+            Sheet sheet = workbook.getSheetAt(sheetIndex==null?0:sheetIndex);
+
+            EntityDto eDto=null;
+            List<FieldDto> fieldList = null;
+            for(int i=startRow;i<=sheet.getLastRowNum();i++) {
+                Row row = sheet.getRow(i);
+                Cell c1 = row.getCell(0);
+               /* Cell c2 = row.getCell(1);
+                Cell c3 = row.getCell(2);
+                Cell c4 = row.getCell(3);
+                Cell c5 = row.getCell(4);*/
+                boolean isEntity = isTarget(c1, "类");
+                if(isEntity) { //如果是对象
+                    if(eDto!=null) { //添加
+                        eDto.setFields(fieldList);
+                        result.add(eDto);
+                    }
+                    eDto = buildEntity(row);
+                    fieldList = new ArrayList<>();
+                } else if(isTarget(c1, "字段")) { //如果是字段
+                    FieldDto fd = buildField(row);
+                    fieldList.add(fd);
+                }
+            }
+            if(eDto!=null) {
+                eDto.setFields(fieldList);
+                result.add(eDto);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+//        generateCode(basePck, result);
+        return result;
+    }
+
+    private static EntityDto buildEntity(Row row) {
+        EntityDto dto = new EntityDto();
+        dto.setPck(getCellStringValue(row, 1));
+        dto.setCls(getCellStringValue(row, 2));
+        dto.setDesc(getCellStringValue(row, 3));
+        dto.setAuthor(getCellStringValue(row, 4));
+        dto.setPModuleName(getCellStringValue(row, 5));
+        dto.setUrl(getCellStringValue(row, 6));
+        dto.setFuns(getCellStringValue(row, 7));
+        return dto;
+    }
+
+    private static FieldDto buildField(Row row) {
+        FieldDto dto = new FieldDto();
+        dto.setName(getCellStringValue(row, 1));
+        dto.setType(getCellStringValue(row, 2));
+        dto.setDesc(getCellStringValue(row, 3));
+        dto.setRemark(getCellStringValue(row, 4));
+        dto.setValidations(getCellStringValue(row, 6));
+        return dto;
+    }
+
+    private static String getCellStringValue(Row row, Integer cellIndex) {
+        Cell cell = row.getCell(cellIndex);
+        if(cell!=null) {return cell.getStringCellValue();}
+        else {return "";}
+    }
+
+    private static boolean isTarget(Cell cell, String val) {
+        if(cell!=null) {
+            return val.equals(cell.getStringCellValue());
+        }
+        return false;
+    }
 
     private static final String TAB = "\t";
     private static final String LINE = "\n";

@@ -151,7 +151,8 @@ public class GenerateTest {
 //        String projectPath = System.getProperty("user.dir");
 //        System.out.println("projectPath==" + projectPath);
         FileInputStream fis = new FileInputStream(new File("G:\\钟述林\\X项目\\T特产\\model.xlsx"));
-        List<EntityDto> res = CodeGenerateTools.generate("com.zslin", fis, 0, 2);
+        List<EntityDto> res = CodeGenerateCommon.generate(fis, 0, 2);
+        CodeGenerateTools.generateCode("com.zslin", res);
         System.out.println(res);
     }
 }
