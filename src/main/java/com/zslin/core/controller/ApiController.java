@@ -35,6 +35,8 @@ public class ApiController {
 
     @GetMapping(value = "get")
     public JsonResult get(HttpServletRequest request, HttpServletResponse response) {
+
+        System.out.println("--------------------调用-----------");
         String token = request.getHeader("auth_token"); //身份认证token
         Long authTime = null;
         try {
@@ -53,7 +55,7 @@ public class ApiController {
         }
 
         if(apiCode==null || "".equals(apiCode)) {
-            return JsonResult.getInstance().fail("api_code为空");
+            return JsonResult.getInstance().fail("api_code不能为空");
         }
         try {
             String serviceName = apiCode.split("\\.")[0];
