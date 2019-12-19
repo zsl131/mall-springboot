@@ -36,7 +36,7 @@ public class ApiController {
     @GetMapping(value = "get")
     public JsonResult get(HttpServletRequest request, HttpServletResponse response) {
 
-        System.out.println("--------------------调用-----------");
+        System.out.println("----------重启----------调用-----------");
         String token = request.getHeader("auth_token"); //身份认证token
         Long authTime = null;
         try {
