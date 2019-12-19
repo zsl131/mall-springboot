@@ -1,6 +1,9 @@
 package com.zslin.test.controller;
 
 import com.zslin.core.common.NormalTools;
+import com.zslin.core.tasker.CronTaskRegistrar;
+import com.zslin.core.tasker.ScheduledTask;
+import com.zslin.core.tasker.SchedulingRunnable;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -18,11 +22,38 @@ public class TestController {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
+    @Autowired
+    private CronTaskRegistrar cronTaskRegistrar;
+
     @GetMapping(value = "index")
     public String index(String msg, HttpServletRequest request) {
         String res = msg + request.getRequestedSessionId()+ "  test in TestController => " + NormalTools.curDatetime();
         log.info(res);
         return res;
+    }
+
+    @GetMapping(value = "addTask")
+    public String addTask(String name, String methodName) {
+        SchedulingRunnable task = new SchedulingRunnable(name,"demoTask", methodName);
+//        task.
+        cronTaskRegistrar.addCronTask(task, "0/10 * * * * ?");
+        return "添加成功";
+    }
+
+    @GetMapping(value = "listTask")
+    public String listTask() {
+        Map<String, ScheduledTask> scheduledTasks = cronTaskRegistrar.list();
+        StringBuffer sb = new StringBuffer();
+        for(String key : scheduledTasks.keySet()) {
+            sb.append("------>key:::").append(key).append("\n");
+        }
+        return sb.toString();
+    }
+
+    @GetMapping(value = "remove")
+    public String remove(String name) {
+        cronTaskRegistrar.removeByName(name);
+        return "删除成功";
     }
 
     /*@GetMapping(value = "rabbit")
