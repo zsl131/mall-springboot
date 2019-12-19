@@ -20,6 +20,7 @@ import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
+import java.util.Enumeration;
 
 @RestController
 @RequestMapping(value = "api")
@@ -40,8 +41,17 @@ public class ApiController {
             authTime = Long.parseLong(request.getHeader("authTime")); //权限时间
         } catch (Exception e) {
         }
-//        logger.info("请求AuthToken：： "+token);
+
         String apiCode = request.getHeader("api_code"); //接口访问编码
+
+
+        log.info("请求AuthToken：： "+token);
+        Enumeration<String> names = request.getHeaderNames();
+        while(names.hasMoreElements()) {
+            String name = names.nextElement();
+            log.info("{} -> {}", name, request.getHeader(name));
+        }
+
         if(apiCode==null || "".equals(apiCode)) {
             return JsonResult.getInstance().fail("api_code为空");
         }
