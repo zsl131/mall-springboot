@@ -37,14 +37,14 @@ public class ApiController {
     public JsonResult get(HttpServletRequest request, HttpServletResponse response) {
 
         System.out.println("----------重启----------调用-----------");
-        String token = request.getHeader("auth_token"); //身份认证token
+        String token = request.getHeader("authToken"); //身份认证token
         Long authTime = null;
         try {
             authTime = Long.parseLong(request.getHeader("authTime")); //权限时间
         } catch (Exception e) {
         }
 
-        String apiCode = request.getHeader("api_code"); //接口访问编码
+        String apiCode = request.getHeader("apiCode"); //接口访问编码
 
 
         log.info("请求AuthToken：： "+token);
