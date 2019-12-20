@@ -3,7 +3,9 @@ package com.zslin.core.common;
 import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 /**
  * 通用工具类
@@ -26,6 +28,14 @@ public class NormalTools {
         DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
         String res = df.format(LocalDateTime.now());
         return res;
+    }
+
+    public static Date getDate(String dateStr, String pattern) {
+        try {
+            DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
+            LocalDateTime ldt = LocalDateTime.parse(dateStr, df);
+            return Date.from(ldt.atZone(ZoneId.systemDefault()).toInstant());
+        } catch (Exception e) {return null;}
     }
 
     public static String curDatetime() {
@@ -59,11 +69,6 @@ public class NormalTools {
         }
         return false;
     }
-
-    /*public static String curDate(String pattern) {
-        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-        return sdf.format(new Date());
-    }*/
 
     /**
      * 生成两位小数的数字

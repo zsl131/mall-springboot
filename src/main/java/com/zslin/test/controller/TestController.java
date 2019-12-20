@@ -1,9 +1,9 @@
 package com.zslin.test.controller;
 
 import com.zslin.core.common.NormalTools;
+import com.zslin.core.model.BaseTask;
 import com.zslin.core.tasker.CronTaskRegistrar;
-import com.zslin.core.tasker.ScheduledTask;
-import com.zslin.core.tasker.SchedulingRunnable;
+import com.zslin.core.tasker.TaskDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,26 +33,35 @@ public class TestController {
     }
 
     @GetMapping(value = "addTask")
-    public String addTask(String name, String methodName) {
-        SchedulingRunnable task = new SchedulingRunnable(name,"demoTask", methodName);
+    public String addTask(String name, String beanName, String methodName, String params, String cron) {
+        BaseTask task = new BaseTask();
+        task.setTaskUuid(name);
+        task.setBeanName(beanName);
+        task.setMethodName(methodName);
+        task.setParams(params);
+        task.setType("3");
+        task.setCron("0/10 * * * * ?");
 //        task.
-        cronTaskRegistrar.addCronTask(task, "0/10 * * * * ?");
+        cronTaskRegistrar.addTask(task);
         return "添加成功";
     }
 
     @GetMapping(value = "listTask")
     public String listTask() {
-        Map<String, ScheduledTask> scheduledTasks = cronTaskRegistrar.list();
+        Map<String, TaskDto> scheduledTasks = cronTaskRegistrar.list();
         StringBuffer sb = new StringBuffer();
         for(String key : scheduledTasks.keySet()) {
-            sb.append("------>key:::").append(key).append("\n");
+            BaseTask runner = scheduledTasks.get(key).getRunner();
+            sb.append("------>key:::").append(key)
+                    .append(", beanName:: ").append(runner.getBeanName())
+                    .append(", methodName:: ").append(runner.getMethodName()).append("\n");
         }
         return sb.toString();
     }
 
     @GetMapping(value = "remove")
     public String remove(String name) {
-        cronTaskRegistrar.removeByName(name);
+        cronTaskRegistrar.removeByUuid(name);
         return "删除成功";
     }
 

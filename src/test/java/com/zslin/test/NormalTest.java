@@ -5,6 +5,7 @@ import com.zslin.business.mini.tools.AccessTokenTools;
 import com.zslin.business.mini.tools.MiniCommonTools;
 import com.zslin.business.mini.tools.MiniUtils;
 import com.zslin.core.common.NormalTools;
+import com.zslin.core.tasker.BeanCheckTools;
 import com.zslin.core.tools.Base64Utils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,6 +33,30 @@ public class NormalTest {
 
     @Autowired
     private MiniCommonTools miniCommonTools;
+
+    @Autowired
+    private BeanCheckTools beanCheckTools;
+
+    @Test
+    public void test09() {
+        beanCheckTools.checkMethod("testService", "handler", "zslzsl");
+        System.out.println("++++++++++++++++++++++++++++++");
+        beanCheckTools.checkMethod("testService", "handler", "sdfsf", 5);
+        System.out.println("=========================================");
+        beanCheckTools.checkMethod("testService", "handler");
+        System.out.println("1----------------------------------------------1");
+        beanCheckTools.checkMethod("testService", "handler", null);
+        System.out.println("2----------------------------------------------2");
+        beanCheckTools.checkMethod("testService", "test", null);
+        System.out.println("3----------------------------------------------3");
+        beanCheckTools.checkMethod("zslzsService", "handler", null);
+    }
+
+    @Test
+    public void test08() {
+        String pattern = "yyyy-MM-dd HH:mm:ss";
+        System.out.println(NormalTools.getDate("2019-12-18 18:18:18", pattern));
+    }
 
     @Test
     public void test07() {

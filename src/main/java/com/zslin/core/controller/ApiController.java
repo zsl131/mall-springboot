@@ -36,26 +36,17 @@ public class ApiController {
     @GetMapping(value = "get")
     public JsonResult get(HttpServletRequest request, HttpServletResponse response) {
 
-        System.out.println("----------重启----------调用-----------");
         String token = request.getHeader("authToken"); //身份认证token
         Long authTime = null;
         try {
-            authTime = Long.parseLong(request.getHeader("authTime")); //权限时间
+            authTime = Long.parseLong(request.getHeader("authTime")); //权限时间，单位秒
         } catch (Exception e) {
         }
 
         String apiCode = request.getHeader("apiCode"); //接口访问编码
 
-
-        log.info("请求AuthToken：： "+token);
-        Enumeration<String> names = request.getHeaderNames();
-        while(names.hasMoreElements()) {
-            String name = names.nextElement();
-            log.info("{} -> {}", name, request.getHeader(name));
-        }
-
         if(apiCode==null || "".equals(apiCode)) {
-            return JsonResult.getInstance().fail("api_code不能为空");
+            return JsonResult.getInstance().fail("apiCode不能为空");
         }
         try {
             String serviceName = apiCode.split("\\.")[0];
@@ -78,7 +69,7 @@ public class ApiController {
             }
 
             //输出的日志，方便查看
-            log.info(apiCode+"-->"+params);
+            log.info("接口调用，apiCode: {}, params: {}", apiCode, params);
 
             JsonResult result;
 
@@ -123,7 +114,8 @@ public class ApiController {
                 BusinessException exc = (BusinessException) e.getTargetException();
                 return JsonResult.getInstance().fail(exc.getCode(), "异常："+exc.getMsg());
             } catch (Exception ex) {
-                return JsonResult.getInstance().fail("数据请求失败："+e.getMessage());
+                ex.printStackTrace();
+                return JsonResult.getInstance().fail("数据请求失败："+ex.getMessage());
             }
         } catch (Exception e) {
             e.printStackTrace();

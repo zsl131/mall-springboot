@@ -34,7 +34,7 @@ import java.util.List;
  * Created by zsl on 2018/7/10.
  */
 @Service
-@AdminAuth(psn = "权限管理", name = "用户管理", orderNum = 1, type = "1", url = "/admin/users")
+@AdminAuth(psn = "系统管理", name = "用户管理", orderNum = 1, type = "1", url = "/admin/users")
 @Explain(name = "用户管理", notes = "后台用户管理", value = "adminUserService")
 public class AdminUserService {
 
