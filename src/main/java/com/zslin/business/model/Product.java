@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 /**
  * 产品信息
  * @author 钟述林
- * @data generate on: 2019-12-18
+ * @data generate on: 2019-12-24
  */
 @Data
 @Entity
@@ -59,7 +59,12 @@ public class Product implements Serializable {
 	* 显示状态
 	* @remark 0-隐藏；1-显示
 	*/
-	private String status;
+	private String status="0";
+
+	/**
+	* 规格数量
+	*/
+	private Integer specsCount=0;
 
 	/**
 	* 收藏次数
@@ -105,7 +110,7 @@ public class Product implements Serializable {
 	* 公益基金金额
 	* @remark 每个产品统一一个金额，为0时不显示
 	*/
-	private Float fund;
+	private Float fund = 0f;
 
 	/**
 	* 归属省份代码
@@ -131,6 +136,14 @@ public class Product implements Serializable {
 	* 归属县级代码
 	*/
 	private String countyCode;
+
+	private Integer cateId;
+
+	private String cateName;
+
+	private Integer pcateId;
+
+	private String pcateName;
 
 	/**
 	* 归属县级名称

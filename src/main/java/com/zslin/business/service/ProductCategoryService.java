@@ -2,26 +2,37 @@ package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.dao.IProductCategoryDao;
+import com.zslin.business.dao.IProductDao;
+import com.zslin.business.dao.IProductSpecsDao;
+import com.zslin.business.dto.CategoryTreeDto;
+import com.zslin.business.model.Product;
+import com.zslin.business.model.ProductCategory;
+import com.zslin.business.model.ProductSpecs;
+import com.zslin.business.tools.CategoryTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
-import com.zslin.business.dao.IProductCategoryDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
-import com.zslin.business.model.ProductCategory;
+import com.zslin.core.exception.BusinessException;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
+import com.zslin.core.repository.SpecificationOperator;
 import com.zslin.core.tools.JsonTools;
+import com.zslin.core.tools.MyBeanUtils;
+import com.zslin.core.tools.PinyinToolkit;
 import com.zslin.core.tools.QueryTools;
 import com.zslin.core.validate.ValidationDto;
 import com.zslin.core.validate.ValidationTools;
-import com.zslin.core.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import com.zslin.core.tools.MyBeanUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
  * Created by 钟述林 on 2019-12-18.
@@ -33,6 +44,98 @@ public class ProductCategoryService {
 
     @Autowired
     private IProductCategoryDao productCategoryDao;
+
+    @Autowired
+    private IProductDao productDao;
+
+    @Autowired
+    private IProductSpecsDao productSpecsDao;
+
+    @Autowired
+    private CategoryTools categoryTools;
+
+    @AdminAuth(name = "产品分类列表", orderNum = 1)
+    @ExplainOperation(name = "构建分类树", notes = "获取子分类列表", params = {
+            @ExplainParam(name = "父ID", value = "pid", type = "int", example = "1，不传则获取根分类")
+    }, back = {
+            @ExplainReturn(field = "size", type = "int", notes = "数据数量"),
+            @ExplainReturn(field = "datas", type = "Object", notes = "数据列表")
+    })
+    public JsonResult listRoot(String params) {
+        Integer pid = 0; String type = "base";
+
+        try {
+            String pidStr = JsonTools.getJsonParam(params, "pid"); //root_33
+            String [] array = pidStr.split("_");
+            type = array[0];
+            pid = Integer.parseInt(array[1]);
+        } catch (Exception e) {
+        }
+
+        type = ("0".equals(type)?"base":type);
+        //System.out.println("------>"+type+"-------"+pid);
+
+        JsonResult result = JsonResult.getInstance();
+        Sort sort = SimpleSortBuilder.generateSort("orderNo_a");
+
+        if("root".equalsIgnoreCase(type)) { //是根分类，则获取子分类
+//            System.out.println("---------------111");
+//            List<Category> children = categoryDao.findByPid(pid, sort);
+            QueryListDto qld = QueryTools.buildQueryListDto(params);
+            Page<ProductCategory> res = productCategoryDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
+                    new SpecificationOperator("pid", "eq", pid)),
+                    SimplePageBuilder.generate(qld.getPage(), qld.getSize(), sort));
+            result.set("data", res.getContent()).set("category", productCategoryDao.findOne(pid)).set("total", res.getTotalElements());
+        } else if("child".equalsIgnoreCase(type)) { //是子分类，则获取产品列表
+//            System.out.println("---------------222");
+            QueryListDto qld = QueryTools.buildQueryListDto(params);
+            Page<Product> res = productDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
+                    new SpecificationOperator("cateId", "eq", pid)),
+                    SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
+            result.set("proList", res.getContent()).set("category", productCategoryDao.findOne(pid)).set("total", res.getTotalElements());
+        } else if("product".equalsIgnoreCase(type)) { //是产品，则获取产品信息
+//            System.out.println("---------------333");
+            Product pro = productDao.findOne(pid);
+            List<ProductSpecs> specsList = productSpecsDao.findByProId(pid, sort);
+            result.set("product", pro).set("specsList", specsList);
+        } else {
+//            System.out.println("---------------444");
+            List<ProductCategory> list = productCategoryDao.findRoot(SimpleSortBuilder.generateSort("orderNo"));
+            result.set("data", list).set("category", "").set("type", "base");
+        }
+
+        List<CategoryTreeDto> treeList = categoryTools.buildTree();
+        result.set("treeList", treeList).set("type", type);
+        return result;
+    }
+
+    @ExplainOperation(name = "产品分类列表", notes = "获取子分类列表", params = {
+            @ExplainParam(name = "父ID", value = "pid", type = "int", example = "1，不传则获取根分类")
+    }, back = {
+            @ExplainReturn(field = "size", type = "int", notes = "数据数量"),
+            @ExplainReturn(field = "datas", type = "Object", notes = "数据列表")
+    })
+    public JsonResult listChildren(String params) {
+        Integer pid = 0;
+        try { pid = Integer.parseInt(JsonTools.getJsonParam(params, "pid"));} catch (Exception e) {pid=0;}
+        Sort sort = SimpleSortBuilder.generateSort("orderNum_a");
+        List<ProductCategory> categoryList ;
+        if(pid==0) {
+            categoryList = productCategoryDao.findRoot(sort);
+        } else {
+            categoryList = productCategoryDao.findByPid(pid, sort);
+        }
+
+        return JsonResult.getInstance().set("size", categoryList.size()).set("datas", categoryList);
+    }
+
+    @ExplainOperation(name = "获取分类级联数组", notes = "获取分类级联数组", back = {
+            @ExplainReturn(field = "data", type = "Object", notes = "数据列表")
+    })
+    public JsonResult listSelect(String params) {
+        boolean needSub = JsonTools.getParamBoolean(params, "needSub"); //是否必须包含子元素
+        return JsonResult.success("获取成功").set("data", categoryTools.buildSelect(needSub));
+    }
 
     @AdminAuth(name = "产品分类列表", orderNum = 1)
     @ExplainOperation(name = "产品分类列表", notes = "产品分类列表", params= {
@@ -66,6 +169,7 @@ public class ProductCategoryService {
             if(vd.isHasError()) { //如果有验证异常
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
             }
+            obj.setSn(PinyinToolkit.cn2Spell(obj.getName(), "").toUpperCase());
             productCategoryDao.save(obj);
             return JsonResult.succ(obj);
         } catch (Exception e) {
@@ -125,6 +229,9 @@ public class ProductCategoryService {
     public JsonResult delete(String params) {
         try {
             Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
+            if(productCategoryDao.findCountByPid(id)>0) {
+                throw new BusinessException(BusinessException.Code.HAVE_SUBELEMENT, BusinessException.Message.HAVE_SUBELEMENT);
+            }
             ProductCategory r = productCategoryDao.findOne(id);
             productCategoryDao.delete(r);
             return JsonResult.success("删除成功");

@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 产品分类
  * @author 钟述林
- * @data generate on: 2019-12-18
+ * @data generate on: 2019-12-24
  */
 @Data
 @Entity
@@ -23,6 +23,8 @@ public class ProductCategory implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
+	private String sn;
+
 	/**
 	* 名称
 	* @remark 如：苹果
@@ -34,6 +36,11 @@ public class ProductCategory implements Serializable {
 	* 父id
 	*/
 	private Integer pid;
+
+	/**
+	* 排序序号
+	*/
+	private Integer orderNo;
 
 	/**
 	* 父名称

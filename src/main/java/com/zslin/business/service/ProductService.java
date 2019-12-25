@@ -89,7 +89,20 @@ public class ProductService {
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
             }
             Product obj = productDao.findOne(o.getId());
-            MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay");
+//            MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay");
+            obj.setTitle(o.getTitle());
+            obj.setProvinceCode(o.getProvinceCode());
+            obj.setProvinceName(o.getProvinceName());
+            obj.setCityCode(o.getCityCode());
+            obj.setCityName(o.getCityName());
+            obj.setCountyCode(o.getCountyCode());
+            obj.setCountyName(o.getCountyName());
+            obj.setCateId(o.getCateId());
+            obj.setCateName(o.getCateName());
+            obj.setPcateId(o.getPcateId());
+            obj.setPcateName(o.getPcateName());
+            obj.setContent(o.getContent());
+            obj.setFund(o.getFund());
             productDao.save(obj);
             return JsonResult.getInstance().set("obj", obj);
         } catch (Exception e) {

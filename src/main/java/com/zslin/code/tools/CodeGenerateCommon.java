@@ -157,16 +157,28 @@ public class CodeGenerateCommon {
         return sb.toString();
     }
 
+    private static boolean hasNotes(FieldDto fd) {
+        return (!NormalTools.isNull(fd.getRemark()) || !NormalTools.isNull(fd.getDesc()));
+    }
+
     private static String buildSingleField(FieldDto fd) {
         StringBuffer sb = new StringBuffer();
         String type = fd.getType();
-        sb.append(getLine())
-                .append(getTab()).append("/**").append(getLine())
-                .append(getTab()).append("* ").append(fd.getDesc()).append(getLine());
-        if(fd.getRemark()!=null && !"".equals(fd.getRemark())) {
+        String desc = fd.getDesc();
+        if(hasNotes(fd)) {
+            sb.append(getLine())
+                    .append(getTab()).append("/**").append(getLine());
+        }
+        if(!NormalTools.isNull(fd.getDesc())) {
+            sb.append(getTab()).append("* ").append(fd.getDesc()).append(getLine());
+        }
+        if(!NormalTools.isNull(fd.getRemark())) {
             sb.append(getTab()).append("* @remark ").append(fd.getRemark()).append(getLine());
         }
-        sb.append(getTab()).append("*/").append(getLine());
+        if(hasNotes(fd)) {
+            sb.append(getTab()).append("*/");
+        }
+        sb.append(getLine());
         if("longString".equalsIgnoreCase(type)) {
             sb.append(getTab()).append("@Lob").append(getLine());
             type = "String";
@@ -300,7 +312,7 @@ public class CodeGenerateCommon {
                 sb.append("import javax.validation.constraints.").append(t).append(";\n");
             }
         }
-        log.info("--->"+sb.toString());
+//        log.info("--->"+sb.toString());
         return sb.toString();
     }
 

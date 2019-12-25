@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 七牛配置
  * @author 钟述林
- * @data generate on: 2019-12-18
+ * @data generate on: 2019-12-24
  */
 @Data
 @Entity
@@ -41,9 +41,6 @@ public class QiniuConfig implements Serializable {
 	@NotBlank(message="链接地址不能为空")
 	private String url;
 
-	/**
-	* 
-	*/
 	@NotBlank(message="仓库名称不能为空")
 	private String bucketName;
 

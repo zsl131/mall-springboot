@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 客户
  * @author 钟述林
- * @data generate on: 2019-12-18
+ * @data generate on: 2019-12-24
  */
 @Data
 @Entity
@@ -22,14 +22,8 @@ public class Customer implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
-	/**
-	* 
-	*/
 	private String openid;
 
-	/**
-	* 
-	*/
 	private String unionid;
 
 	/**

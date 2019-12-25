@@ -68,6 +68,7 @@ public class UploadController {
                 BufferedOutputStream bw = null;
                 try {
                     //System.out.println("---->"+extra);
+                    log.info("上传参数：{}。", extra);
                     UploadParam param = UploadParamsTools.buildParams(extra); //参数DTO对象
                     log.info(param.toString());
                     boolean isEditor = param.isEditor();
@@ -120,9 +121,9 @@ public class UploadController {
                     m.setCreateLong(System.currentTimeMillis());
                     mediumDao.save(m); //保存
                     if(isEditor) {
-                        result.add(m.getRootUrl() + "/" + m.getQiniuKey());
+                        result.add(m.getRootUrl() + (m.getRootUrl().endsWith("/")?"":"/") + m.getQiniuKey());
                     } else {
-                        result.add(m.getId(), m.getRootUrl() + "/" + m.getQiniuKey());
+                        result.add(m.getId(), m.getRootUrl() + (m.getRootUrl().endsWith("/")?"":"/") + m.getQiniuKey());
                     }
                 } catch (IOException e) {
                     e.printStackTrace();

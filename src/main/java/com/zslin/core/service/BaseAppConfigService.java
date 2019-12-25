@@ -31,7 +31,7 @@ import java.security.NoSuchAlgorithmException;
  */
 @Service
 @Explain(name = "系统配置管理", notes = "系统配置管理")
-@AdminAuth(psn = "系统管理", name = "基础配置", orderNum = 1, type = "1", url = "/admin/appConfig")
+@AdminAuth(psn = "系统管理", name = "基础配置", orderNum = 1, type = "1", url = "/admin/basic/appConfig")
 public class BaseAppConfigService {
 
     @Autowired

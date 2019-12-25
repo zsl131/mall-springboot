@@ -59,6 +59,40 @@ public class JsonTools {
         return result;
     }
 
+    /**
+     * 获取boolean属性
+     * @param jsonStr json数据
+     * @param field 对应属性名
+     * @return
+     */
+    public static boolean getParamBoolean(String jsonStr, String field) {
+        try {
+            String result = getJsonParam(jsonStr, field);
+            boolean res = Boolean.parseBoolean(result);
+            return res;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    /**
+     * 获取Integer属性
+     * @param jsonStr json数据
+     * @param field 对应属性名
+     * @return
+     */
+    public static Integer getParamInteger(String jsonStr, String field) {
+        try {
+            String result = getJsonParam(jsonStr, field);
+            Integer res = Integer.parseInt(result);
+            return res;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public static Integer getId(String jsonStr) {
         try {
             return Integer.parseInt(JsonTools.getJsonParam(jsonStr, "id"));

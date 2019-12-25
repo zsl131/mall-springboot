@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 搜索记录
  * @author 钟述林
- * @data generate on: 2019-12-18
+ * @data generate on: 2019-12-24
  */
 @Data
 @Entity
@@ -55,9 +55,6 @@ public class SearchRecord implements Serializable {
 	*/
 	private String openid;
 
-	/**
-	* 
-	*/
 	private String unionid;
 
 	/**

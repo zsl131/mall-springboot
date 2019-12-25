@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@AdminAuth(name = "任务管理", psn = "系统管理", orderNum = 4, type = "1", url = "/admin/baseTask")
+@AdminAuth(name = "任务管理", psn = "系统管理", orderNum = 4, type = "1", url = "/admin/basic/baseTask")
 @Explain(name = "系统任务管理", notes = "系统任务管理")
 @Slf4j
 public class AdminBaseTaskService {

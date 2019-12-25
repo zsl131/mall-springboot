@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单
  * @author 钟述林
- * @data generate on: 2019-12-18
+ * @data generate on: 2019-12-24
  */
 @Data
 @Entity
@@ -27,14 +27,8 @@ public class Orders implements Serializable {
 	*/
 	private String ordersNo;
 
-	/**
-	* 
-	*/
 	private String openid;
 
-	/**
-	* 
-	*/
 	private String unionid;
 
 	/**

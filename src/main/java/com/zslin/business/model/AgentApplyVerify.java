@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理申请审核
  * @author 钟述林
- * @data generate on: 2019-12-18
+ * @data generate on: 2019-12-24
  */
 @Data
 @Entity
@@ -27,14 +27,8 @@ public class AgentApplyVerify implements Serializable {
 	*/
 	private Integer agentId;
 
-	/**
-	* 
-	*/
 	private String openid;
 
-	/**
-	* 
-	*/
 	private String unionid;
 
 	/**

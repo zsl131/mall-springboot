@@ -1,5 +1,6 @@
 package com.zslin.test;
 
+import com.zslin.business.dao.IProductDao;
 import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.tools.AccessTokenTools;
 import com.zslin.business.mini.tools.MiniCommonTools;
@@ -36,6 +37,14 @@ public class NormalTest {
 
     @Autowired
     private BeanCheckTools beanCheckTools;
+
+    @Autowired
+    private IProductDao productDao;
+
+    @Test
+    public void test10() {
+        productDao.updateSpecsCount(5, 1);
+    }
 
     @Test
     public void test09() {

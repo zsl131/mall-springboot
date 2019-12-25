@@ -28,7 +28,7 @@ import java.util.List;
  * Created by zsl on 2018/7/13.
  */
 @Service
-@AdminAuth(name = "菜单管理", psn = "系统管理", orderNum = 3, type = "1", url = "/admin/menu")
+@AdminAuth(name = "菜单管理", psn = "系统管理", orderNum = 3, type = "1", url = "/admin/basic/menu")
 @Explain(name = "系统菜单管理", notes = "系统菜单管理")
 public class AdminMenuService {
 
