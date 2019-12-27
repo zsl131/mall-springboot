@@ -30,7 +30,6 @@ import java.util.List;
  * Created by 钟述林 on 2019-12-18.
  */
 @Service
-@AdminAuth(name = "产品规格管理", psn = "产品管理", orderNum = 2, type = "1", url = "/admin/productSpecs")
 @Explain(name = "产品规格管理", notes = "产品规格管理")
 public class ProductSpecsService {
 

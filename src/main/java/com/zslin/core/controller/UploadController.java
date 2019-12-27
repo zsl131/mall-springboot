@@ -81,6 +81,7 @@ public class UploadController {
                     m.setObjClassName(objType);
                     m.setTicket(param.getTicket());
                     m.setOrderNo(param.getOrderNo());
+                    m.setObjId(param.getObjId());
                     m.setIsFirst(param.getIsFirst());
                     m.setType(MyFileTools.getFileEngType(fileName));
                     m.setRootUrl(qiniuConfig.getUrl());

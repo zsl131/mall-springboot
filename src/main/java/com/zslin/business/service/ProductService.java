@@ -74,6 +74,27 @@ public class ProductService {
         }
     }
 
+    @ExplainOperation(name = "修改产品状态", notes = "修改产品状态", params = {
+            @ExplainParam(value = "id", name = "产品信息id", require = true, type = "int", example = "1"),
+            @ExplainParam(value = "status", name = "状态标识", type = "String", example = "1")
+    }, back = {
+            @ExplainReturn(field = "message", notes = "提示信息"),
+            @ExplainReturn(field = "flag", notes = "结果标识")
+    })
+    public JsonResult modifyStatus(String params) {
+        Integer id = JsonTools.getId(params);
+        String status = JsonTools.getJsonParam(params, "status");
+        String message = "设置成功";
+        String flag = "1";
+        if("1".equals(status)) { //如果是设置为显示，则需要进行一些判断
+            Product pro = productDao.findOne(id);
+            if(pro.getSurplusCount()==null || pro.getSurplusCount()<=0) {message = "库存数必须大于0"; flag = "0";}
+            if(pro.getPicCount()==null || pro.getPicCount()<=0) {message = "必须先上传图片信息"; flag = "0";}
+        }
+        if("1".equals(flag)) {productDao.updateStatus(status, id);}
+        return JsonResult.success(message).set("flag", flag);
+    }
+
     @AdminAuth(name = "修改产品信息", orderNum = 3)
     @ExplainOperation(name = "修改产品信息", notes = "修改产品信息信息", params = {
             @ExplainParam(value = "id", name = "产品信息id", require = true, type = "int", example = "1"),
@@ -103,6 +124,7 @@ public class ProductService {
             obj.setPcateName(o.getPcateName());
             obj.setContent(o.getContent());
             obj.setFund(o.getFund());
+            obj.setSurplusCount(o.getSurplusCount());
             productDao.save(obj);
             return JsonResult.getInstance().set("obj", obj);
         } catch (Exception e) {
@@ -136,16 +158,31 @@ public class ProductService {
             @ExplainReturn(field = "flag", notes = "删除标识")
     })
     public JsonResult delete(String params) {
-        try {
-            Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
-            Product r = productDao.findOne(id);
-            productDao.delete(r);
-            return JsonResult.success("删除成功");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return JsonResult.error(e.getMessage());
-        }
+        Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
+        Product r = productDao.findOne(id);
+        if(r.getPicCount()>0) {throw new BusinessException(BusinessException.Code.HAVE_SUBELEMENT, "有图片信息，不能删除");}
+        if(r.getReplyCount()>0) {throw new BusinessException(BusinessException.Code.HAVE_SUBELEMENT, "有评论信息，不能删除");}
+        if(r.getVideoCount()>0) {throw new BusinessException(BusinessException.Code.HAVE_SUBELEMENT, "有视频信息，不能删除");}
+        if(r.getSaleCount()>0) {throw new BusinessException(BusinessException.Code.HAVE_SUBELEMENT, "有订单信息，不能删除");}
+        if(r.getSpecsCount()>0) {throw new BusinessException(BusinessException.Code.HAVE_SUBELEMENT, "有规格信息，不能删除");}
+        productDao.delete(r);
+        return JsonResult.success("删除成功");
     }
 
-
+    @ExplainOperation(name = "修改产品的计量值", notes = "修改产品的计量值", params = {
+            @ExplainParam(value = "id", name = "对象ID", type = "int", require = true, example = "1"),
+            @ExplainParam(value = "amount", name = "计量值", type = "int", require = true, example = "1"),
+            @ExplainParam(value = "field", name = "计量属性", example = "picCount"),
+    }, back = {
+            @ExplainReturn(field = "message", notes = "提示信息")
+    })
+    public JsonResult plusCount(String params) {
+        Integer id = JsonTools.getId(params);
+        Integer amount = JsonTools.getParamInteger(params, "amount");
+        String field = JsonTools.getJsonParam(params, "field");
+        String hql = "UPDATE Product p SET p."+field+"=p."+field+"+"+amount+" WHERE p.id=?1 ";
+        //System.out.println("----------------->hql:"+hql);
+        productDao.updateByHql(hql, id);
+        return JsonResult.success("操作成功");
+    }
 }

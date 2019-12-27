@@ -21,6 +21,8 @@ public interface IMediumDao extends BaseRepository<Medium, Integer>, JpaSpecific
     @Transactional
     Integer modifyOwn(Integer objId, String objType, String ticket);
 
+    List<Medium> findByObjClassNameAndObjId(String objClassName, Integer objId, Sort sort);
+
     Medium findByTicket(String ticket);
 
     List<Medium> findByObjIdAndObjClassNameAndIsFirst(Integer objId, String objClassName, String isFirst, Sort sort);

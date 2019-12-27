@@ -95,6 +95,7 @@ public class ApiController {
                 result = JsonResult.getInstance().failLogin("无权访问，请先登陆");
             }
             return result;
+            //IllegalAccessException, IllegalArgumentException,InvocationTargetException
         } catch(ArrayIndexOutOfBoundsException e) {
             e.printStackTrace();
             return JsonResult.getInstance().fail(BusinessException.Code.API_ERR_FORMAT, BusinessException.Message.API_ERR_FORMAT);
@@ -114,8 +115,9 @@ public class ApiController {
                 BusinessException exc = (BusinessException) e.getTargetException();
                 return JsonResult.getInstance().fail(exc.getCode(), "异常："+exc.getMsg());
             } catch (Exception ex) {
-                ex.printStackTrace();
-                return JsonResult.getInstance().fail("数据请求失败："+ex.getMessage());
+                String msg = e.getTargetException().getMessage();
+                e.getTargetException().printStackTrace();
+                return JsonResult.getInstance().fail("数据请求失败："+msg);
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -3,6 +3,7 @@ package com.zslin.core.tools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.dao.IAdminMenuDao;
 import com.zslin.core.model.AdminMenu;
+import com.zslin.core.repository.SimpleSortBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
@@ -12,10 +13,12 @@ import org.springframework.core.type.MethodMetadata;
 import org.springframework.core.type.classreading.CachingMetadataReaderFactory;
 import org.springframework.core.type.classreading.MetadataReader;
 import org.springframework.core.type.classreading.MetadataReaderFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,6 +30,27 @@ public class BuildAdminMenuTools {
 
     @Autowired
     private IAdminMenuDao menuDao;
+
+    public void buildAdminMenusOrderNo() {
+        Sort sort = SimpleSortBuilder.generateSort("orderNo_a");
+        List<AdminMenu> root = menuDao.findRootMenu(sort);
+        Integer index = 1;
+        for(AdminMenu r : root) {
+            menuDao.updateOrderNo(index++, r.getId());
+            buildAdminMenusOrderNo(r.getId(), sort);
+        }
+    }
+
+    private void buildAdminMenusOrderNo(Integer pid, Sort sort) {
+        List<AdminMenu> list = menuDao.findByParent(pid, sort);
+        if(list!=null && list.size()>0) {
+            int index = 1;
+            for(AdminMenu m : list) {
+                menuDao.updateOrderNo(index++, m.getId());
+                buildAdminMenusOrderNo(m.getId(), sort);
+            }
+        }
+    }
 
     public void buildAdminMenus() {
 //        String pn = "com/zslin/*/dao/*Service.class";

@@ -27,6 +27,9 @@ public class UploadParam {
     /** 归属对象类型 */
     private String objClassName;
 
+    /** 归属对象ID */
+    private Integer objId=0;
+
     /** 排序序号 */
     private Integer orderNo = 0;
 

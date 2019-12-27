@@ -47,6 +47,32 @@ public class AdminMenuService {
     @Autowired
     private AuthRoleMenuTools authRoleMenuTools;
 
+    @ExplainOperation(name = "交换菜单序号", notes = "交换菜单序号", params = {
+            @ExplainParam(name = "id1", value = "第一个菜单ID", type = "int", example = "1"),
+            @ExplainParam(name = "no1", value = "第一个菜单OrderNo", type = "int", example = "1"),
+            @ExplainParam(name = "id2", value = "第二个菜单OrderNo", type = "int", example = "1"),
+            @ExplainParam(name = "no2", value = "第二个菜单OrderNo", type = "int", example = "1"),
+    }, back = {
+            @ExplainReturn(field = "message", notes = "初始化结果信息")
+    })
+    public JsonResult changeOrderNo(String params) {
+        Integer id1 = JsonTools.getParamInteger(params, "id1");
+        Integer id2 = JsonTools.getParamInteger(params, "id2");
+        Integer no1 = JsonTools.getParamInteger(params, "no1");
+        Integer no2 = JsonTools.getParamInteger(params, "no2");
+        menuDao.updateOrderNo(no1, id2); //交换两菜单的序号
+        menuDao.updateOrderNo(no2, id1); //交换两菜单的序号
+        return JsonResult.success("设置成功");
+    }
+
+    @ExplainOperation(name = "初始化菜单序号", notes = "为每个菜单生成一个不重复的序号", back = {
+            @ExplainReturn(field = "message", notes = "初始化结果信息")
+    })
+    public JsonResult initOrderNo(String params) {
+        buildAdminMenuTools.buildAdminMenusOrderNo(); //重新生成序号
+        return JsonResult.success("初始化成功");
+    }
+
     @AdminAuth(name = "初始化菜单", orderNum = 6)
     @ExplainOperation(name = "初始化系统菜单", notes = "当系统中增加功能是可以通过此功能增加相应功能菜单", back = {
             @ExplainReturn(field = "message", notes = "初始化结果信息")

@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 /**
  * 产品信息
  * @author 钟述林
- * @data generate on: 2019-12-24
+ * @data generate on: 2019-12-25
  */
 @Data
 @Entity
@@ -83,6 +83,16 @@ public class Product implements Serializable {
 	private Integer saleCount=0;
 
 	/**
+	* 图片数量
+	*/
+	private Integer picCount=0;
+
+	/**
+	* 视频数量
+	*/
+	private Integer videoCount=0;
+
+	/**
 	* 默认销售量
 	* @remark 此数值仅用于前期销售量的显示
 	*/
@@ -110,7 +120,7 @@ public class Product implements Serializable {
 	* 公益基金金额
 	* @remark 每个产品统一一个金额，为0时不显示
 	*/
-	private Float fund = 0f;
+	private Float fund=0f;
 
 	/**
 	* 归属省份代码

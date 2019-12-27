@@ -24,6 +24,27 @@ public class CategoryTools {
     @Autowired
     private IProductDao productDao;
 
+    public void buildCategoryOrderNo() {
+        Sort sort = SimpleSortBuilder.generateSort("orderNo_a");
+        List<ProductCategory> root = categoryDao.findRoot(sort);
+        Integer index = 1;
+        for(ProductCategory r : root) {
+            categoryDao.updateOrderNo(index++, r.getId());
+            buildCategoryOrderNo(r.getId(), sort);
+        }
+    }
+
+    private void buildCategoryOrderNo(Integer pid, Sort sort) {
+        List<ProductCategory> list = categoryDao.findByPid(pid, sort);
+        if(list!=null && list.size()>0) {
+            int index = 1;
+            for(ProductCategory m : list) {
+                categoryDao.updateOrderNo(index++, m.getId());
+                buildCategoryOrderNo(m.getId(), sort);
+            }
+        }
+    }
+
     /**
      * 生成分类数据的树结构数据
      * @return

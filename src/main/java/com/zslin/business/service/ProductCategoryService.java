@@ -54,6 +54,32 @@ public class ProductCategoryService {
     @Autowired
     private CategoryTools categoryTools;
 
+    @ExplainOperation(name = "交换产品分类序号", notes = "交换产品分类序号", params = {
+            @ExplainParam(name = "id1", value = "第一个分类ID", type = "int", example = "1"),
+            @ExplainParam(name = "no1", value = "第一个分类OrderNo", type = "int", example = "1"),
+            @ExplainParam(name = "id2", value = "第二个分类OrderNo", type = "int", example = "1"),
+            @ExplainParam(name = "no2", value = "第二个分类OrderNo", type = "int", example = "1"),
+    }, back = {
+            @ExplainReturn(field = "message", notes = "初始化结果信息")
+    })
+    public JsonResult changeOrderNo(String params) {
+        Integer id1 = JsonTools.getParamInteger(params, "id1");
+        Integer id2 = JsonTools.getParamInteger(params, "id2");
+        Integer no1 = JsonTools.getParamInteger(params, "no1");
+        Integer no2 = JsonTools.getParamInteger(params, "no2");
+        productCategoryDao.updateOrderNo(no1, id2); //交换两菜单的序号
+        productCategoryDao.updateOrderNo(no2, id1); //交换两菜单的序号
+        return JsonResult.success("设置成功");
+    }
+
+    @ExplainOperation(name = "初始化产品分类序号", notes = "为每个产品分类生成一个不重复的序号", back = {
+            @ExplainReturn(field = "message", notes = "初始化结果信息")
+    })
+    public JsonResult initOrderNo(String params) {
+        categoryTools.buildCategoryOrderNo(); //重新生成序号
+        return JsonResult.success("初始化成功");
+    }
+
     @AdminAuth(name = "产品分类列表", orderNum = 1)
     @ExplainOperation(name = "构建分类树", notes = "获取子分类列表", params = {
             @ExplainParam(name = "父ID", value = "pid", type = "int", example = "1，不传则获取根分类")

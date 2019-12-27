@@ -4,7 +4,9 @@ import com.zslin.core.model.AdminMenu;
 import com.zslin.core.repository.BaseRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -43,4 +45,9 @@ public interface IAdminMenuDao extends BaseRepository<AdminMenu, Integer>, JpaSp
 
     @Query("SELECT id from AdminMenu")
     List<Integer> findAllIds();
+
+    @Query("UPDATE AdminMenu m SET m.orderNo=?1 WHERE m.id=?2 ")
+    @Modifying
+    @Transactional
+    void updateOrderNo(Integer orderNo, Integer id);
 }

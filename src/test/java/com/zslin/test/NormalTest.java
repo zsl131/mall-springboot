@@ -8,6 +8,7 @@ import com.zslin.business.mini.tools.MiniUtils;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.tasker.BeanCheckTools;
 import com.zslin.core.tools.Base64Utils;
+import com.zslin.core.tools.BuildAdminMenuTools;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,14 @@ public class NormalTest {
 
     @Autowired
     private IProductDao productDao;
+
+    @Autowired
+    private BuildAdminMenuTools buildAdminMenuTools;
+
+    @Test
+    public void test11() {
+        buildAdminMenuTools.buildAdminMenusOrderNo();
+    }
 
     @Test
     public void test10() {
