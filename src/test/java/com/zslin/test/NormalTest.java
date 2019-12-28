@@ -9,6 +9,7 @@ import com.zslin.core.common.NormalTools;
 import com.zslin.core.tasker.BeanCheckTools;
 import com.zslin.core.tools.Base64Utils;
 import com.zslin.core.tools.BuildAdminMenuTools;
+import com.zslin.core.tools.SortTools;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,16 @@ public class NormalTest {
 
     @Autowired
     private BuildAdminMenuTools buildAdminMenuTools;
+
+    @Autowired
+    private SortTools sortTools;
+
+    @Test
+    public void test12() {
+        String str = "[{\"orderNo\":4,\"name\":\"移动端管理\",\"id\":158},{\"orderNo\":2,\n" +
+                "\"name\":\"七牛管理\",\"id\":271},{\"orderNo\":3,\"name\":\"产品管理\",\"id\":235}]";
+        sortTools.handler("AdminMenu", str);
+    }
 
     @Test
     public void test11() {

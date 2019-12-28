@@ -2,25 +2,26 @@ package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.dao.IAppModuleDao;
+import com.zslin.business.model.AppModule;
+import com.zslin.business.tools.AppModuleTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
-import com.zslin.business.dao.IAppModuleDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
-import com.zslin.business.model.AppModule;
+import com.zslin.core.exception.BusinessException;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
+import com.zslin.core.tools.MyBeanUtils;
 import com.zslin.core.tools.QueryTools;
 import com.zslin.core.validate.ValidationDto;
 import com.zslin.core.validate.ValidationTools;
-import com.zslin.core.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,6 +34,17 @@ public class AppModuleService {
 
     @Autowired
     private IAppModuleDao appModuleDao;
+
+    @Autowired
+    private AppModuleTools appModuleTools;
+
+    @ExplainOperation(name = "初始化模块序号", notes = "为每个模块生成一个不重复的序号", back = {
+            @ExplainReturn(field = "message", notes = "初始化结果信息")
+    })
+    public JsonResult initOrderNo(String params) {
+        appModuleTools.buildModuleOrderNo(); //重新生成序号
+        return JsonResult.success("初始化成功");
+    }
 
     @AdminAuth(name = "移动端首页大功能展示列表", orderNum = 1)
     @ExplainOperation(name = "移动端首页大功能展示列表", notes = "移动端首页大功能展示列表", params= {
@@ -134,5 +146,19 @@ public class AppModuleService {
         }
     }
 
-
+    @ExplainOperation(name = "修改模块状态", notes = "修改模块状态", params = {
+            @ExplainParam(value = "id", name = "产品信息id", require = true, type = "int", example = "1"),
+            @ExplainParam(value = "status", name = "状态标识", type = "String", example = "1")
+    }, back = {
+            @ExplainReturn(field = "message", notes = "提示信息"),
+            @ExplainReturn(field = "flag", notes = "结果标识")
+    })
+    public JsonResult modifyStatus(String params) {
+        Integer id = JsonTools.getId(params);
+        String status = JsonTools.getJsonParam(params, "status");
+        String message = "设置成功";
+        String flag = "1";
+        if("1".equals(flag)) {appModuleDao.updateStatus(status, id);}
+        return JsonResult.success(message).set("flag", flag);
+    }
 }

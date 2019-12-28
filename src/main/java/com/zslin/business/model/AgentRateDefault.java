@@ -8,32 +8,33 @@ import java.io.Serializable;
 
 
 /**
- * 代理等级关系
+ * 代理默认提成标准
  * @author 钟述林
  * @data generate on: 2019-12-28
  */
 @Data
 @Entity
-@Table(name = "business_agent_level_relation")
+@Table(name = "business_agent_rate_default")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AgentLevelRelation implements Serializable {
+public class AgentRateDefault implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
 	/**
-	* 代理ID
-	*/
-	private Integer agentId;
-
-	private String openid;
-
-	private String unionid;
-
-	/**
 	* 等级ID
 	*/
 	private Integer levelId;
+
+	/**
+	* 等级名称
+	*/
+	private String levelName;
+
+	/**
+	* 默认提成标准
+	*/
+	private Float amount;
 
 }

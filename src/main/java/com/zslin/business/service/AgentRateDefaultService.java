@@ -2,16 +2,15 @@ package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.zslin.business.tools.AgentRateTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
-import com.zslin.business.dao.IAgentLevelDao;
+import com.zslin.business.dao.IAgentRateDefaultDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
-import com.zslin.business.model.AgentLevel;
+import com.zslin.business.model.AgentRateDefault;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
@@ -25,54 +24,49 @@ import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
 
 /**
- * Created by 钟述林 on 2019-12-18.
+ * Created by 钟述林 on 2019-12-28.
  */
 @Service
-@AdminAuth(name = "代理等级管理", psn = "销售管理", orderNum = 2, type = "1", url = "/admin/agentLevel")
-@Explain(name = "代理等级管理", notes = "代理等级管理")
-public class AgentLevelService {
+@AdminAuth(name = "代理默认提成标准管理", psn = "销售管理", orderNum = 2, type = "1", url = "/admin/agentRateDefault")
+@Explain(name = "代理默认提成标准管理", notes = "代理默认提成标准管理")
+public class AgentRateDefaultService {
 
     @Autowired
-    private IAgentLevelDao agentLevelDao;
+    private IAgentRateDefaultDao agentRateDefaultDao;
 
-    @Autowired
-    private AgentRateTools agentRateTools;
-
-    @AdminAuth(name = "代理等级列表", orderNum = 1)
-    @ExplainOperation(name = "代理等级列表", notes = "代理等级列表", params= {
+    @AdminAuth(name = "代理默认提成标准列表", orderNum = 1)
+    @ExplainOperation(name = "代理默认提成标准列表", notes = "代理默认提成标准列表", params= {
              @ExplainParam(value = "page", name = "页码，从0开始，默认0", require = false, type = "int", example = "0"),
              @ExplainParam(value = "size", name = "每页条数，默认15答", require = false, type = "int", example = "15"),
              @ExplainParam(value = "sort", name = "排序，id_desc表示根据id降序", require = false, type = "String", example = "id_desc"),
              @ExplainParam(value = "conditions", name = "筛选条件，id_eq:5表示id=5", require = false, type = "String", example = "id_eq:5")
      }, back = {
-             @ExplainReturn(field = "size", type = "int", notes = "代理等级数量"),
-             @ExplainReturn(field = "datas", type = "Object", notes = "代理等级数组对象")
+             @ExplainReturn(field = "size", type = "int", notes = "代理默认提成标准数量"),
+             @ExplainReturn(field = "datas", type = "Object", notes = "代理默认提成标准数组对象")
      })
      public JsonResult list(String params) {
          QueryListDto qld = QueryTools.buildQueryListDto(params);
-         Page<AgentLevel> res = agentLevelDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList()),
+         Page<AgentRateDefault> res = agentRateDefaultDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList()),
                  SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
 
          return JsonResult.getInstance().set("size", (int) res.getTotalElements()).set("datas", res.getContent());
      }
 
-    @AdminAuth(name = "添加代理等级", orderNum = 2)
-    @ExplainOperation(name = "添加代理等级", notes = "添加代理等级信息", params = {
-            @ExplainParam(value = "id", name = "代理等级id", require = true, type = "int", example = "1"),
+    @AdminAuth(name = "添加代理默认提成标准", orderNum = 2)
+    @ExplainOperation(name = "添加代理默认提成标准", notes = "添加代理默认提成标准信息", params = {
+            @ExplainParam(value = "id", name = "代理默认提成标准id", require = true, type = "int", example = "1"),
             @ExplainParam(value = "...", name = "其他信息", type = "Object", example = "对应其他数据")
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "添加成功的对象信息")
     })
     public JsonResult add(String params) {
         try {
-            AgentLevel obj = JSONObject.toJavaObject(JSON.parseObject(params), AgentLevel.class);
+            AgentRateDefault obj = JSONObject.toJavaObject(JSON.parseObject(params), AgentRateDefault.class);
             ValidationDto vd = ValidationTools.buildValidate(obj);
             if(vd.isHasError()) { //如果有验证异常
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
             }
-            agentLevelDao.save(obj);
-
-            agentRateTools.initDefault(); //处理默认提成标准
+            agentRateDefaultDao.save(obj);
             return JsonResult.succ(obj);
         } catch (Exception e) {
             e.printStackTrace();
@@ -80,25 +74,24 @@ public class AgentLevelService {
         }
     }
 
-    @AdminAuth(name = "修改代理等级", orderNum = 3)
-    @ExplainOperation(name = "修改代理等级", notes = "修改代理等级信息", params = {
-            @ExplainParam(value = "id", name = "代理等级id", require = true, type = "int", example = "1"),
+    @AdminAuth(name = "修改代理默认提成标准", orderNum = 3)
+    @ExplainOperation(name = "修改代理默认提成标准", notes = "修改代理默认提成标准信息", params = {
+            @ExplainParam(value = "id", name = "代理默认提成标准id", require = true, type = "int", example = "1"),
             @ExplainParam(value = "...", name = "其他信息", type = "Object", example = "对应其他数据")
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "对应的对象信息")
     })
     public JsonResult update(String params) {
         try {
-            AgentLevel o = JSONObject.toJavaObject(JSON.parseObject(params), AgentLevel.class);
+            AgentRateDefault o = JSONObject.toJavaObject(JSON.parseObject(params), AgentRateDefault.class);
             ValidationDto vd = ValidationTools.buildValidate(o);
             if(vd.isHasError()) { //如果有验证异常
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
             }
-            AgentLevel obj = agentLevelDao.findOne(o.getId());
-            MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay");
-            agentLevelDao.save(obj);
-
-            agentRateTools.initDefault(); //处理默认提成标准
+            AgentRateDefault obj = agentRateDefaultDao.findOne(o.getId());
+//            MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay");
+            obj.setAmount(o.getAmount());
+            agentRateDefaultDao.save(obj);
             return JsonResult.getInstance().set("obj", obj);
         } catch (Exception e) {
             e.printStackTrace();
@@ -106,16 +99,16 @@ public class AgentLevelService {
         }
     }
 
-    @AdminAuth(name = "获取代理等级", orderNum = 5)
-    @ExplainOperation(name = "获取代理等级信息", notes = "通过ID获取角色对象", params = {
-            @ExplainParam(value = "id", name = "代理等级ID", require = true, type = "int", example = "1")
+    @AdminAuth(name = "获取代理默认提成标准", orderNum = 5)
+    @ExplainOperation(name = "获取代理默认提成标准信息", notes = "通过ID获取角色对象", params = {
+            @ExplainParam(value = "id", name = "代理默认提成标准ID", require = true, type = "int", example = "1")
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "获取到的对象信息")
     })
     public JsonResult loadOne(String params) {
         try {
             Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
-            AgentLevel obj = agentLevelDao.findOne(id);
+            AgentRateDefault obj = agentRateDefaultDao.findOne(id);
             return JsonResult.getInstance().set("obj", obj);
         } catch (Exception e) {
             e.printStackTrace();
@@ -123,8 +116,8 @@ public class AgentLevelService {
         }
     }
 
-    @AdminAuth(name = "删除代理等级", orderNum = 4)
-    @ExplainOperation(name = "删除代理等级", notes = "通过ID删除对象", params = {
+    @AdminAuth(name = "删除代理默认提成标准", orderNum = 4)
+    @ExplainOperation(name = "删除代理默认提成标准", notes = "通过ID删除对象", params = {
             @ExplainParam(value = "id", name = "对象ID", type = "int", require = true, example = "1")
     }, back = {
             @ExplainReturn(field = "message", notes = "提示信息"),
@@ -133,10 +126,8 @@ public class AgentLevelService {
     public JsonResult delete(String params) {
         try {
             Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
-            AgentLevel r = agentLevelDao.findOne(id);
-            agentLevelDao.delete(r);
-
-            agentRateTools.initDefault(); //处理默认提成标准
+            AgentRateDefault r = agentRateDefaultDao.findOne(id);
+            agentRateDefaultDao.delete(r);
             return JsonResult.success("删除成功");
         } catch (Exception e) {
             e.printStackTrace();
