@@ -135,7 +135,7 @@ public class AppNoticeService {
     }
 
     @ExplainOperation(name = "修改公告状态", notes = "修改公告状态", params = {
-            @ExplainParam(value = "id", name = "产品信息id", require = true, type = "int", example = "1"),
+            @ExplainParam(value = "id", name = "对象id", require = true, type = "int", example = "1"),
             @ExplainParam(value = "status", name = "状态标识", type = "String", example = "1")
     }, back = {
             @ExplainReturn(field = "message", notes = "提示信息"),

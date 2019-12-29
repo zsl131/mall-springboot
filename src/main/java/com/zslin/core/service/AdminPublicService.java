@@ -23,7 +23,6 @@ public class AdminPublicService {
             @ExplainReturn(field = "message", notes = "初始化结果信息")
     })
     public JsonResult changeOrderNo(String params) {
-        System.out.println(params);
         String type = JsonTools.getJsonParam(params, "type");
         String data = JsonTools.getJsonParam(params, "data");
         sortTools.handler(type, data);

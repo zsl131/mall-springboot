@@ -19,7 +19,7 @@ public class SortTools {
         JSONArray jsonArray = JsonTools.str2JsonArray(sortArrayJson);
         for(int i=0;i<jsonArray.size();i++) {
             JSONObject obj = jsonArray.getJSONObject(i);
-            System.out.println(obj.getString("name")+"------->"+obj.getInteger("orderNo"));
+//            System.out.println(obj.getString("name")+"------->"+obj.getInteger("orderNo"));
             String hql = "UPDATE "+type+" o SET o.orderNo=?1 WHERE o.id=?2 ";
             adminMenuDao.updateByHql(hql, obj.getInteger("orderNo"), obj.getInteger("id"));
         }

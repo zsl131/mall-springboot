@@ -56,4 +56,8 @@ public class Carousel implements Serializable {
 	*/
 	private String content;
 
+	/**
+	 * 图片上传的token
+	 */
+	private String token;
 }

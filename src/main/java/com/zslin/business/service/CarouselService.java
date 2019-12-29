@@ -2,25 +2,27 @@ package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.dao.ICarouselDao;
+import com.zslin.business.dao.IMediumDao;
+import com.zslin.business.model.Carousel;
+import com.zslin.business.tools.CarouselTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
-import com.zslin.business.dao.ICarouselDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
-import com.zslin.business.model.Carousel;
+import com.zslin.core.exception.BusinessException;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
+import com.zslin.core.tools.MyBeanUtils;
 import com.zslin.core.tools.QueryTools;
 import com.zslin.core.validate.ValidationDto;
 import com.zslin.core.validate.ValidationTools;
-import com.zslin.core.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,6 +35,12 @@ public class CarouselService {
 
     @Autowired
     private ICarouselDao carouselDao;
+
+    @Autowired
+    private IMediumDao mediumDao;
+
+    @Autowired
+    private CarouselTools carouselTools;
 
     @AdminAuth(name = "轮播图列表", orderNum = 1)
     @ExplainOperation(name = "轮播图列表", notes = "轮播图列表", params= {
@@ -67,6 +75,9 @@ public class CarouselService {
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
             }
             carouselDao.save(obj);
+
+            //修改媒介的归属
+            mediumDao.modifyOwn(obj.getId(), "Carousel", obj.getToken());
             return JsonResult.succ(obj);
         } catch (Exception e) {
             e.printStackTrace();
@@ -89,7 +100,7 @@ public class CarouselService {
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
             }
             Carousel obj = carouselDao.findOne(o.getId());
-            MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay");
+            MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay", "token", "url");
             carouselDao.save(obj);
             return JsonResult.getInstance().set("obj", obj);
         } catch (Exception e) {
@@ -134,5 +145,27 @@ public class CarouselService {
         }
     }
 
+    @ExplainOperation(name = "修改轮播图状态", notes = "修改轮播图状态", params = {
+            @ExplainParam(value = "id", name = "对象id", require = true, type = "int", example = "1"),
+            @ExplainParam(value = "status", name = "状态标识", type = "String", example = "1")
+    }, back = {
+            @ExplainReturn(field = "message", notes = "提示信息"),
+            @ExplainReturn(field = "flag", notes = "结果标识")
+    })
+    public JsonResult modifyStatus(String params) {
+        Integer id = JsonTools.getId(params);
+        String status = JsonTools.getJsonParam(params, "status");
+        String message = "设置成功";
+        String flag = "1";
+        if("1".equals(flag)) {carouselDao.updateStatus(status, id);}
+        return JsonResult.success(message).set("flag", flag);
+    }
 
+    @ExplainOperation(name = "初始化轮播图序号", notes = "为每个轮播图生成一个不重复的序号", back = {
+            @ExplainReturn(field = "message", notes = "初始化结果信息")
+    })
+    public JsonResult initOrderNo(String params) {
+        carouselTools.buildOrderNo(); //重新生成序号
+        return JsonResult.success("初始化成功");
+    }
 }
