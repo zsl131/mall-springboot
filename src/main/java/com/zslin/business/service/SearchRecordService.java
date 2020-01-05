@@ -51,6 +51,4 @@ public class SearchRecordService {
 
          return JsonResult.getInstance().set("size", (int) res.getTotalElements()).set("datas", res.getContent());
      }
-
-
 }

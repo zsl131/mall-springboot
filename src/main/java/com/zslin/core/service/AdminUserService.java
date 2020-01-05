@@ -27,13 +27,14 @@ import com.zslin.core.tools.login.LoginTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 /**
  * Created by zsl on 2018/7/10.
  */
-@Service
+@Service(value = "adminUserService")
 @AdminAuth(psn = "系统管理", name = "用户管理", orderNum = 1, type = "1", url = "/admin/basic/users")
 @Explain(name = "用户管理", notes = "后台用户管理", value = "adminUserService")
 public class AdminUserService {
@@ -94,6 +95,7 @@ public class AdminUserService {
     }, back = {
             @ExplainReturn(field = "obj", notes = "对象信息"),
     })
+    @Transactional
     public JsonResult saveUser(String params) {
 //        System.out.println("params::   "+ params);
         try {
@@ -130,6 +132,7 @@ public class AdminUserService {
             @ExplainReturn(field = "message", notes = "提示信息"),
             @ExplainReturn(field = "flag", notes = "删除标识")
     })
+    @Transactional
     public JsonResult deleteUser(String params) {
         try {
             Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
@@ -147,7 +150,6 @@ public class AdminUserService {
         }
     }
 
-    @NeedAuth(need = false)
     @ExplainOperation(name = "用户登陆", notes = "通过用户名和密码登陆用户", params = {
             @ExplainParam(value = "username", name = "用户名", type = "String", require = true, example = "admin"),
             @ExplainParam(value = "password", name = "密码", type = "String", require = true, example = "111111")
@@ -155,6 +157,7 @@ public class AdminUserService {
             @ExplainReturn(field = "message", notes = "提示信息"),
             @ExplainReturn(field = "flag", notes = "标识")
     })
+    @NeedAuth(need = false)
     public JsonResult login(String params) {
         try {
             String username = JsonTools.getJsonParam(params, "username");

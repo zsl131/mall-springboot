@@ -68,6 +68,4 @@ public class CustomCouponService {
             return JsonResult.error(e.getMessage());
         }
     }
-
-
 }

@@ -23,6 +23,7 @@ import com.zslin.core.validate.ValidationDto;
 import com.zslin.core.validate.ValidationTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.security.NoSuchAlgorithmException;
 
@@ -50,6 +51,7 @@ public class BaseAppConfigService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "保存成功的对象信息")
     })
+    @Transactional
     public JsonResult save(String params) {
         BaseAppConfig obj = JSONObject.toJavaObject(JSON.parseObject(params), BaseAppConfig.class);
         ValidationDto vd = ValidationTools.buildValidate(obj);
@@ -101,6 +103,7 @@ public class BaseAppConfigService {
     }, back = {
             @ExplainReturn(field = "message", notes = "初始化结果信息")
     })
+    @Transactional
     public JsonResult initSystem(String params) throws BusinessException {
         BaseAppConfig ac = baseAppConfigDao.loadOne();
         if(ac!=null && "1".equals(ac.getInitFlag())) {

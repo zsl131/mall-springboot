@@ -27,7 +27,6 @@ import org.springframework.stereotype.Service;
  * Created by 钟述林 on 2019-12-18.
  */
 @Service
-@AdminAuth(name = "代理等级变化记录管理", psn = "销售管理", orderNum = 2, type = "1", url = "/admin/agentLevelRecord")
 @Explain(name = "代理等级变化记录管理", notes = "代理等级变化记录管理")
 public class AgentLevelRecordService {
 
@@ -51,6 +50,4 @@ public class AgentLevelRecordService {
 
          return JsonResult.getInstance().set("size", (int) res.getTotalElements()).set("datas", res.getContent());
      }
-
-
 }

@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 代理
  * @author 钟述林
- * @data generate on: 2019-12-28
+ * @data generate on: 2020-01-05
  */
 @Data
 @Entity
@@ -30,10 +30,15 @@ public class Agent implements Serializable {
 	private String name;
 
 	/**
+	* 昵称
+	*/
+	private String nickname;
+
+	/**
 	* 状态
 	* @remark 0-申请；1-正式代理；2-驳回申请；
 	*/
-	private String status;
+	private String status="0";
 
 	/**
 	* 联系电话
@@ -78,10 +83,14 @@ public class Agent implements Serializable {
 	private String countyName;
 
 	/**
+	* 街道地址
+	*/
+	private String street;
+
+	/**
 	* 性别
 	* @remark 1-男；2-女
 	*/
-	@Lob
 	private String sex;
 
 	/**
@@ -108,5 +117,41 @@ public class Agent implements Serializable {
 	* 上级代理电话
 	*/
 	private String leaderPhone;
+
+	/**
+	* 证件数量
+	* @remark 对应AgentPaper
+	*/
+	private Integer paperCount=0;
+
+	/**
+	* 审核次数
+	*/
+	private Integer verifyCount=0;
+
+	/**
+	* 级别调整次数
+	*/
+	private Integer relationCount=0;
+
+	/**
+	* 下级代理人数
+	*/
+	private Integer subCount=0;
+
+	/**
+	* 订单数量
+	*/
+	private Integer ordersCount=0;
+
+	/**
+	* 当前等级ID
+	*/
+	private Integer levelId;
+
+	/**
+	* 当前等级名称
+	*/
+	private String levelName;
 
 }

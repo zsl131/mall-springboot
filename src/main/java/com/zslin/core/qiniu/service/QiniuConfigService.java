@@ -10,6 +10,7 @@ import com.zslin.core.qiniu.tools.QiniuConfigTools;
 import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by zsl on 2018/12/1.
@@ -30,6 +31,7 @@ public class QiniuConfigService {
         return JsonResult.succ(wc);
     }
 
+    @Transactional
     public JsonResult save(String params) {
         QiniuConfig wc = JSONObject.toJavaObject(JSON.parseObject(params), QiniuConfig.class);
         QiniuConfig wcOld = qiniuConfigDao.loadOne();

@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 轮播图
  * @author 钟述林
- * @data generate on: 2019-12-28
+ * @data generate on: 2020-01-05
  */
 @Data
 @Entity
@@ -57,7 +57,9 @@ public class Carousel implements Serializable {
 	private String content;
 
 	/**
-	 * 图片上传的token
-	 */
+	* 图片上传的token
+	* @remark 用于与Medium进行匹配
+	*/
 	private String token;
+
 }

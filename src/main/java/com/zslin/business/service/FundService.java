@@ -68,6 +68,4 @@ public class FundService {
             return JsonResult.error(e.getMessage());
         }
     }
-
-
 }

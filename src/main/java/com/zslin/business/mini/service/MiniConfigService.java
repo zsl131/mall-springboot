@@ -17,6 +17,7 @@ import com.zslin.core.validate.ValidationDto;
 import com.zslin.core.validate.ValidationTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by 钟述林 on 2019-12-01.
@@ -36,6 +37,7 @@ public class MiniConfigService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "保存成功的对象信息")
     })
+    @Transactional
     public JsonResult addOrUpdate(String params) {
         MiniConfig obj = JSONObject.toJavaObject(JSON.parseObject(params), MiniConfig.class);
         ValidationDto vd = ValidationTools.buildValidate(obj);

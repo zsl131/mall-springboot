@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by 钟述林 on 2019-12-18.
@@ -59,6 +60,7 @@ public class ProductService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "添加成功的对象信息")
     })
+    @Transactional
     public JsonResult add(String params) {
         try {
             Product obj = JSONObject.toJavaObject(JSON.parseObject(params), Product.class);
@@ -81,6 +83,7 @@ public class ProductService {
             @ExplainReturn(field = "message", notes = "提示信息"),
             @ExplainReturn(field = "flag", notes = "结果标识")
     })
+    @Transactional
     public JsonResult modifyStatus(String params) {
         Integer id = JsonTools.getId(params);
         String status = JsonTools.getJsonParam(params, "status");
@@ -102,6 +105,7 @@ public class ProductService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "对应的对象信息")
     })
+    @Transactional
     public JsonResult update(String params) {
         try {
             Product o = JSONObject.toJavaObject(JSON.parseObject(params), Product.class);
@@ -157,6 +161,7 @@ public class ProductService {
             @ExplainReturn(field = "message", notes = "提示信息"),
             @ExplainReturn(field = "flag", notes = "删除标识")
     })
+    @Transactional
     public JsonResult delete(String params) {
         Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
         Product r = productDao.findOne(id);
@@ -176,6 +181,7 @@ public class ProductService {
     }, back = {
             @ExplainReturn(field = "message", notes = "提示信息")
     })
+    @Transactional
     public JsonResult plusCount(String params) {
         Integer id = JsonTools.getId(params);
         Integer amount = JsonTools.getParamInteger(params, "amount");

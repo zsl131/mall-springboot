@@ -5,35 +5,47 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import javax.validation.constraints.NotBlank;
 
 
 /**
- * 代理等级
+ * 代理证件
  * @author 钟述林
  * @data generate on: 2020-01-05
  */
 @Data
 @Entity
-@Table(name = "business_agent_level")
+@Table(name = "business_agent_paper")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AgentLevel implements Serializable {
+public class AgentPaper implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
 	/**
-	* 等级名称
-	* @remark 如：铜牌代理、银牌代理、金牌代理
+	* 代理ID
 	*/
-	@NotBlank(message="等级名称不能为空")
-	private String name;
+	private Integer agentId;
 
 	/**
-	* 级别
-	* @remark 数值越大，等级越高，提成标准越高
+	* 代理姓名
 	*/
-	private Integer level;
+	private String agentName;
+
+	/**
+	* 媒介ID
+	*/
+	private Integer mediumId;
+
+	/**
+	* 文件路径
+	*/
+	private String filePath;
+
+	/**
+	* 证件名称
+	* @remark 如：身份证正面
+	*/
+	private String fileName;
 
 }

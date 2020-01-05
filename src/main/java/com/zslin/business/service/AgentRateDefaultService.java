@@ -22,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by 钟述林 on 2019-12-28.
@@ -59,6 +60,7 @@ public class AgentRateDefaultService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "添加成功的对象信息")
     })
+    @Transactional
     public JsonResult add(String params) {
         try {
             AgentRateDefault obj = JSONObject.toJavaObject(JSON.parseObject(params), AgentRateDefault.class);
@@ -81,6 +83,7 @@ public class AgentRateDefaultService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "对应的对象信息")
     })
+    @Transactional
     public JsonResult update(String params) {
         try {
             AgentRateDefault o = JSONObject.toJavaObject(JSON.parseObject(params), AgentRateDefault.class);
@@ -123,6 +126,7 @@ public class AgentRateDefaultService {
             @ExplainReturn(field = "message", notes = "提示信息"),
             @ExplainReturn(field = "flag", notes = "删除标识")
     })
+    @Transactional
     public JsonResult delete(String params) {
         try {
             Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
@@ -134,6 +138,4 @@ public class AgentRateDefaultService {
             return JsonResult.error(e.getMessage());
         }
     }
-
-
 }

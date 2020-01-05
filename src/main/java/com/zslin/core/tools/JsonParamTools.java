@@ -11,7 +11,7 @@ import java.util.*;
  */
 public class JsonParamTools {
 
-    private static final String HEADER_PARAM_NAME = "headerParams";
+    public static final String HEADER_PARAM_NAME = "headerParams";
 
     public static String rebuildParams(String params, HttpServletRequest request)  {
 
@@ -21,8 +21,9 @@ public class JsonParamTools {
         ignoreNames.add("accept-encoding");
         ignoreNames.add("referer");
         ignoreNames.add("accept");
-        ignoreNames.add("auth_token"); //这两个不用传给实际服务接口
-        ignoreNames.add("api_code");
+        ignoreNames.add("authToken"); //这两个不用传给实际服务接口
+        ignoreNames.add("apiCode");
+        ignoreNames.add("apicode");
         ignoreNames.add("user-agent");
         ignoreNames.add("connection");
         ignoreNames.add("host");
@@ -39,7 +40,7 @@ public class JsonParamTools {
         while(names.hasMoreElements()) {
             String name = names.nextElement();
             if(!ignoreNames.contains(name)) {
-                if("nickname".equalsIgnoreCase(name)) { //如果是nickname则需要解密
+                if("nickname".equalsIgnoreCase(name) || "username".equalsIgnoreCase(name)) { //如果是nickname则需要解密
                     headerMap.put(name, Base64Utils.unPassword(request.getHeader(name)));
                 } else {
                     headerMap.put(name, request.getHeader(name));

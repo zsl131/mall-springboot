@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by 钟述林 on 2019-12-18.
@@ -63,6 +64,7 @@ public class AgentLevelService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "添加成功的对象信息")
     })
+    @Transactional
     public JsonResult add(String params) {
         try {
             AgentLevel obj = JSONObject.toJavaObject(JSON.parseObject(params), AgentLevel.class);
@@ -87,6 +89,7 @@ public class AgentLevelService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "对应的对象信息")
     })
+    @Transactional
     public JsonResult update(String params) {
         try {
             AgentLevel o = JSONObject.toJavaObject(JSON.parseObject(params), AgentLevel.class);
@@ -143,6 +146,4 @@ public class AgentLevelService {
             return JsonResult.error(e.getMessage());
         }
     }
-
-
 }

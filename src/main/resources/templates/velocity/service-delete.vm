@@ -5,6 +5,7 @@
             @ExplainReturn(field = "message", notes = "提示信息"),
             @ExplainReturn(field = "flag", notes = "删除标识")
     })
+    @Transactional
     public JsonResult delete(String params) {
         try {
             Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));

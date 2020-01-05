@@ -23,6 +23,7 @@ import com.zslin.core.validate.ValidationTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by 钟述林 on 2019-12-18.
@@ -71,6 +72,7 @@ public class AppModuleService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "添加成功的对象信息")
     })
+    @Transactional
     public JsonResult add(String params) {
         try {
             AppModule obj = JSONObject.toJavaObject(JSON.parseObject(params), AppModule.class);
@@ -93,6 +95,7 @@ public class AppModuleService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "对应的对象信息")
     })
+    @Transactional
     public JsonResult update(String params) {
         try {
             AppModule o = JSONObject.toJavaObject(JSON.parseObject(params), AppModule.class);
@@ -134,6 +137,7 @@ public class AppModuleService {
             @ExplainReturn(field = "message", notes = "提示信息"),
             @ExplainReturn(field = "flag", notes = "删除标识")
     })
+    @Transactional
     public JsonResult delete(String params) {
         try {
             Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
@@ -153,6 +157,7 @@ public class AppModuleService {
             @ExplainReturn(field = "message", notes = "提示信息"),
             @ExplainReturn(field = "flag", notes = "结果标识")
     })
+    @Transactional
     public JsonResult modifyStatus(String params) {
         Integer id = JsonTools.getId(params);
         String status = JsonTools.getJsonParam(params, "status");

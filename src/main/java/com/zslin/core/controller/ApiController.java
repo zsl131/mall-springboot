@@ -1,13 +1,12 @@
 package com.zslin.core.controller;
 
 import com.zslin.core.annotations.NeedAuth;
+import com.zslin.core.controller.dto.ApiDto;
+import com.zslin.core.controller.tools.ApiTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.exception.BusinessException;
 import com.zslin.core.tools.AuthCheckTools;
-import com.zslin.core.tools.Base64Utils;
-import com.zslin.core.tools.JsonParamTools;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,9 +17,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.URLDecoder;
-import java.util.Enumeration;
 
 @RestController
 @RequestMapping(value = "api")
@@ -28,10 +24,10 @@ import java.util.Enumeration;
 public class ApiController {
 
     @Autowired
-    private BeanFactory factory;
+    private AuthCheckTools authCheckTools;
 
     @Autowired
-    private AuthCheckTools authCheckTools;
+    private ApiTools apiTools;
 
     @GetMapping(value = "get")
     public JsonResult get(HttpServletRequest request, HttpServletResponse response) {
@@ -48,46 +44,31 @@ public class ApiController {
         if(apiCode==null || "".equals(apiCode)) {
             return JsonResult.getInstance().fail("apiCode不能为空");
         }
+
         try {
-            String serviceName = apiCode.split("\\.")[0];
-            String actionName = apiCode.split("\\.")[1];
-            Object obj = factory.getBean(serviceName);
-            Method method ;
-            boolean hasParams = false;
-            String params = request.getParameter("params");
-            if(params==null || "".equals(params.trim())) {
-                method = obj.getClass().getMethod(actionName);
-            } else {
-                params = Base64Utils.getFromBase64(params);
-                params = URLDecoder.decode(params, "utf-8");
-//                System.out.println("============="+params);
 
-                params = JsonParamTools.rebuildParams(params, request);
-
-                method = obj.getClass().getMethod(actionName, params.getClass());
-                hasParams = true;
-            }
+            ApiDto apiDto = apiTools.buildApiDto(request, apiCode);
 
             //输出的日志，方便查看
-            log.info("接口调用，apiCode: {}, params: {}", apiCode, params);
+            log.info("接口调用，apiCode: {}, params: {}", apiCode, apiDto.getParams());
 
             JsonResult result;
 
-            NeedAuth needAuth = method.getDeclaredAnnotation(NeedAuth.class);
+            NeedAuth needAuth = apiDto.getMethod().getDeclaredAnnotation(NeedAuth.class);
             //System.out.println("---------->needAuth:::"+needAuth);
             boolean hasAuth = true;
             if(needAuth==null || needAuth.need()) { //需要权限验证
-//                logger.info(serviceName+"."+actionName+"，需要权限验证");
+                log.info(apiCode+"，需要权限验证");
                 hasAuth = authCheckTools.hasAuth(token, authTime);
             } else {
-                log.info(serviceName+"."+actionName+"， 不需要权限验证");
+                log.info(apiCode+"， 不需要权限验证");
             }
 
             if(hasAuth) {
-                if(hasParams) {
-                    result = (JsonResult) method.invoke(obj, params);
+                if(apiDto.isHasParams()) {
+                    result = (JsonResult) apiDto.getMethod().invoke(apiDto.getObj(), apiDto.getParams());
                 } else {
-                    result = (JsonResult) method.invoke(obj);
+                    result = (JsonResult) apiDto.getMethod().invoke(apiDto.getObj());
                 }
             } else {
 //                logger.info("需要重新登陆");

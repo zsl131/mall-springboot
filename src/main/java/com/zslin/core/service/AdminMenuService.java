@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -59,6 +60,7 @@ public class AdminMenuService {
     @ExplainOperation(name = "初始化系统菜单", notes = "当系统中增加功能是可以通过此功能增加相应功能菜单", back = {
             @ExplainReturn(field = "message", notes = "初始化结果信息")
     })
+    @Transactional
     public JsonResult init(String params) {
         buildAdminMenuTools.buildAdminMenus(); //重构菜单
         authRoleMenuTools.authAdmin(); //为系统管理员授权菜单
@@ -136,6 +138,7 @@ public class AdminMenuService {
     }, back = {
             @ExplainReturn(field = "datas", type = "Object", notes = "添加成功的对象信息")
     })
+    @Transactional
     public JsonResult add(String params) {
         try {
             AdminMenu menu = JSONObject.toJavaObject(JSON.parseObject(params), AdminMenu.class);
@@ -153,6 +156,7 @@ public class AdminMenuService {
     }, back = {
             @ExplainReturn(field = "datas", notes = "对象信息")
     })
+    @Transactional
     public JsonResult update(String params) {
         try {
             AdminMenu menu = JSONObject.toJavaObject(JSON.parseObject(params), AdminMenu.class);
@@ -175,6 +179,7 @@ public class AdminMenuService {
     }, back = {
             @ExplainReturn(field = "message", notes = "提示信息")
     })
+    @Transactional
     public JsonResult delete(String params) {
         try {
             Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));

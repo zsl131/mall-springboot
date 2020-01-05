@@ -36,6 +36,9 @@ public class BusinessException extends RuntimeException {
         /** 有子元素异常 */
         public static final String HAVE_SUBELEMENT = "10004";
 
+        /** 数据已存在 */
+        public static final String HAS_EXISTS = "10005";
+
         /** 未找到接口 */
         public static final String NO_SUCH_METHOD = "20001";
 
@@ -66,6 +69,9 @@ public class BusinessException extends RuntimeException {
         public static final String VALIDATE_ERR = "表单验证异常";
 
         public static final String HAVE_SUBELEMENT = "存在子元素";
+
+        public static final String HAS_EXISTS = "数据已存在";
+
 
         /** 未找到接口 */
         public static final String NO_SUCH_METHOD = "接口不存在";

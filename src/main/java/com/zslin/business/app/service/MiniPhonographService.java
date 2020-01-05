@@ -4,6 +4,7 @@ import com.zslin.business.dao.IMediumDao;
 import com.zslin.business.dao.IPhonographDao;
 import com.zslin.business.model.Medium;
 import com.zslin.business.model.Phonograph;
+import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.tools.JsonTools;
@@ -29,6 +30,7 @@ public class MiniPhonographService {
      * @param params
      * @return
      */
+    @NeedAuth(openid = true)
     public JsonResult add(String params) {
         try {
             String openid = JsonTools.getOpenid(params);

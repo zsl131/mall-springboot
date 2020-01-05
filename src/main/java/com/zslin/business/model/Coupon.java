@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 优惠券
  * @author 钟述林
- * @data generate on: 2019-12-28
+ * @data generate on: 2020-01-05
  */
 @Data
 @Entity
@@ -36,9 +36,9 @@ public class Coupon implements Serializable {
 
 	/**
 	* 价值
-	* @remark 一张优惠券抵价多少钱，单位分
+	* @remark 一张优惠券抵价多少钱，单位元
 	*/
-	private Integer worth;
+	private Float worth;
 
 	/**
 	* 可否重复
@@ -69,5 +69,11 @@ public class Coupon implements Serializable {
 	* @remark proId为0时，则“通用券”
 	*/
 	private String proTitle;
+
+	/**
+	* 满减
+	* @remark 达到某值可以使用，0表示均可使用，单位元
+	*/
+	private Float reachMoney;
 
 }

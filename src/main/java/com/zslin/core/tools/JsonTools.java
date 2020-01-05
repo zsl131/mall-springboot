@@ -3,6 +3,8 @@ package com.zslin.core.tools;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.core.dto.LoginUserDto;
+import com.zslin.core.dto.WxCustomDto;
 
 /**
  * Created by zsl on 2018/7/7.
@@ -109,7 +111,7 @@ public class JsonTools {
      */
     public static String getHeaderParams(String params, String field) {
         try {
-            String headerParams = getJsonParam(params, "headerParams");
+            String headerParams = getJsonParam(params, JsonParamTools.HEADER_PARAM_NAME);
             String res = getJsonParam(headerParams, field);
             return res;
         } catch (Exception e) {
@@ -135,5 +137,25 @@ public class JsonTools {
      */
     public static String getNickname(String params) {
         return getHeaderParams(params, "nickname");
+    }
+
+    public static WxCustomDto getCustom(String params) {
+        JSONObject jsonObj = str2JsonObj(getJsonParam(params, JsonParamTools.HEADER_PARAM_NAME));
+        WxCustomDto res = new WxCustomDto();
+        res.setCustomId(jsonObj.getInteger("customid"));
+        res.setNickname(jsonObj.getString("nickname"));
+        res.setOpenid(jsonObj.getString("openid"));
+        res.setUnionid(jsonObj.getString("unionid"));
+        return res;
+    }
+
+    public static LoginUserDto getUser(String params) {
+        JSONObject jsonObj = str2JsonObj(getJsonParam(params, JsonParamTools.HEADER_PARAM_NAME));
+        LoginUserDto dto = new LoginUserDto();
+        dto.setId(jsonObj.getInteger("userid"));
+        dto.setNickname(jsonObj.getString("nickname"));
+        dto.setUsername(jsonObj.getString("username"));
+        dto.setPhone(jsonObj.getString("phone"));
+        return dto;
     }
 }

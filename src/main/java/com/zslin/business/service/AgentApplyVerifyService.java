@@ -22,12 +22,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by 钟述林 on 2019-12-18.
  */
 @Service
-@AdminAuth(name = "代理申请审核管理", psn = "销售管理", orderNum = 2, type = "1", url = "/admin/agentApplyVerify")
 @Explain(name = "代理申请审核管理", notes = "代理申请审核管理")
 public class AgentApplyVerifyService {
 
@@ -59,6 +59,7 @@ public class AgentApplyVerifyService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "对应的对象信息")
     })
+    @Transactional
     public JsonResult update(String params) {
         try {
             AgentApplyVerify o = JSONObject.toJavaObject(JSON.parseObject(params), AgentApplyVerify.class);
@@ -75,6 +76,4 @@ public class AgentApplyVerifyService {
             return JsonResult.getInstance().fail(e.getMessage());
         }
     }
-
-
 }

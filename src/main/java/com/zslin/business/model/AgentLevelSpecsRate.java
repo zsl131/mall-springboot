@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Range;
 /**
  * 代理提成标准
  * @author 钟述林
- * @data generate on: 2019-12-28
+ * @data generate on: 2020-01-05
  */
 @Data
 @Entity

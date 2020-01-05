@@ -1,33 +1,48 @@
 package com.zslin.test;
 
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.dao.IProductDao;
 import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.tools.AccessTokenTools;
 import com.zslin.business.mini.tools.MiniCommonTools;
 import com.zslin.business.mini.tools.MiniUtils;
+import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
+import com.zslin.core.dto.JsonResult;
+import com.zslin.core.service.TestService;
 import com.zslin.core.tasker.BeanCheckTools;
 import com.zslin.core.tools.Base64Utils;
 import com.zslin.core.tools.BuildAdminMenuTools;
+import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.SortTools;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.core.BridgeMethodResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.interceptor.TransactionAttribute;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.net.URLDecoder;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @ActiveProfiles(value = "zsl")
-public class NormalTest {
+public class NormalTest implements ApplicationContextAware {
 
     private RestTemplate template = new RestTemplate();
 
@@ -48,6 +63,92 @@ public class NormalTest {
 
     @Autowired
     private SortTools sortTools;
+
+    @Autowired
+    private TestService testService;
+
+    @Autowired
+    private BeanFactory factory;
+
+    private ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext=applicationContext;
+    }
+
+    public ApplicationContext getApplicationContext() {
+        return applicationContext;
+    }
+
+    @Test
+    public void test16() throws Exception {
+        String clsName = "webInterceptorService", methodName = "loadWebBase";
+//        String clsName = "adminUserService", methodName = "login";
+        Object obj = getApplicationContext().getBean(clsName);
+        Method method = obj.getClass().getDeclaredMethod(methodName,"params".getClass());
+
+        Class<?> userClass = ClassUtils.getUserClass(obj);
+        //method代表接口中的方法，specificMethod代表实现类中的方法
+        Method specificMethod = ClassUtils.getMostSpecificMethod(method, userClass);
+        specificMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
+        Annotation [] annotations = specificMethod.getAnnotations();
+        System.out.println("==========>size:: "+annotations.length);
+        for(Annotation an : annotations) {
+            System.out.println("---------------------------============="+an.annotationType().getName());
+        }
+//        TransactionAttribute txAtt = findTransactionAttribute(specificMethod);
+    }
+
+    @Test
+    public void test15() throws Exception {
+//        String clsName = "webInterceptorService", methodName = "loadWebBase";
+        String clsName = "adminUserService", methodName = "login";
+//        Object obj = factory.getBean("adminUserService");
+//        Object obj = getApplicationContext().getBean("adminUserService");
+        Object obj = getApplicationContext().getBean(clsName);
+//        Class obj = Class.forName("com.zslin.core.service.AdminUserService");
+//        System.out.println(obj.getClass().getName()+"========");
+//        Method method = obj.getClass().getMethod("login", "params".getClass());
+        Method method = obj.getClass().getDeclaredMethod(methodName,"params".getClass());
+
+        Annotation[] annotations = method.getAnnotations();
+        System.out.println(method.getName()+"------->annSize: "+ annotations.length);
+        for(Annotation an : annotations) {
+            System.out.println("---------------------------============="+an.annotationType().getName());
+        }
+        Annotation[] annos = method.getDeclaredAnnotations();
+        System.out.println("------>decSize: "+annos.length);
+        for (Annotation an : annos) {
+            System.out.println(an.annotationType().getName());
+        }
+
+        Annotation ann = method.getAnnotation(NeedAuth.class);
+        System.out.println("ann======>"+ann);
+    }
+
+    @Test
+    public void test14() {
+        JsonResult jr = testService.add("");
+        System.out.println(jr);
+    }
+
+    @Test
+    public void test13() {
+        String str = "{\"address\":\"嘎斯地方阿斯蒂芬\",\"provinceCode\":\"110000\",\"cityCode\":\"110100\",\"sex\":\"1\",\"papers\":[{\"name\":\"身份证正面\",\"id\":80,\"url\":\"https://zz-specialty.zslin.com/agent_e7b96a3f-fc87-4b30-8b2f-8f09c3e538d1.png\"},\n" +
+                "{\"name\":\"身份证背面\",\"id\":81,\"url\":\"https://zz-specialty.zslin.com/agent_6575dc4b-de2b-4d60-a23f-a413144e5a15.png\"}],\"countyCode\":\"110102\",\"headerParams\":{\"unionid\":\"okOD4jgutW_OHQBkIJYD8NL4NhEU\",\"apicode\":\"min\n" +
+                "iAgentService.addAgent\",\"openid\":\"oHoS55Tke2HI5m62XKVXRwRm_HAk\",\"nickname\":\"想攀登的胖子\",\"authtoken\":\"test-token\",\"customid\":\"2\"},\"cityName\":\"市辖区\",\"phone\":\"15925061256\",\"identity\":\"532127198803011115\",\"name\n" +
+                "\":\"颖三要\",\"hasExperience\":\"1\",\"provinceName\":\"北京市\",\"countyName\":\"西城区\"}";
+        JSONArray jsonArray = JsonTools.str2JsonArray(JsonTools.getJsonParam(str, "papers"));
+        for(int i=0;i<jsonArray.size();i++) {
+            JSONObject jsonObj = jsonArray.getJSONObject(i);
+            System.out.println("----->" + jsonObj.toJSONString());
+        }
+
+/*        ----->{"name":"身份证正面","id":80,"url":"https://zz-specialty.zslin.com/agent_e7b96a3f-fc87-4b30-8b2f-8f09c3e538d1.png"}
+        ----->{"name":"身份证背面","id":81,"url":"https://zz-specialty.zslin.com/agent_6575dc4b-de2b-4d60-a23f-a413144e5a15.png"}*/
+
+    }
 
     @Test
     public void test12() {

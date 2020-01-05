@@ -2,29 +2,37 @@ package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.dao.IAgentDao;
+import com.zslin.business.dao.IAgentLevelDao;
+import com.zslin.business.dao.IAgentPaperDao;
+import com.zslin.business.model.Agent;
+import com.zslin.business.model.AgentLevel;
+import com.zslin.business.model.AgentPaper;
+import com.zslin.business.tools.AgentTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
-import com.zslin.business.dao.IAgentDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
-import com.zslin.business.model.Agent;
+import com.zslin.core.exception.BusinessException;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
+import com.zslin.core.tools.MyBeanUtils;
 import com.zslin.core.tools.QueryTools;
 import com.zslin.core.validate.ValidationDto;
 import com.zslin.core.validate.ValidationTools;
-import com.zslin.core.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
- * Created by 钟述林 on 2019-12-18.
+ * Created by 钟述林 on 2020-01-02.
  */
 @Service
 @AdminAuth(name = "代理管理", psn = "销售管理", orderNum = 2, type = "1", url = "/admin/agent")
@@ -33,6 +41,63 @@ public class AgentService {
 
     @Autowired
     private IAgentDao agentDao;
+
+    @Autowired
+    private IAgentPaperDao agentPaperDao;
+
+    @Autowired
+    private AgentTools agentTools;
+
+    @Autowired
+    private IAgentLevelDao agentLevelDao;
+
+    @ExplainOperation(name = "代理申请审核", notes = "代理申请审核", params= {
+            @ExplainParam(value = "id", name = "代理ID", require = true, type = "int", example = "1"),
+            @ExplainParam(value = "status", name = "审核状态结果", require = true, type = "String", example = "1"),
+            @ExplainParam(value = "reason", name = "审核原因结果", require = true, type = "String")
+    }, back = {
+            @ExplainReturn(field = "message", notes = "提示信息"),
+    })
+    public JsonResult verify(String params) {
+        System.out.println(params);
+        Integer id = JsonTools.getId(params);
+        String status = JsonTools.getJsonParam(params, "status");
+        Integer level = JsonTools.getParamInteger(params, "level");
+//        String reason = JsonTools.getJsonParam(params, "reason");
+        Agent a = agentDao.findOne(id);
+
+        AgentLevel al = null;
+        if(level!=null && level>0) {
+            al = agentLevelDao.findOne(level);
+        }
+        agentTools.verify(params, a, al); //审核过后默认设置为初级代理
+
+        if(al!=null) {
+            a.setLevelId(level);
+            a.setLevelName(al.getName());
+        }
+
+        a.setStatus(status);
+        agentDao.save(a); //修改状态
+
+        agentDao.plusVerifyCount(1, a.getId());
+        if("1".equals(status)) { //只有审核通过才进行等级调整
+            agentDao.plusRelationCount(1, a.getId());
+        }
+        return JsonResult.success("操作成功");
+    }
+
+    @ExplainOperation(name = "获取代理资质", notes = "获取代理资质", params= {
+            @ExplainParam(value = "id", name = "代理ID", require = true, type = "int", example = "1")
+    }, back = {
+            @ExplainReturn(field = "size", type = "int", notes = "资质数量"),
+            @ExplainReturn(field = "data", type = "Object", notes = "资质数组对象")
+    })
+    public JsonResult listPapers(String params) {
+        Integer id = JsonTools.getId(params);
+        List<AgentPaper> list = agentPaperDao.findByAgentId(id);
+        return JsonResult.success().set("size", list.size()).set("data", list);
+    }
 
     @AdminAuth(name = "代理列表", orderNum = 1)
     @ExplainOperation(name = "代理列表", notes = "代理列表", params= {
@@ -59,6 +124,7 @@ public class AgentService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "对应的对象信息")
     })
+    @Transactional
     public JsonResult update(String params) {
         try {
             Agent o = JSONObject.toJavaObject(JSON.parseObject(params), Agent.class);
@@ -100,6 +166,7 @@ public class AgentService {
             @ExplainReturn(field = "message", notes = "提示信息"),
             @ExplainReturn(field = "flag", notes = "删除标识")
     })
+    @Transactional
     public JsonResult delete(String params) {
         try {
             Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));

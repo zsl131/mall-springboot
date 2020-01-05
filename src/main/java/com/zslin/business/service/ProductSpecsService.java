@@ -23,6 +23,7 @@ import com.zslin.core.validate.ValidationTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -81,6 +82,7 @@ public class ProductSpecsService {
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "添加成功的对象信息")
     })
+    @Transactional
     public JsonResult save(String params) {
         try {
             ProductSpecs obj = JSONObject.toJavaObject(JSON.parseObject(params), ProductSpecs.class);
@@ -130,6 +132,7 @@ public class ProductSpecsService {
             @ExplainReturn(field = "message", notes = "提示信息"),
             @ExplainReturn(field = "flag", notes = "删除标识")
     })
+    @Transactional
     public JsonResult delete(String params) {
         try {
             Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
