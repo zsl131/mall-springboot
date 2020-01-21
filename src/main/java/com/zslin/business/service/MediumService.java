@@ -2,11 +2,11 @@ package com.zslin.business.service;
 
 import com.zslin.business.dao.IMediumDao;
 import com.zslin.business.model.Medium;
+import com.zslin.business.tools.MediumTools;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
 import com.zslin.core.dto.JsonResult;
-import com.zslin.core.qiniu.tools.QiniuTools;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ public class MediumService {
     private IMediumDao mediumDao;
 
     @Autowired
-    private QiniuTools qiniuTools;
+    private MediumTools mediumTools;
 
     @ExplainOperation(name = "删除对象的媒介信息", notes = "删除对象的媒介信息", params = {
             @ExplainParam(name = "id", value = "对象ID", type = "int", example = "1")
@@ -32,9 +32,10 @@ public class MediumService {
     public JsonResult delete(String params) {
         try {
             Integer id = JsonTools.getId(params);
-            Medium m = mediumDao.findOne(id);
+            mediumTools.deleteMedium(id);
+            /*Medium m = mediumDao.findOne(id);
             qiniuTools.deleteFile(m.getQiniuKey());
-            mediumDao.delete(m);
+            mediumDao.delete(m);*/
             return JsonResult.success("删除成功");
         } catch (Exception e) {
             return JsonResult.error("删除失败");

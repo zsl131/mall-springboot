@@ -15,13 +15,19 @@ import java.util.Set;
  * Created by zsl on 2018/7/10.
  * 从客户端提交查询数据的工具类
  */
-public class QueryTools<T> {
+public class QueryTools {
 
     public static QueryTools getInstance() {
         return new QueryTools();
     }
 
-    public Specification<T> buildSearch(List<QueryListConditionDto> conditionDtoList, SpecificationOperator... ops) {
+    public Specification buildSearch(SpecificationOperator... opts) {
+        SimpleSpecificationBuilder builder = new SimpleSpecificationBuilder();
+        builder.add(opts); //先添加
+        return builder.generate();
+    }
+
+    public Specification buildSearch(List<QueryListConditionDto> conditionDtoList, SpecificationOperator... ops) {
         SimpleSpecificationBuilder builder = new SimpleSpecificationBuilder();
         builder.add(ops); //先添加
         for(QueryListConditionDto dto : conditionDtoList) {

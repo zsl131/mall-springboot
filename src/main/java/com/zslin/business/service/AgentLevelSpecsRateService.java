@@ -2,27 +2,33 @@ package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.dao.*;
+import com.zslin.business.dto.CategoryTreeDto;
+import com.zslin.business.model.*;
+import com.zslin.business.tools.CategoryTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
-import com.zslin.business.dao.IAgentLevelSpecsRateDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
-import com.zslin.business.model.AgentLevelSpecsRate;
+import com.zslin.core.exception.BusinessException;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
+import com.zslin.core.repository.SpecificationOperator;
 import com.zslin.core.tools.JsonTools;
+import com.zslin.core.tools.MyBeanUtils;
 import com.zslin.core.tools.QueryTools;
 import com.zslin.core.validate.ValidationDto;
 import com.zslin.core.validate.ValidationTools;
-import com.zslin.core.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import com.zslin.core.tools.MyBeanUtils;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * Created by 钟述林 on 2019-12-18.
@@ -34,6 +40,94 @@ public class AgentLevelSpecsRateService {
 
     @Autowired
     private IAgentLevelSpecsRateDao agentLevelSpecsRateDao;
+
+    @Autowired
+    private IProductCategoryDao productCategoryDao;
+
+    @Autowired
+    private IProductDao productDao;
+
+    @Autowired
+    private IProductSpecsDao productSpecsDao;
+
+    @Autowired
+    private CategoryTools categoryTools;
+
+    @Autowired
+    private IAgentLevelDao agentLevelDao;
+
+    @ExplainOperation(name = "添加或修改代理提成标准", notes = "添加或修改代理提成标准", params = {
+            @ExplainParam(value = "id", name = "代理提成标准id", type = "int", example = "1"),
+            @ExplainParam(value = "...", name = "其他信息", type = "Object", example = "对应其他数据")
+    }, back = {
+            @ExplainReturn(field = "message", type = "String", notes = "提示信息")
+    })
+    @Transactional
+    public JsonResult addOrUpdateRate(String params) {
+        AgentLevelSpecsRate obj = JSONObject.toJavaObject(JSON.parseObject(params), AgentLevelSpecsRate.class);
+        ValidationDto vd = ValidationTools.buildValidate(obj);
+        if(vd.isHasError()) { //如果有验证异常
+            return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
+        }
+
+        if(obj.getId()!=null && obj.getId()>0) { //修改
+            AgentLevelSpecsRate old = agentLevelSpecsRateDao.findOne(obj.getId());
+            MyBeanUtils.copyProperties(obj, old);
+            agentLevelSpecsRateDao.save(old);
+        } else {
+            agentLevelSpecsRateDao.save(obj);
+        }
+        return JsonResult.success("保存成功");
+    }
+
+    @ExplainOperation(name = "产品分类树", notes = "产品分类树", params = {
+            @ExplainParam(name = "父ID", value = "pid", type = "int", example = "1，不传则获取根分类")
+    }, back = {
+            @ExplainReturn(field = "size", type = "int", notes = "数据数量"),
+            @ExplainReturn(field = "datas", type = "Object", notes = "数据列表")
+    })
+    public JsonResult listRoot(String params) {
+        Integer pid = 0; String type = "base";
+
+        try {
+            String pidStr = JsonTools.getJsonParam(params, "pid"); //root_33
+            String [] array = pidStr.split("_");
+            type = array[0];
+            pid = Integer.parseInt(array[1]);
+        } catch (Exception e) {
+        }
+
+        type = ("0".equals(type)?"base":type);
+        //System.out.println("------>"+type+"-------"+pid);
+
+        JsonResult result = JsonResult.getInstance();
+        Sort sort = SimpleSortBuilder.generateSort("orderNo_a");
+
+        if("root".equalsIgnoreCase(type)) { //是根分类，则获取子分类
+//            System.out.println("---------------111");
+//            List<Category> children = categoryDao.findByPid(pid, sort);
+            QueryListDto qld = QueryTools.buildQueryListDto(params);
+            Page<ProductCategory> res = productCategoryDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
+                    new SpecificationOperator("pid", "eq", pid)),
+                    SimplePageBuilder.generate(qld.getPage(), qld.getSize(), sort));
+            result.set("data", res.getContent()).set("category", productCategoryDao.findOne(pid)).set("total", res.getTotalElements());
+        } else if("detail".equalsIgnoreCase(type)) { //是产品，则获取产品信息
+//            System.out.println("---------------333");
+            Product pro = productDao.findOne(pid);
+            List<ProductSpecs> specsList = productSpecsDao.findByProId(pid, sort);
+            List<AgentLevel> levelList = agentLevelDao.findAll();
+            List<AgentLevelSpecsRate> rateList = agentLevelSpecsRateDao.findByProduct(pid);
+            result.set("product", pro).set("specsList", specsList).set("levelList", levelList).set("rateList", rateList);
+        } else {
+//            System.out.println("---------------444");
+            List<ProductCategory> list = productCategoryDao.findRoot(SimpleSortBuilder.generateSort("orderNo"));
+            result.set("data", list).set("category", "").set("type", "base");
+        }
+
+        List<CategoryTreeDto> treeList = categoryTools.buildTree();
+        result.set("treeList", treeList).set("type", type);
+        return result;
+    }
 
     @AdminAuth(name = "代理提成标准列表", orderNum = 1)
     @ExplainOperation(name = "代理提成标准列表", notes = "代理提成标准列表", params= {

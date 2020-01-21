@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 移动端首页大功能展示
  * @author 钟述林
- * @data generate on: 2020-01-05
+ * @data generate on: 2020-01-10
  */
 @Data
 @Entity
@@ -61,5 +61,11 @@ public class AppModule implements Serializable {
 	* @remark 0-隐藏；1-显示
 	*/
 	private String status;
+
+	/**
+	* 链接打开的模式
+	* @remark 如：navigate、switchTab
+	*/
+	private String navMode;
 
 }

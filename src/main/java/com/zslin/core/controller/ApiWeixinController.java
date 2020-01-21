@@ -77,8 +77,6 @@ public class ApiWeixinController {
             NeedAuth needAuth = apiDto.getMethod().getDeclaredAnnotation(NeedAuth.class);
             boolean hasAuth = true;
             if(needAuth!=null && needAuth.openid()) { //需要传入Openid
-//                logger.info(serviceName+"."+actionName+"，需要权限验证");
-//                hasAuth = authCheckTools.hasAuth(token, authTime);
                 hasAuth = !NormalTools.isNull(openid); //只要不空就表示有权限
             } else {
                 log.info(apiCode+"， 不需要openid验证");

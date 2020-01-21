@@ -39,6 +39,12 @@ public class BusinessException extends RuntimeException {
         /** 数据已存在 */
         public static final String HAS_EXISTS = "10005";
 
+        /** 状态异常 */
+        public static final String STATUS_ERROR = "10006";
+
+        /** 权限异常 */
+        public static final String AUTH_ERROR = "10007";
+
         /** 未找到接口 */
         public static final String NO_SUCH_METHOD = "20001";
 

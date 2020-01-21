@@ -12,4 +12,6 @@ import java.util.List;
 public interface IAgentPaperDao extends BaseRepository<AgentPaper, Integer>, JpaSpecificationExecutor<AgentPaper> {
 
     List<AgentPaper> findByAgentId(Integer agentId);
+
+    AgentPaper findByAgentIdAndFileName(Integer agentId, String fileName);
 }

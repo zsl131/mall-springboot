@@ -5,14 +5,13 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import javax.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.Range;
 
 
 /**
  * 代理提成标准
  * @author 钟述林
- * @data generate on: 2020-01-05
+ * @data generate on: 2020-01-10
  */
 @Data
 @Entity
@@ -57,8 +56,7 @@ public class AgentLevelSpecsRate implements Serializable {
 	/**
 	* 提成金额
 	*/
-	@NotBlank(message="提成金额不能为空")
-@Range(min=0, message="提成金额不能小于0")
+	@Range(min=0, message="提成金额不能小于0")
 	private Float amount;
 
 }

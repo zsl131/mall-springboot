@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 代理
  * @author 钟述林
- * @data generate on: 2020-01-05
+ * @data generate on: 2020-01-10
  */
 @Data
 @Entity
@@ -86,6 +86,12 @@ public class Agent implements Serializable {
 	* 街道地址
 	*/
 	private String street;
+
+	/**
+	* 小程序选择地址的序号
+	* @remark 如：0-0-1，表示第一个省；第一个市；第二个县区
+	*/
+	private String addressIndex;
 
 	/**
 	* 性别

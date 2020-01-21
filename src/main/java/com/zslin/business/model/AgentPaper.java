@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理证件
  * @author 钟述林
- * @data generate on: 2020-01-05
+ * @data generate on: 2020-01-10
  */
 @Data
 @Entity
