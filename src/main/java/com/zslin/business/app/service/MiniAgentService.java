@@ -43,13 +43,13 @@ public class MiniAgentService {
      * @return
      */
     public JsonResult updateAgent(String params) {
-        System.out.println("=======>"+params);
+        //System.out.println("=======>"+params);
         WxCustomDto dto = JsonTools.getCustom(params);
-        System.out.println(dto);
+        //System.out.println(dto);
 
         Integer id = JsonTools.getId(params);
 
-        System.out.println("+++++++++ID::: "+id);
+        //System.out.println("+++++++++ID::: "+id);
         Agent agent = agentDao.findOne(id); //获取信息
         if(!"2".equals(agent.getStatus())) {throw new BusinessException(BusinessException.Code.STATUS_ERROR, "当前状态不可修改");}
         if(!dto.getUnionid().equals(agent.getUnionid())) {throw new BusinessException(BusinessException.Code.AUTH_ERROR, "无权限修改");}

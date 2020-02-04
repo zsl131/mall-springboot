@@ -1,6 +1,7 @@
 package com.zslin.core.controller;
 
 import com.zslin.business.dao.IMediumDao;
+import com.zslin.business.dao.IProductDao;
 import com.zslin.business.model.Medium;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.controller.dto.UploadParam;
@@ -43,6 +44,9 @@ public class UploadController {
 
     @Autowired
     private QiniuTools qiniuTools;
+
+    @Autowired
+    private IProductDao productDao;
 
     //private static final String PATH_PRE = "/wangeditor/images";
     //private static final String UPLOAD_PATH_PRE = "/publicFile/upload";
@@ -121,11 +125,13 @@ public class UploadController {
                     }
                     m.setCreateLong(System.currentTimeMillis());
                     mediumDao.save(m); //保存
+                    String filePath = m.getRootUrl() + (m.getRootUrl().endsWith("/")?"":"/") + m.getQiniuKey();
                     if(isEditor) {
-                        result.add(m.getRootUrl() + (m.getRootUrl().endsWith("/")?"":"/") + m.getQiniuKey());
+                        result.add(filePath);
                     } else {
-                        result.add(m.getId(), m.getRootUrl() + (m.getRootUrl().endsWith("/")?"":"/") + m.getQiniuKey());
+                        result.add(m.getId(), filePath);
                     }
+                    updateProductHeadimg(param, filePath);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } finally {
@@ -140,5 +146,16 @@ public class UploadController {
             }
         }
         return result;
+    }
+
+    /**
+     * 修改产品的头像图片信息
+     * @param param
+     * @param imgPath
+     */
+    private void updateProductHeadimg(UploadParam param, String imgPath) {
+        if("Product".equalsIgnoreCase(param.getObjClassName()) && param.getOrderNo()==1) {
+            productDao.updateHeadimgUrl(imgPath, param.getObjId());
+        }
     }
 }

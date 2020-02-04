@@ -170,8 +170,22 @@ public class ProductService {
         if(r.getVideoCount()>0) {throw new BusinessException(BusinessException.Code.HAVE_SUBELEMENT, "有视频信息，不能删除");}
         if(r.getSaleCount()>0) {throw new BusinessException(BusinessException.Code.HAVE_SUBELEMENT, "有订单信息，不能删除");}
         if(r.getSpecsCount()>0) {throw new BusinessException(BusinessException.Code.HAVE_SUBELEMENT, "有规格信息，不能删除");}
+        if(r.getSaleMode()==null || "0".equals(r.getSaleMode())) {throw new BusinessException(BusinessException.Code.HAVE_SUBELEMENT, "先设置销售类型");}
         productDao.delete(r);
         return JsonResult.success("删除成功");
+    }
+
+    @ExplainOperation(name = "设置产品销售模式", notes = "设置产品销售模式", params = {
+            @ExplainParam(value = "id", name = "对象ID", type = "int", require = true, example = "1"),
+            @ExplainParam(value = "mode", name = "模式", type = "String", require = true, example = "1"),
+    }, back = {
+            @ExplainReturn(field = "message", notes = "提示信息")
+    })
+    public JsonResult modifySaleMode(String params) {
+        Integer id = JsonTools.getId(params);
+        String mode = JsonTools.getJsonParam(params, "mode");
+        productDao.updateMode(mode, id);
+        return JsonResult.success("设置销售模式成功");
     }
 
     @ExplainOperation(name = "修改产品的计量值", notes = "修改产品的计量值", params = {

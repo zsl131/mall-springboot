@@ -95,10 +95,12 @@ public class ProductSpecsService {
                 ProductSpecs o = productSpecsDao.findOne(obj.getId());
                 MyBeanUtils.copyProperties(obj, o, "id", "cateId", "proId");
                 productSpecsDao.save(o);
+                updateProductPrice(o.getProId());
                 return JsonResult.succ(o);
             } else {
                 obj = productSpecsDao.save(obj);
-                productDao.updateSpecsCount(1, obj.getProId()); //修改规格数
+                productDao.plusSpecsCount(1, obj.getProId()); //修改规格数
+                updateProductPrice(obj.getProId());
                 return JsonResult.succ(obj);
             }
 
@@ -106,6 +108,15 @@ public class ProductSpecsService {
             e.printStackTrace();
             return JsonResult.getInstance().fail(e.getMessage());
         }
+    }
+
+    /**
+     * 设置产品显示的价格
+     * @param proId
+     */
+    private void updateProductPrice(Integer proId) {
+        Float price = productSpecsDao.queryPrice(proId);
+        productDao.updatePrice(price, proId);
     }
 
     @AdminAuth(name = "获取产品规格", orderNum = 5)
@@ -137,7 +148,7 @@ public class ProductSpecsService {
         try {
             Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
             ProductSpecs r = productSpecsDao.findOne(id);
-            productDao.updateSpecsCount(-1, r.getProId());
+            productDao.plusSpecsCount(-1, r.getProId());
             productSpecsDao.delete(r);
             return JsonResult.success("删除成功");
         } catch (Exception e) {

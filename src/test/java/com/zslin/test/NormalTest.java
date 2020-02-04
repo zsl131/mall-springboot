@@ -164,7 +164,7 @@ public class NormalTest implements ApplicationContextAware {
 
     @Test
     public void test10() {
-        productDao.updateSpecsCount(5, 1);
+        productDao.plusSpecsCount(5, 1);
     }
 
     @Test

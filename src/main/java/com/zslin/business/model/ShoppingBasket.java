@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 购物车
  * @author 钟述林
- * @data generate on: 2020-01-10
+ * @data generate on: 2020-02-04
  */
 @Data
 @Entity
@@ -57,6 +57,8 @@ public class ShoppingBasket implements Serializable {
 	*/
 	private Float price;
 
+	private Float oriPrice;
+
 	/**
 	* 加入购物车日期
 	* @remark 格式：yyyy-MM-dd
@@ -74,5 +76,31 @@ public class ShoppingBasket implements Serializable {
 	* @remark Long格式
 	*/
 	private Long createLong;
+
+	/**
+	* 修改时间
+	* @remark 格式：yyyy-MM-dd
+	*/
+	private String updateDay;
+
+	/**
+	* 修改时间
+	* @remark 格式：yyyy-MM-dd HH:mm:ss
+	*/
+	private String updateTime;
+
+	/**
+	* 修改时间
+	* @remark Long格式
+	*/
+	private Long updateLong;
+
+	private String openid;
+
+	private String unionid;
+
+	private String nickname;
+
+	private Integer customId;
 
 }

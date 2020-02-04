@@ -5,33 +5,27 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import org.hibernate.validator.constraints.Range;
 
 
 /**
- * 代理提成标准
+ * 产品收藏记录
  * @author 钟述林
  * @data generate on: 2020-02-04
  */
 @Data
 @Entity
-@Table(name = "business_agent_level_specs_rate")
+@Table(name = "business_product_favorite_record")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AgentLevelSpecsRate implements Serializable {
+public class ProductFavoriteRecord implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
 	/**
-	* 等级ID
+	* 用户ID
 	*/
-	private Integer levelId;
-
-	/**
-	* 等级名称
-	*/
-	private String levelName;
+	private Integer customId;
 
 	/**
 	* 产品ID
@@ -43,20 +37,27 @@ public class AgentLevelSpecsRate implements Serializable {
 	*/
 	private String proTitle;
 
-	/**
-	* 产品规格ID
-	*/
-	private Integer specsId;
+	private String openid;
+
+	private String unionid;
+
+	private String nickname;
 
 	/**
-	* 产品规格名称
+	* 创建时间Long
 	*/
-	private String specsName;
+	private Long createLong;
 
 	/**
-	* 提成金额
+	* 创建时间Time
+	* @remark 格式：yyyy-MM-dd HH:mm:ss
 	*/
-	@Range(min=0, message="提成金额不能小于0")
-	private Float amount;
+	private String createTime;
+
+	/**
+	* 创建时间Date
+	* @remark 格式：yyyy-MM-dd
+	*/
+	private String createDay;
 
 }

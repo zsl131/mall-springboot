@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 /**
  * 客户收货地址
  * @author 钟述林
- * @data generate on: 2020-01-10
+ * @data generate on: 2020-02-04
  */
 @Data
 @Entity
@@ -27,6 +27,10 @@ public class CustomAddress implements Serializable {
 	private String openid;
 
 	private String unionid;
+
+	private Integer customId;
+
+	private String nickname;
 
 	/**
 	* 省级代码
@@ -65,8 +69,14 @@ public class CustomAddress implements Serializable {
 	* 街道地址
 	*/
 	@NotBlank(message="街道不能为空")
-@Length(min=5, message="街道至少5个字")
+@Length(min=4, message="街道至少4个字")
 	private String street;
+
+	/**
+	* 小程序选择地址的序号
+	* @remark 如：0-0-1，表示第一个省；第一个市；第二个县区
+	*/
+	private String addressIndex;
 
 	/**
 	* 姓名

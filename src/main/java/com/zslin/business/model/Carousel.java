@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 轮播图
  * @author 钟述林
- * @data generate on: 2020-01-10
+ * @data generate on: 2020-02-04
  */
 @Data
 @Entity

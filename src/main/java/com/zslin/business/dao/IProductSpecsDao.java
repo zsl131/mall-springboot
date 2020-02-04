@@ -22,4 +22,7 @@ public interface IProductSpecsDao extends BaseRepository<ProductSpecs, Integer>,
     Long findCountByProId(Integer proId);
 
     List<ProductSpecs> findByProId(Integer proId, Sort sort);
+
+    @Query("SELECT MIN(s.price) FROM ProductSpecs s WHERE s.proId=?1")
+    Float queryPrice(Integer proId);
 }

@@ -1,0 +1,67 @@
+package com.zslin.business.app.service;
+
+import com.zslin.business.app.dto.PriceDto;
+import com.zslin.business.app.tools.PriceTools;
+import com.zslin.business.dao.*;
+import com.zslin.business.model.Medium;
+import com.zslin.business.model.Product;
+import com.zslin.business.model.ProductFavoriteRecord;
+import com.zslin.business.model.ProductSpecs;
+import com.zslin.core.dto.JsonResult;
+import com.zslin.core.dto.WxCustomDto;
+import com.zslin.core.rabbit.RabbitUpdateTools;
+import com.zslin.core.repository.SimpleSortBuilder;
+import com.zslin.core.tools.JsonTools;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+/**
+ * 小程序端 - 产品
+ */
+@Service
+public class MiniProductService {
+
+    @Autowired
+    private IProductDao productDao;
+
+    @Autowired
+    private IProductSpecsDao productSpecsDao;
+
+    @Autowired
+    private IMediumDao mediumDao;
+
+    @Autowired
+    private IProductFavoriteRecordDao productFavoriteRecordDao;
+
+    @Autowired
+    private RabbitUpdateTools rabbitUpdateTools;
+
+    @Autowired
+    private IShoppingBasketDao shoppingBasketDao;
+
+    public JsonResult loadOne(String params) {
+        Integer id = JsonTools.getId(params);
+        Product product = productDao.findOne(id);
+        Sort sort = SimpleSortBuilder.generateSort("orderNo");
+        List<ProductSpecs> specsList = productSpecsDao.findByProId(id, sort);
+        List<Medium> mediumList = mediumDao.findByObjClassNameAndObjId("Product", id, sort);
+        PriceDto priceDto = PriceTools.buildPriceDto(specsList);
+
+        WxCustomDto custom = JsonTools.getCustom(params);
+        ProductFavoriteRecord pfr = productFavoriteRecordDao.findByProIdAndCustomId(id, custom.getCustomId());
+//        productDao.plusReadCount(1, id); //增加点击量
+
+        Integer basketCount = shoppingBasketDao.queryCount(custom.getOpenid());
+        plusCount(id); //增加点击量
+
+        return JsonResult.success("获取成功").set("product", product).set("specsList", specsList)
+                .set("mediumList", mediumList).set("price", priceDto).set("favorite", pfr).set("basketCount", basketCount==null?0:basketCount);
+    }
+
+    private void plusCount(Integer proId) {
+        rabbitUpdateTools.updateData("productDao", "plusReadCount", 1, proId);
+    }
+}

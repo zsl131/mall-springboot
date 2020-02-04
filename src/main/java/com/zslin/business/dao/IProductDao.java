@@ -5,6 +5,7 @@ import com.zslin.core.repository.BaseRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 /**
  * Created by 钟述林 on 2019-12-18.
  */
+@Component("productDao")
 public interface IProductDao extends BaseRepository<Product, Integer>, JpaSpecificationExecutor<Product> {
 
     /** 获取分类下的产品数量，用于删除分类前的判断 */
@@ -28,5 +30,35 @@ public interface IProductDao extends BaseRepository<Product, Integer>, JpaSpecif
     @Query("UPDATE Product p SET p.specsCount=p.specsCount+?1 WHERE p.id=?2 ")
     @Modifying
     @Transactional
-    void updateSpecsCount(Integer amount, Integer id);
+    void plusSpecsCount(Integer amount, Integer id);
+
+    @Query("UPDATE Product p SET p.readCount=p.readCount+?1 WHERE p.id=?2 ")
+    @Modifying
+    @Transactional
+    void plusReadCount(Integer amount, Integer id);
+
+    @Query("UPDATE Product p SET p.favoriteCount=p.favoriteCount+?1 WHERE p.id=?2 ")
+    @Modifying
+    @Transactional
+    void plusFavoriteCount(Integer amount, Integer id);
+
+    @Query("UPDATE Product p SET p.saleMode=?1 WHERE p.id=?2")
+    @Modifying
+    @Transactional
+    void updateMode(String mode, Integer id);
+
+    @Query("UPDATE Product p SET p.headImgUrl=?1 WHERE p.id=?2")
+    @Modifying
+    @Transactional
+    void updateHeadimgUrl(String headimg, Integer id);
+
+    /**
+     * 设置显示的价格
+     * @param price
+     * @param id
+     */
+    @Query("UPDATE Product p SET p.price=?1 WHERE p.id=?2")
+    @Modifying
+    @Transactional
+    void updatePrice(Float price, Integer id);
 }
