@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 /**
  * 产品信息
  * @author 钟述林
- * @data generate on: 2020-02-04
+ * @data generate on: 2020-02-07
  */
 @Data
 @Entity
@@ -159,5 +159,10 @@ public class Product implements Serializable {
 	* 归属县级名称
 	*/
 	private String countyName;
+
+	/**
+	* 单位
+	*/
+	private String units;
 
 }

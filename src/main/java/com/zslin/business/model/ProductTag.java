@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 产品标签
  * @author 钟述林
- * @data generate on: 2020-02-04
+ * @data generate on: 2020-02-07
  */
 @Data
 @Entity
@@ -28,5 +28,22 @@ public class ProductTag implements Serializable {
 	*/
 	@NotBlank(message="标签名称不能为空")
 	private String name;
+
+	private Integer orderNo;
+
+	/**
+	* 显示状态
+	*/
+	private String status;
+
+	/**
+	* 对应产品ID
+	*/
+	private Integer proId;
+
+	/**
+	* 对应产品标题
+	*/
+	private String proTitle;
 
 }

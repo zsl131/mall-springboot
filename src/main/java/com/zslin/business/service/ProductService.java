@@ -24,6 +24,8 @@ import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Created by 钟述林 on 2019-12-18.
  */
@@ -204,5 +206,16 @@ public class ProductService {
         //System.out.println("----------------->hql:"+hql);
         productDao.updateByHql(hql, id);
         return JsonResult.success("操作成功");
+    }
+
+    @ExplainOperation(name = "通过标题搜索产品", notes = "通过标题搜索产品", params = {
+            @ExplainParam(value = "title", name = "产品标题", require = true, example = "苹果"),
+    }, back = {
+            @ExplainReturn(field = "proList", notes = "结果数组")
+    })
+    public JsonResult searchByTitle(String params) {
+        String title = JsonTools.getJsonParam(params, "title");
+        List<Product> list = productDao.searchByTitle(title);
+        return JsonResult.success().set("proList", list);
     }
 }

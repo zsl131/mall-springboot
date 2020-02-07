@@ -28,4 +28,8 @@ public interface ICustomAddressDao extends BaseRepository<CustomAddress, Integer
     void updateDefault(String isDefault, Integer id);
 
     CustomAddress findByCustomIdAndId(Integer customId, Integer id);
+
+    @Modifying
+    @Transactional
+    void deleteByCustomIdAndId(Integer customId, Integer id);
 }

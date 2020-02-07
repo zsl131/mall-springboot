@@ -2,6 +2,7 @@ package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.tools.ProductTagTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
@@ -34,6 +35,9 @@ public class ProductTagService {
 
     @Autowired
     private IProductTagDao productTagDao;
+
+    @Autowired
+    private ProductTagTools productTagTools;
 
     @AdminAuth(name = "产品标签列表", orderNum = 1)
     @ExplainOperation(name = "产品标签列表", notes = "产品标签列表", params= {
@@ -68,6 +72,9 @@ public class ProductTagService {
             if(vd.isHasError()) { //如果有验证异常
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
             }
+            Integer maxOrder = productTagDao.maxOrderNo();
+            maxOrder = maxOrder==null?0:maxOrder;
+            obj.setOrderNo(maxOrder+1);
             productTagDao.save(obj);
             return JsonResult.succ(obj);
         } catch (Exception e) {
@@ -138,5 +145,21 @@ public class ProductTagService {
         }
     }
 
+    @Transactional
+    public JsonResult modifyStatus(String params) {
+        Integer id = JsonTools.getId(params);
+        String status = JsonTools.getJsonParam(params, "status");
+        String message = "设置成功";
+        String flag = "1";
+        if("1".equals(flag)) {productTagDao.updateStatus(status, id);}
+        return JsonResult.success(message).set("flag", flag);
+    }
 
+    @ExplainOperation(name = "初始化轮播图序号", notes = "为每个轮播图生成一个不重复的序号", back = {
+            @ExplainReturn(field = "message", notes = "初始化结果信息")
+    })
+    public JsonResult initOrderNo(String params) {
+        productTagTools.buildOrderNo(); //重新生成序号
+        return JsonResult.success("初始化成功");
+    }
 }

@@ -3,19 +3,21 @@ package com.zslin.test;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.dao.IProductDao;
+import com.zslin.business.dao.IProductFavoriteRecordDao;
+import com.zslin.business.dao.IProductSpecsDao;
 import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.tools.AccessTokenTools;
 import com.zslin.business.mini.tools.MiniCommonTools;
 import com.zslin.business.mini.tools.MiniUtils;
+import com.zslin.business.model.Product;
+import com.zslin.business.model.ProductFavoriteRecord;
+import com.zslin.business.model.ProductSpecs;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.service.TestService;
 import com.zslin.core.tasker.BeanCheckTools;
-import com.zslin.core.tools.Base64Utils;
-import com.zslin.core.tools.BuildAdminMenuTools;
-import com.zslin.core.tools.JsonTools;
-import com.zslin.core.tools.SortTools;
+import com.zslin.core.tools.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -38,6 +40,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
+import java.util.List;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -79,6 +82,59 @@ public class NormalTest implements ApplicationContextAware {
 
     public ApplicationContext getApplicationContext() {
         return applicationContext;
+    }
+
+    @Autowired
+    private IProductFavoriteRecordDao productFavoriteRecordDao;
+
+    @Autowired
+    private IProductSpecsDao productSpecsDao;
+
+    @Test
+    public void test19() {
+        List<Product> list = productDao.searchByTitle("苹果");
+        System.out.println("---------->size::"+list.size());
+        for(Product p : list) {
+            System.out.println(p);
+        }
+    }
+
+    @Test
+    public void test18() {
+        Product p = productDao.findOne(1);
+        for(int i=0;i<22;i++) {
+            Product np = new Product();
+            MyBeanUtils.copyProperties(p, np, "id");
+            np.setTitle(p.getTitle()+"_"+(i+1));
+            np.setReadCount(0);
+            np.setFavoriteCount(0);
+            productDao.save(np);
+            for(int j=1;j<=3;j++) {
+                ProductSpecs ps = new ProductSpecs();
+                ps.setCateId(np.getCateId());
+                ps.setCateName(np.getCateName());
+                ps.setName("果号—"+i+"-"+j);
+                ps.setOrderNo(j);
+                ps.setOriPrice((i+1)*j*1.5f);
+                ps.setPrice((i+1)*j*1.0f);
+                ps.setProId(np.getId());
+                ps.setProTitle(np.getTitle());
+                ps.setRemark("果号—"+i+"-"+j+" 这里是描述");
+                productSpecsDao.save(ps);
+            }
+        }
+    }
+
+    @Test
+    public void test17() {
+        ProductFavoriteRecord pfr = productFavoriteRecordDao.findOne(9);
+        System.out.println(pfr);
+        for(int i=0;i<33;i++) {
+            ProductFavoriteRecord p = new ProductFavoriteRecord();
+            MyBeanUtils.copyProperties(pfr, p, "id");
+            p.setProTitle(pfr.getProTitle()+"_"+i);
+            productFavoriteRecordDao.save(p);
+        }
     }
 
     @Test

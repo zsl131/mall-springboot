@@ -68,4 +68,11 @@ public class MiniCustomAddressService {
         CustomAddress address = customAddressDao.findByCustomIdAndId(custom.getCustomId(), id);
         return JsonResult.success().set("address", address);
     }
+
+    public JsonResult delete(String params) {
+        Integer id = JsonTools.getId(params);
+        WxCustomDto custom = JsonTools.getCustom(params);
+        customAddressDao.deleteByCustomIdAndId(custom.getCustomId(), id);
+        return JsonResult.success("删除成功");
+    }
 }

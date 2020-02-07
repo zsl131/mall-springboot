@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 搜索记录
  * @author 钟述林
- * @data generate on: 2020-02-04
+ * @data generate on: 2020-02-07
  */
 @Data
 @Entity
@@ -61,5 +61,13 @@ public class SearchRecord implements Serializable {
 	* 用户昵称
 	*/
 	private String nickname;
+
+	private Integer customId;
+
+	private String updateDay;
+
+	private String updateTime;
+
+	private Long updateLong;
 
 }

@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 产品收藏记录
  * @author 钟述林
- * @data generate on: 2020-02-04
+ * @data generate on: 2020-02-07
  */
 @Data
 @Entity
@@ -36,6 +36,11 @@ public class ProductFavoriteRecord implements Serializable {
 	* 产品标题
 	*/
 	private String proTitle;
+
+	/**
+	* 产品图片
+	*/
+	private String proImg;
 
 	private String openid;
 

@@ -61,4 +61,7 @@ public interface IProductDao extends BaseRepository<Product, Integer>, JpaSpecif
     @Modifying
     @Transactional
     void updatePrice(Float price, Integer id);
+
+    @Query("SELECT p FROM Product p WHERE p.title LIKE %?1%")
+    List<Product> searchByTitle(String title);
 }
