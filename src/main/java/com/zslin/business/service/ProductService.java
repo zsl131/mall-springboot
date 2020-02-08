@@ -11,6 +11,7 @@ import com.zslin.business.dao.IProductDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.business.model.Product;
+import com.zslin.core.rabbit.RabbitUpdateTools;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
@@ -36,6 +37,9 @@ public class ProductService {
 
     @Autowired
     private IProductDao productDao;
+
+    @Autowired
+    private RabbitUpdateTools rabbitUpdateTools;
 
     @AdminAuth(name = "产品信息列表", orderNum = 1)
     @ExplainOperation(name = "产品信息列表", notes = "产品信息列表", params= {
@@ -132,11 +136,17 @@ public class ProductService {
             obj.setFund(o.getFund());
             obj.setSurplusCount(o.getSurplusCount());
             productDao.save(obj);
+            onUpdateProduct(obj);
             return JsonResult.getInstance().set("obj", obj);
         } catch (Exception e) {
             e.printStackTrace();
             return JsonResult.getInstance().fail(e.getMessage());
         }
+    }
+
+    //更新产品关联更新
+    private void onUpdateProduct(Product pro) {
+        rabbitUpdateTools.updateData("productTools", "onUpdateProduct", pro);
     }
 
     @AdminAuth(name = "获取产品信息", orderNum = 5)

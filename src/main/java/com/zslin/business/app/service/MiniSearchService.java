@@ -39,17 +39,27 @@ public class MiniSearchService {
 
     @NeedAuth(openid = true)
     public JsonResult search(String params) {
+        JsonResult result = JsonResult.getInstance();
         String keyword = JsonTools.getJsonParam(params, "keyword");
-
         QueryListDto qld = QueryTools.buildQueryListDto(params);
-        Page<Product> res = productDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
-                new SpecificationOperator("status", "eq", "1", "and"),
-                new SpecificationOperator("title", "like", keyword, "and",
-                        new SpecificationOperator("content", "like", keyword, "or"))),
-                SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
-
+        String searchType = JsonTools.getJsonParam(params, "searchType"); //搜索类型，0-产品；1-资讯
+        if("0".equals(searchType)) {
+            Page<Product> res = productDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
+                    new SpecificationOperator("status", "eq", "1", "and"),
+                    new SpecificationOperator("title", "like", keyword, "and",
+                            new SpecificationOperator("content", "like", keyword, "or"))),
+                    SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
+            result.set("productList", res.getContent());
+        } else { //搜索其他内容
+            /*Page<Product> res = productDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
+                    new SpecificationOperator("status", "eq", "1", "and"),
+                    new SpecificationOperator("title", "like", keyword, "and",
+                            new SpecificationOperator("content", "like", keyword, "or"))),
+                    SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
+            result.set("productList", res.getContent());*/
+        }
         rabbitUpdateTools.updateData("searchRecordTools", "record", params);
-        return JsonResult.success().set("productList", res.getContent()).set("tag", queryTag(keyword));
+        return result.set("tag", queryTag(keyword));
     }
 
     private ProductTag queryTag(String keyword) {
@@ -72,15 +82,16 @@ public class MiniSearchService {
 
     @NeedAuth(openid = true)
     public JsonResult onSearch(String params) {
+        //默认获取20条数据
         try {
             WxCustomDto custom = JsonTools.getCustom(params);
             Page<ProductTag> tagList = productTagDao.findAll(QueryTools.getInstance().buildSearch(
                     new SpecificationOperator("status", "eq", "1")),
-                    SimplePageBuilder.generate(0, 10, SimpleSortBuilder.generateSort("orderNo_a")));
+                    SimplePageBuilder.generate(0, 20, SimpleSortBuilder.generateSort("orderNo_a")));
 
             Page<SearchRecord> ownList = searchRecordDao.findAll(QueryTools.getInstance().buildSearch(
                     new SpecificationOperator("customId", "eq", custom.getCustomId())),
-                    SimplePageBuilder.generate(0, 10, SimpleSortBuilder.generateSort("updateLong_d")));
+                    SimplePageBuilder.generate(0, 20, SimpleSortBuilder.generateSort("updateLong_d")));
 
             return JsonResult.success().set("tagList", tagList.getContent()).set("ownList", ownList.getContent());
         } catch (Exception e) {
