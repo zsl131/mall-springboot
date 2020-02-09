@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 优惠券
  * @author 钟述林
- * @data generate on: 2020-02-07
+ * @data generate on: 2020-02-09
  */
 @Data
 @Entity
@@ -75,5 +75,15 @@ public class Coupon implements Serializable {
 	* @remark 达到某值可以使用，0表示均可使用，单位元
 	*/
 	private Float reachMoney;
+
+	/**
+	* 剩余数量
+	*/
+	private Integer surplusCount=0;
+
+	/**
+	* 已领取数量
+	*/
+	private Integer receiveCount=0;
 
 }

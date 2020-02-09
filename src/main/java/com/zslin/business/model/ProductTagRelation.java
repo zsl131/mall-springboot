@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 产品标签关系
  * @author 钟述林
- * @data generate on: 2020-02-07
+ * @data generate on: 2020-02-09
  */
 @Data
 @Entity
