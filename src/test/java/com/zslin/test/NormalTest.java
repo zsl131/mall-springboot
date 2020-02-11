@@ -2,6 +2,8 @@ package com.zslin.test;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.app.tools.CouponTools;
+import com.zslin.business.dao.ICouponDao;
 import com.zslin.business.dao.IProductDao;
 import com.zslin.business.dao.IProductFavoriteRecordDao;
 import com.zslin.business.dao.IProductSpecsDao;
@@ -9,6 +11,7 @@ import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.tools.AccessTokenTools;
 import com.zslin.business.mini.tools.MiniCommonTools;
 import com.zslin.business.mini.tools.MiniUtils;
+import com.zslin.business.model.Coupon;
 import com.zslin.business.model.Product;
 import com.zslin.business.model.ProductFavoriteRecord;
 import com.zslin.business.model.ProductSpecs;
@@ -89,6 +92,26 @@ public class NormalTest implements ApplicationContextAware {
 
     @Autowired
     private IProductSpecsDao productSpecsDao;
+
+    @Autowired
+    private ICouponDao couponDao;
+
+    @Test
+    public void test21() {
+        String str = NormalTools.curDatetime();
+//        String str2 = CouponTools.buildEndTime(86400);
+        System.out.println("str1: "+str);
+        System.out.println("str2: "+str);
+    }
+
+    @Test
+    public void test20() {
+        Coupon c = couponDao.findByRuleSn("TEST");
+        Coupon c1 = couponDao.findByRuleSn("BUY_PRODUCT");
+        System.out.println("test:::"+c);
+        System.out.println("product:::"+c1);
+        System.out.println("----------->");
+    }
 
     @Test
     public void test19() {

@@ -140,13 +140,17 @@ public class JsonTools {
     }
 
     public static WxCustomDto getCustom(String params) {
-        JSONObject jsonObj = str2JsonObj(getJsonParam(params, JsonParamTools.HEADER_PARAM_NAME));
-        WxCustomDto res = new WxCustomDto();
-        res.setCustomId(jsonObj.getInteger("customid"));
-        res.setNickname(jsonObj.getString("nickname"));
-        res.setOpenid(jsonObj.getString("openid"));
-        res.setUnionid(jsonObj.getString("unionid"));
-        return res;
+        try {
+            JSONObject jsonObj = str2JsonObj(getJsonParam(params, JsonParamTools.HEADER_PARAM_NAME));
+            WxCustomDto res = new WxCustomDto();
+            res.setCustomId(jsonObj.getInteger("customid"));
+            res.setNickname(jsonObj.getString("nickname"));
+            res.setOpenid(jsonObj.getString("openid"));
+            res.setUnionid(jsonObj.getString("unionid"));
+            return res;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     public static LoginUserDto getUser(String params) {

@@ -72,10 +72,10 @@ public class MiniProductService {
     }
 
     public JsonResult list(String params) {
-        QueryListDto qld = QueryTools.buildQueryListDto(params);
         WxCustomDto custom = JsonTools.getCustom(params);
         String type = JsonTools.getJsonParam(params, "type"); //获取的类型，1-当季；2-预售
 
+        QueryListDto qld = QueryTools.buildQueryListDto(params);
         Page<Product> res = productDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
                 new SpecificationOperator("status", "eq", "1"),
                 (type==null||"".equals(type) ||"0".equals(type))?null:new SpecificationOperator("saleMode", "eq", type)),

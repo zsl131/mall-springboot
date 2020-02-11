@@ -14,4 +14,7 @@ public interface ICouponDao extends BaseRepository<Coupon, Integer>, JpaSpecific
 
     @Query("SELECT c FROM Coupon c WHERE c.name LIKE %?1%")
     List<Coupon> searchByName(String name);
+
+    @Query("SELECT c FROM Coupon c, CouponRule r WHERE c.id=r.couponId AND r.ruleSn=?1")
+    Coupon findByRuleSn(String ruleSn);
 }

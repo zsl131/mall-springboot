@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 客户优惠券
  * @author 钟述林
- * @data generate on: 2020-02-09
+ * @data generate on: 2020-02-11
  */
 @Data
 @Entity
@@ -25,6 +25,8 @@ public class CustomCoupon implements Serializable {
 	private String openid;
 
 	private String unionid;
+
+	private Integer customId;
 
 	/**
 	* 优惠券ID
@@ -43,9 +45,9 @@ public class CustomCoupon implements Serializable {
 
 	/**
 	* 价值
-	* @remark 优惠券的价值，单位分
+	* @remark 优惠券的价值，单位元
 	*/
-	private Integer worth;
+	private Float worth;
 
 	/**
 	* 可否重复
@@ -68,7 +70,7 @@ public class CustomCoupon implements Serializable {
 	* 状态
 	* @remark 1-可使用；2-过期；3-已使用
 	*/
-	private String status;
+	private String status="1";
 
 	/**
 	* 指定产品ID
@@ -99,5 +101,26 @@ public class CustomCoupon implements Serializable {
 	* @remark Long格式
 	*/
 	private Long createLong;
+
+	/**
+	* 规则SN，通过这个判断是否领取
+	*/
+	private String ruleSn;
+
+	/**
+	* 获取时的key
+	* @remark 每一次获取都对应一个Key，为了防止重复领取
+	*/
+	private String receiveKey;
+
+	/**
+	* 是否查看
+	*/
+	private String hasRead="0";
+
+	/**
+	* 满减
+	*/
+	private Float reachMoney;
 
 }

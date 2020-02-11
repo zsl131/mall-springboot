@@ -14,6 +14,7 @@ import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.exception.BusinessException;
 import com.zslin.core.qiniu.tools.QiniuTools;
+import com.zslin.core.rabbit.RabbitUpdateTools;
 import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.MyBeanUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,9 @@ public class MiniAuthService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private RabbitUpdateTools rabbitUpdateTools;
 
     @ExplainOperation(name = "获取微信用户信息", params = {
             @ExplainParam(value = "code", name = "loginCode", require = true, example = "通过uni.login获取"),
@@ -95,6 +99,7 @@ public class MiniAuthService {
             headimg = qiniuTools.uploadCustomerHeadImg(headimg, customer.getUnionid()+".jpg");
         }
         customer.setHeadImgUrl(headimg);
+        Customer res = null;
         if(old==null) { //如果不存在
             customer.setFirstFollowDay(NormalTools.curDate());
             customer.setFirstFollowTime(NormalTools.curDatetime());
@@ -103,14 +108,16 @@ public class MiniAuthService {
             customer.setFollowTime(NormalTools.curDatetime());
             customer.setFollowLong(System.currentTimeMillis());
             customerDao.save(customer);
-            return customer;
+            res = customer;
         } else {
             MyBeanUtils.copyProperties(customer, old, "id", "firstFollowDay", "firstFollowTime", "firstFollowLong");
             customer.setFollowDay(NormalTools.curDate());
             customer.setFollowTime(NormalTools.curDatetime());
             customer.setFollowLong(System.currentTimeMillis());
             customerDao.save(old);
-            return old;
+            res = old;
         }
+        rabbitUpdateTools.updateData("couponTools", "handlerFirstFollowCoupon", customer);
+        return res;
     }
 }
