@@ -36,4 +36,11 @@ public interface IShoppingBasketDao extends BaseRepository<ShoppingBasket, Integ
     @Modifying
     @Transactional
     void deleteBasket(Integer [] ids);
+
+    @Query("FROM ShoppingBasket s WHERE s.id in ?1")
+    List<ShoppingBasket> findByIds(Integer [] ids);
+
+    /** 获取对应规格库存 */
+    @Query("SELECT s.amount FROM ProductSpecs s, ShoppingBasket b WHERE s.proId=b.proId AND b.id=?1")
+    Integer querySpecsAmount(Integer basketId);
 }

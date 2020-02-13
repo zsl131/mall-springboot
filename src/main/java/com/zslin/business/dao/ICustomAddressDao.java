@@ -32,4 +32,8 @@ public interface ICustomAddressDao extends BaseRepository<CustomAddress, Integer
     @Modifying
     @Transactional
     void deleteByCustomIdAndId(Integer customId, Integer id);
+
+    /** 获取默认地址 */
+    @Query("FROM CustomAddress c WHERE c.isDefault='1' AND c.customId=?1")
+    CustomAddress findDefaultAddress(Integer customId);
 }

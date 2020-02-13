@@ -25,4 +25,14 @@ public interface IProductSpecsDao extends BaseRepository<ProductSpecs, Integer>,
 
     @Query("SELECT MIN(s.price) FROM ProductSpecs s WHERE s.proId=?1")
     Float queryPrice(Integer proId);
+
+    /** 获取产品的库存 */
+    @Query("SELECT SUM(s.amount) FROM ProductSpecs s WHERE s.proId=?1")
+    Integer queryProductTotalAmount(Integer proId);
+
+    @Query("SELECT s.amount FROM ProductSpecs s WHERE s.id=?1")
+    Integer querySpecsAmount(Integer specsId);
+
+    @Query("FROM ProductSpecs p WHERE p.id in ?1")
+    List<ProductSpecs> findByIds(Integer [] ids);
 }

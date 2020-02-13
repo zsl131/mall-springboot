@@ -3,6 +3,7 @@ package com.zslin.business.app.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.dao.IProductDao;
 import com.zslin.business.dao.IShoppingBasketDao;
 import com.zslin.business.model.ShoppingBasket;
 import com.zslin.core.common.NormalTools;
@@ -62,10 +63,20 @@ public class MiniShoppingBasketService {
      * @return
      */
     public JsonResult updateAmount(String params) {
+        JsonResult result = JsonResult.success("操作成功");
         Integer id = JsonTools.getId(params);
+        Integer surplusCount = shoppingBasketDao.querySpecsAmount(id); //产品库存
+        surplusCount = surplusCount==null?0:surplusCount;
         Integer amount = JsonTools.getParamInteger(params, "amount");
+        if(amount>surplusCount) {
+            result.set("isOut", true); //超过库存
+            amount = surplusCount;
+        } else {
+            result.set("isOut", false);
+        }
         shoppingBasketDao.updateAmount(amount, id);
-        return JsonResult.success("操作成功");
+        result.set("amount", amount);
+        return result;
     }
 
     /**

@@ -110,6 +110,12 @@ public class ProductSpecsService {
         }
     }
 
+    /** 修改产品库存 */
+    private void modifyProductAmount(Integer proId) {
+        Integer amount = productSpecsDao.queryProductTotalAmount(proId);
+        productDao.updateSurplus(amount, proId);
+    }
+
     /**
      * 设置产品显示的价格
      * @param proId
@@ -117,6 +123,8 @@ public class ProductSpecsService {
     private void updateProductPrice(Integer proId) {
         Float price = productSpecsDao.queryPrice(proId);
         productDao.updatePrice(price, proId);
+
+        modifyProductAmount(proId); //修改库存
     }
 
     @AdminAuth(name = "获取产品规格", orderNum = 5)

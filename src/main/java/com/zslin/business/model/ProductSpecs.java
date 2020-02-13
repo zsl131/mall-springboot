@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Range;
 /**
  * 产品规格
  * @author 钟述林
- * @data generate on: 2020-02-11
+ * @data generate on: 2020-02-12
  */
 @Data
 @Entity
@@ -76,5 +76,10 @@ public class ProductSpecs implements Serializable {
 	* 分类名称
 	*/
 	private String cateName;
+
+	/**
+	* 库存数量
+	*/
+	private Integer amount;
 
 }
