@@ -43,6 +43,7 @@ public class CouponTools {
                 coupon.setCreateTime(NormalTools.curDatetime());
                 coupon.setCustomId(customer.getId());
                 coupon.setOpenid(customer.getOpenid());
+                coupon.setNickname(customer.getNickname());
                 coupon.setProId(c.getProId());
                 coupon.setProTitle(c.getProTitle());
                 coupon.setReceiveKey(customer.getId()+"");

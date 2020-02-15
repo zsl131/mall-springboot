@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 客户优惠券
  * @author 钟述林
- * @data generate on: 2020-02-12
+ * @data generate on: 2020-02-15
  */
 @Data
 @Entity
@@ -27,6 +27,8 @@ public class CustomCoupon implements Serializable {
 	private String unionid;
 
 	private Integer customId;
+
+	private String nickname;
 
 	/**
 	* 优惠券ID
