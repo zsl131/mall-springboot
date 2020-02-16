@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 /**
  * 客户收货地址
  * @author 钟述林
- * @data generate on: 2020-02-15
+ * @data generate on: 2020-02-16
  */
 @Data
 @Entity
@@ -100,5 +100,11 @@ public class CustomAddress implements Serializable {
 	* @remark 0-不是默认；1-默认
 	*/
 	private String isDefault;
+
+	/**
+	* 是否来自微信
+	* @remark 0-不是；1-是
+	*/
+	private String fromWx="0";
 
 }

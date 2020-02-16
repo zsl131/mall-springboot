@@ -5,6 +5,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.dao.IAgentDao;
 import com.zslin.business.dao.IAgentLevelDao;
 import com.zslin.business.dao.IAgentPaperDao;
+import com.zslin.business.dao.ICustomerDao;
 import com.zslin.business.model.Agent;
 import com.zslin.business.model.AgentLevel;
 import com.zslin.business.model.AgentPaper;
@@ -51,6 +52,9 @@ public class AgentService {
     @Autowired
     private IAgentLevelDao agentLevelDao;
 
+    @Autowired
+    private ICustomerDao customerDao;
+
     @ExplainOperation(name = "代理申请审核", notes = "代理申请审核", params= {
             @ExplainParam(value = "id", name = "代理ID", require = true, type = "int", example = "1"),
             @ExplainParam(value = "status", name = "审核状态结果", require = true, type = "String", example = "1"),
@@ -80,11 +84,20 @@ public class AgentService {
         a.setStatus(status);
         agentDao.save(a); //修改状态
 
+        if("1".equals(status)) { //如果是审核通过，则修改Customer的相关信息
+            updateCustomer(a.getName(), a.getPhone(), a.getId(), a.getOpenid());
+        }
+
         agentDao.plusVerifyCount(1, a.getId());
         if("1".equals(status)) { //只有审核通过才进行等级调整
             agentDao.plusRelationCount(1, a.getId());
         }
         return JsonResult.success("操作成功");
+    }
+
+    /** 审核通过时修改姓名等信息 */
+    private void updateCustomer(String name, String phone, Integer agentId, String openid) {
+        customerDao.updateName(name, phone, agentId, openid);
     }
 
     @ExplainOperation(name = "获取代理资质", notes = "获取代理资质", params= {

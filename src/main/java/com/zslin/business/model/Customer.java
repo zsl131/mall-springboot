@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 客户
  * @author 钟述林
- * @data generate on: 2020-02-15
+ * @data generate on: 2020-02-16
  */
 @Data
 @Entity
@@ -82,5 +82,15 @@ public class Customer implements Serializable {
 	* @remark 1-男；2-女
 	*/
 	private String sex;
+
+	/**
+	* 性别
+	*/
+	private String name;
+
+	/**
+	* 代理ID
+	*/
+	private Integer agentId;
 
 }
