@@ -8,38 +8,39 @@ import java.io.Serializable;
 
 
 /**
- * 优惠券规则
+ * 预售产品
  * @author 钟述林
  * @data generate on: 2020-02-17
  */
 @Data
 @Entity
-@Table(name = "business_coupon_rule")
+@Table(name = "business_presale_product")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CouponRule implements Serializable {
+public class PresaleProduct implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
 	/**
-	* 名称
+	* 产品ID
 	*/
-	private String name;
+	private Integer proId;
 
 	/**
-	* 优惠券ID
+	* 产品标题
 	*/
-	private Integer couponId;
+	private String proTitle;
 
 	/**
-	* 优惠券名称
+	* 显示状态
+	* @remark 0-隐藏；1-显示
 	*/
-	private String couponName;
+	private String status;
 
 	/**
-	* 规则SN，唯一，不可修改
+	* 预计发货时间
 	*/
-	private String ruleSn;
+	private String deliveryDate;
 
 }

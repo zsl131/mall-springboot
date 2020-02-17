@@ -2,6 +2,8 @@ package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.dao.IPresaleProductDao;
+import com.zslin.business.model.PresaleProduct;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
@@ -40,6 +42,9 @@ public class ProductService {
 
     @Autowired
     private RabbitUpdateTools rabbitUpdateTools;
+
+    @Autowired
+    private IPresaleProductDao presaleProductDao;
 
     @AdminAuth(name = "产品信息列表", orderNum = 1)
     @ExplainOperation(name = "产品信息列表", notes = "产品信息列表", params= {
@@ -197,7 +202,45 @@ public class ProductService {
         Integer id = JsonTools.getId(params);
         String mode = JsonTools.getJsonParam(params, "mode");
         productDao.updateMode(mode, id);
+        if("1".equals(mode)) {presaleProductDao.updateStatus("0", id);} //如果设置为当季，则将预售信息设置为停用
         return JsonResult.success("设置销售模式成功");
+    }
+
+    @ExplainOperation(name = "获取产品预售信息", notes = "获取产品预售信息", params = {
+            @ExplainParam(value = "id", name = "产品对象ID", type = "int", require = true, example = "1"),
+    }, back = {
+            @ExplainReturn(field = "message", notes = "提示信息"),
+            @ExplainReturn(field = "obj", notes = "对象信息")
+    })
+    public JsonResult onPresale(String params) {
+        Integer id = JsonTools.getId(params);
+        PresaleProduct prePro = presaleProductDao.findByProId(id);
+        return JsonResult.success().set("obj", prePro);
+    }
+
+    @ExplainOperation(name = "设置产品预售信息", notes = "设置产品预售信息", params = {
+            @ExplainParam(value = "id", name = "预售对象ID", type = "int", require = true, example = "1"),
+            @ExplainParam(value = "proId", name = "产品对象ID", type = "int", require = true, example = "1"),
+            @ExplainParam(value = "proTitle", name = "产品标题", type = "String", require = true, example = "1"),
+            @ExplainParam(value = "deliveryDate", name = "预售时间", type = "String", require = true, example = "1"),
+    }, back = {
+            @ExplainReturn(field = "message", notes = "提示信息"),
+            @ExplainReturn(field = "obj", notes = "对象信息")
+    })
+    public JsonResult savePresale(String params) {
+        PresaleProduct pre = JSONObject.toJavaObject(JSON.parseObject(params), PresaleProduct.class);
+        PresaleProduct old = presaleProductDao.findByProId(pre.getProId());
+        if(old!=null) {
+            old.setProTitle(pre.getProTitle());
+            old.setDeliveryDate(pre.getDeliveryDate());
+            old.setStatus("1");
+            presaleProductDao.save(old);
+        } else {
+            pre.setStatus("1");
+            presaleProductDao.save(pre);
+        }
+        productDao.updateMode("2", pre.getProId());
+        return JsonResult.success("设置成功");
     }
 
     @ExplainOperation(name = "修改产品的计量值", notes = "修改产品的计量值", params = {

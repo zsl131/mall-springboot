@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 七牛配置
  * @author 钟述林
- * @data generate on: 2020-02-16
+ * @data generate on: 2020-02-17
  */
 @Data
 @Entity
