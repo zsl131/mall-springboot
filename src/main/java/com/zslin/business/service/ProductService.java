@@ -2,17 +2,16 @@ package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
-import com.zslin.business.dao.IPresaleProductDao;
-import com.zslin.business.model.PresaleProduct;
+import com.zslin.business.dao.IProductDao;
+import com.zslin.business.model.Product;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
-import com.zslin.business.dao.IProductDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
-import com.zslin.business.model.Product;
+import com.zslin.core.exception.BusinessException;
 import com.zslin.core.rabbit.RabbitUpdateTools;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
@@ -20,10 +19,8 @@ import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.QueryTools;
 import com.zslin.core.validate.ValidationDto;
 import com.zslin.core.validate.ValidationTools;
-import com.zslin.core.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,9 +39,6 @@ public class ProductService {
 
     @Autowired
     private RabbitUpdateTools rabbitUpdateTools;
-
-    @Autowired
-    private IPresaleProductDao presaleProductDao;
 
     @AdminAuth(name = "产品信息列表", orderNum = 1)
     @ExplainOperation(name = "产品信息列表", notes = "产品信息列表", params= {
@@ -201,21 +195,8 @@ public class ProductService {
     public JsonResult modifySaleMode(String params) {
         Integer id = JsonTools.getId(params);
         String mode = JsonTools.getJsonParam(params, "mode");
-        productDao.updateMode(mode, id);
-        if("1".equals(mode)) {presaleProductDao.updateStatus("0", id);} //如果设置为当季，则将预售信息设置为停用
+        productDao.updateMode(mode, "", id);
         return JsonResult.success("设置销售模式成功");
-    }
-
-    @ExplainOperation(name = "获取产品预售信息", notes = "获取产品预售信息", params = {
-            @ExplainParam(value = "id", name = "产品对象ID", type = "int", require = true, example = "1"),
-    }, back = {
-            @ExplainReturn(field = "message", notes = "提示信息"),
-            @ExplainReturn(field = "obj", notes = "对象信息")
-    })
-    public JsonResult onPresale(String params) {
-        Integer id = JsonTools.getId(params);
-        PresaleProduct prePro = presaleProductDao.findByProId(id);
-        return JsonResult.success().set("obj", prePro);
     }
 
     @ExplainOperation(name = "设置产品预售信息", notes = "设置产品预售信息", params = {
@@ -228,18 +209,9 @@ public class ProductService {
             @ExplainReturn(field = "obj", notes = "对象信息")
     })
     public JsonResult savePresale(String params) {
-        PresaleProduct pre = JSONObject.toJavaObject(JSON.parseObject(params), PresaleProduct.class);
-        PresaleProduct old = presaleProductDao.findByProId(pre.getProId());
-        if(old!=null) {
-            old.setProTitle(pre.getProTitle());
-            old.setDeliveryDate(pre.getDeliveryDate());
-            old.setStatus("1");
-            presaleProductDao.save(old);
-        } else {
-            pre.setStatus("1");
-            presaleProductDao.save(pre);
-        }
-        productDao.updateMode("2", pre.getProId());
+        Integer proId = JsonTools.getParamInteger(params, "proId");
+        String deliveryDate = JsonTools.getJsonParam(params, "deliveryDate");
+        productDao.updateMode("2", deliveryDate, proId);
         return JsonResult.success("设置成功");
     }
 

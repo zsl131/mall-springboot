@@ -42,10 +42,10 @@ public interface IProductDao extends BaseRepository<Product, Integer>, JpaSpecif
     @Transactional
     void plusFavoriteCount(Integer amount, Integer id);
 
-    @Query("UPDATE Product p SET p.saleMode=?1 WHERE p.id=?2")
+    @Query("UPDATE Product p SET p.saleMode=?1, p.deliveryDate=?2 WHERE p.id=?3")
     @Modifying
     @Transactional
-    void updateMode(String mode, Integer id);
+    void updateMode(String mode, String deliveryDate, Integer id);
 
     @Query("UPDATE Product p SET p.headImgUrl=?1 WHERE p.id=?2")
     @Modifying

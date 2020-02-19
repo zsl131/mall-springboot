@@ -72,7 +72,6 @@ public class MiniProductService {
     }
 
     public JsonResult list(String params) {
-        WxCustomDto custom = JsonTools.getCustom(params);
         String type = JsonTools.getJsonParam(params, "type"); //获取的类型，1-当季；2-预售
 
         QueryListDto qld = QueryTools.buildQueryListDto(params);

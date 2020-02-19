@@ -111,13 +111,13 @@ public class MiniAuthService {
             res = customer;
         } else {
             MyBeanUtils.copyProperties(customer, old, "id", "firstFollowDay", "firstFollowTime", "firstFollowLong");
-            customer.setFollowDay(NormalTools.curDate());
-            customer.setFollowTime(NormalTools.curDatetime());
-            customer.setFollowLong(System.currentTimeMillis());
+            old.setFollowDay(NormalTools.curDate());
+            old.setFollowTime(NormalTools.curDatetime());
+            old.setFollowLong(System.currentTimeMillis());
             customerDao.save(old);
             res = old;
         }
-        rabbitUpdateTools.updateData("couponTools", "handlerFirstFollowCoupon", customer);
+        rabbitUpdateTools.updateData("couponTools", "handlerFirstFollowCoupon", res);
         return res;
     }
 }

@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单产品
  * @author 钟述林
- * @data generate on: 2020-02-17
+ * @data generate on: 2020-02-19
  */
 @Data
 @Entity
@@ -105,5 +105,17 @@ public class OrdersProduct implements Serializable {
 	* @remark 单个产品基金金额*amount
 	*/
 	private Float fund;
+
+	/**
+	* 产品销售类型
+	* @remark 1-当季；2-预售
+	*/
+	private String saleMode="1";
+
+	/**
+	* 预计发货时间
+	* @remark 当saleMode为2时，此值有效
+	*/
+	private String deliveryDate;
 
 }

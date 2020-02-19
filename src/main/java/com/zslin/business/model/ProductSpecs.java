@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Range;
 /**
  * 产品规格
  * @author 钟述林
- * @data generate on: 2020-02-17
+ * @data generate on: 2020-02-19
  */
 @Data
 @Entity

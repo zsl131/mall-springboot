@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 /**
  * 产品信息
  * @author 钟述林
- * @data generate on: 2020-02-17
+ * @data generate on: 2020-02-19
  */
 @Data
 @Entity
@@ -109,6 +109,12 @@ public class Product implements Serializable {
 	* @remark 0-未上架；1-正常销售；2-预售
 	*/
 	private String saleMode="1";
+
+	/**
+	* 预计发货时间
+	* @remark 当saleMode为2时，此值有效
+	*/
+	private String deliveryDate;
 
 	/**
 	* 售价
