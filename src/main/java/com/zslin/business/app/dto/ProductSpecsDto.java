@@ -27,4 +27,10 @@ public class ProductSpecsDto {
     private Float price;
 
     private Integer amount;
+
+    /** 销售模式，1-当季；2-预售 */
+    private String saleMode;
+
+    /** 如果是预售则显示预售发货日期 */
+    private String deliveryDate;
 }
