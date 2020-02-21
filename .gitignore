@@ -31,4 +31,7 @@ sms.properties
 kaoqin.properties
 *.bat
 
+# office的临时文件
+~$
+
 # application-*.properties
