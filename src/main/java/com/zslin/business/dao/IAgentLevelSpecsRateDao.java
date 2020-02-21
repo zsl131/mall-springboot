@@ -14,4 +14,8 @@ public interface IAgentLevelSpecsRateDao extends BaseRepository<AgentLevelSpecsR
 
     @Query("FROM AgentLevelSpecsRate a WHERE a.proId=?1")
     List<AgentLevelSpecsRate> findByProduct(Integer proId);
+
+    /** 获取提成 */
+    @Query("FROM AgentLevelSpecsRate a WHERE a.levelId=?1 AND a.specsId=?2")
+    AgentLevelSpecsRate getRate(Integer levelId, Integer specsId);
 }

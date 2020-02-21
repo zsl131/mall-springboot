@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理默认提成标准
  * @author 钟述林
- * @data generate on: 2020-02-19
+ * @data generate on: 2020-02-21
  */
 @Data
 @Entity
@@ -36,5 +36,10 @@ public class AgentRateDefault implements Serializable {
 	* 默认提成标准
 	*/
 	private Float amount;
+
+	/**
+	* 上级默认提成标准
+	*/
+	private Float leaderAmount=0f;
 
 }

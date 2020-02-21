@@ -147,10 +147,20 @@ public class GenerateTest {
     }
 
     @Test
-    public void test01() throws Exception {
+    public void test01() {
+        String dir = System.getProperty("user.dir");
+
+        System.out.println(dir);
+    }
+
+    @Test
+    public void buildCode() throws Exception {
 //        String projectPath = System.getProperty("user.dir");
 //        System.out.println("projectPath==" + projectPath);
-        FileInputStream fis = new FileInputStream(new File("G:\\钟述林\\X项目\\T特产\\model.xlsx"));
+        String dir = System.getProperty("user.dir");
+        String fileName = dir+File.separator+"model.xlsx";
+//        String oldName = "G:\\钟述林\\X项目\\T特产\\model.xlsx";
+        FileInputStream fis = new FileInputStream(new File(fileName));
         List<EntityDto> res = CodeGenerateCommon.generate(fis, 0, 2);
         CodeGenerateTools.generateCode("com.zslin", res);
         System.out.println(res);

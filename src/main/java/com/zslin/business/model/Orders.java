@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单
  * @author 钟述林
- * @data generate on: 2020-02-19
+ * @data generate on: 2020-02-21
  */
 @Data
 @Entity
@@ -32,6 +32,16 @@ public class Orders implements Serializable {
 	private String unionid;
 
 	/**
+	* 用户昵称
+	*/
+	private String nickname;
+
+	/**
+	* 用户ID
+	*/
+	private Integer customId;
+
+	/**
 	* 订单内总产品数量
 	*/
 	private Integer totalCount;
@@ -42,9 +52,20 @@ public class Orders implements Serializable {
 	private Float totalMoney;
 
 	/**
+	* 订单内产品件数
+	*/
+	private Integer specsCount=0;
+
+	/**
 	* 订单总优惠金额
 	*/
 	private Float discountMoney;
+
+	/**
+	* 优惠原因
+	* @remark 优惠券名称
+	*/
+	private String discountReason;
 
 	/**
 	* 订单实付金额
@@ -116,5 +137,38 @@ public class Orders implements Serializable {
 	* 代理unionid
 	*/
 	private String agentUnionid;
+
+	/**
+	* 代理姓名
+	*/
+	private String agentName;
+
+	/**
+	* 代理电话
+	*/
+	private String agentPhone;
+
+	/**
+	* 佣金总额
+	* @remark 各级代理所提佣金总额
+	*/
+	private Float totalCommission=0f;
+
+	/**
+	* 订单密钥
+	* @remark 为客户端快速响应，增加key作为订单标识
+	*/
+	private String ordersKey;
+
+	/**
+	* 收货地址ID
+	*/
+	private Integer addressId;
+
+	/**
+	* 收货地址详情
+	* @remark 姓名,地址,电话
+	*/
+	private String addressCon;
 
 }

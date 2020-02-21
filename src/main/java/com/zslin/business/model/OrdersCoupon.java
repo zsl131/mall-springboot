@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单优惠券
  * @author 钟述林
- * @data generate on: 2020-02-19
+ * @data generate on: 2020-02-21
  */
 @Data
 @Entity
@@ -22,6 +22,11 @@ public class OrdersCoupon implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
+	/**
+	* 用户优惠券对应ID
+	*/
+	private Integer customCouponId;
+
 	/**
 	* 优惠券ID
 	*/
@@ -46,6 +51,8 @@ public class OrdersCoupon implements Serializable {
 	*/
 	private String ordersNo;
 
+	private String ordersKey;
+
 	/**
 	* 使用日期
 	* @remark 格式：yyyy-MM-dd
@@ -66,8 +73,8 @@ public class OrdersCoupon implements Serializable {
 
 	/**
 	* 抵价金额
-	* @remark 单位分
+	* @remark 单位元
 	*/
-	private Integer discountMoney;
+	private Float discountMoney;
 
 }

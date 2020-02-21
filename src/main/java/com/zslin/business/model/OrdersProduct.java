@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单产品
  * @author 钟述林
- * @data generate on: 2020-02-19
+ * @data generate on: 2020-02-21
  */
 @Data
 @Entity
@@ -27,21 +27,34 @@ public class OrdersProduct implements Serializable {
 	*/
 	private String openid;
 
+	private String nickname;
+
+	private Integer customId;
+
 	/**
 	* 消费者Unionid
 	*/
 	private String unionid;
 
+	private Integer ordersId;
+
+	private String ordersKey;
+
 	/**
 	* 订单编号
 	*/
-	private String OrdersNo;
+	private String ordersNo;
 
 	/**
 	* 是否存在售后
 	* @remark 0-不存在；1-存在；默认0
 	*/
 	private String hasAfterSale="0";
+
+	/**
+	* 代理ID
+	*/
+	private Integer agentId;
 
 	/**
 	* 代理Openid

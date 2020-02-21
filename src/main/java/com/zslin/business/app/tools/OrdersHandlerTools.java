@@ -1,4 +1,334 @@
 package com.zslin.business.app.tools;
 
-public class OrdershandlerTools {
+import com.zslin.business.app.dto.SubmitOrdersDto;
+import com.zslin.business.app.dto.orders.OrdersHandlerDto;
+import com.zslin.business.app.dto.orders.OrdersProductDto;
+import com.zslin.business.app.dto.orders.OrdersRateDto;
+import com.zslin.business.dao.*;
+import com.zslin.business.model.*;
+import com.zslin.core.common.NormalTools;
+import com.zslin.core.dto.WxCustomDto;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+/**
+ * 订单处理工具类
+ *
+ */
+@Component("ordersHandlerTools")
+public class OrdersHandlerTools {
+
+    @Autowired
+    private ICustomAddressDao customAddressDao;
+
+    @Autowired
+    private ICustomCouponDao customCouponDao;
+
+    @Autowired
+    private IProductDao productDao;
+
+    @Autowired
+    private IProductSpecsDao productSpecsDao;
+
+    @Autowired
+    private IOrdersDao ordersDao;
+
+    @Autowired
+    private IOrdersProductDao ordersProductDao;
+
+    @Autowired
+    private IAgentDao agentDao;
+
+    @Autowired
+    private IOrdersCouponDao ordersCouponDao;
+
+    @Autowired
+    private IAgentLevelDao agentLevelDao;
+
+    @Autowired
+    private ICustomCommissionRecordDao customCommissionRecordDao;
+
+    @Autowired
+    private RateTools rateTools;
+
+    @Transactional
+    public void addOrders(WxCustomDto custom, SubmitOrdersDto ordersDto) {
+//        System.out.println(custom);
+//        System.out.println("------------------------------");
+        //SubmitOrdersDto(ordersKey=1_442098271, addressId=5, agentId=0 couponId=0, remark=, productData=_23-89-8_20-82-3_)
+        CustomCoupon coupon = null; //优惠券
+        CustomAddress address = null; //收货地址
+        Agent agent = null; //对应代理
+        AgentLevel level = null; //代理对应的代理等级对象
+        if(ordersDto.getCouponId()!=null && ordersDto.getCouponId()>0) {coupon = customCouponDao.findOne(ordersDto.getCouponId());}
+        if(ordersDto.getAddressId()!=null && ordersDto.getAddressId()>0) {address = customAddressDao.findOne(ordersDto.getAddressId());}
+        if(ordersDto.getAgentId()!=null && ordersDto.getAgentId()>0) {agent = agentDao.findOne(ordersDto.getAgentId());}
+        if(agent!=null) {level = agentLevelDao.findByAgentId(agent.getId());}
+
+        String ordersKey = ordersDto.getOrdersKey();
+        String ordersNo = buildOrdersNo(custom.getCustomId());
+        //产品信息列表
+        List<OrdersProductDto> productDtoList = generateProducts(ordersDto.getProductData());
+        List<CustomCommissionRecord> commissionRecordList = buildCommission(agent, custom, level, productDtoList, ordersKey, ordersNo);
+
+        OrdersHandlerDto countDto = buildHandlerDto(productDtoList, commissionRecordList);
+
+//        System.out.println(ordersDto);
+        Orders orders = addOrders(ordersKey, ordersNo, custom, address, agent, coupon, countDto);
+        //订单生成后要处理用户优惠券
+        buildCoupon(orders, coupon);
+        //保存佣金， //TODO 还差一个设置上级的佣金
+        for(CustomCommissionRecord ccr : commissionRecordList) {
+            ccr.setOrdersId(orders.getId());
+            customCommissionRecordDao.save(ccr);
+        }
+        //保存订单产品
+        saveOrderProducts(orders, agent, level, custom, productDtoList);
+    }
+
+    private Orders addOrders(String ordersKey, String ordersNo, WxCustomDto custom, CustomAddress address,
+                           Agent agent, CustomCoupon coupon, OrdersHandlerDto countDto) {
+        Orders order = new Orders();
+        order.setAddressCon(buildAddressCon(address));
+        order.setAddressId(address.getId());
+
+        if(agent!=null) {
+            order.setAgentName(agent.getName());
+            order.setAgentOpenid(agent.getOpenid());
+            order.setAgentPhone(agent.getPhone());
+            order.setAgentUnionid(agent.getUnionid());
+        }
+        order.setCreateDay(NormalTools.curDate());
+        order.setCreateTime(NormalTools.curDatetime());
+        order.setCreateLong(System.currentTimeMillis());
+        order.setCustomId(custom.getCustomId());
+        order.setOpenid(custom.getOpenid());
+        order.setUnionid(custom.getUnionid());
+        order.setNickname(custom.getNickname());
+        order.setStatus("0");
+        order.setHasAfterSale("0"); //默认为无售后问题
+        order.setOrdersKey(ordersKey);
+        order.setOrdersNo(ordersNo);
+        order.setFreight(0f); //TODO 设置运费
+        if(coupon!=null) {
+            order.setDiscountMoney(coupon.getWorth()); //TODO 设置优惠金额
+            order.setDiscountReason(coupon.getCouponName()); //TODO 设置优惠原因
+        }
+        order.setFundMoney(countDto.getFundMoney()); //TODO 设置基金金额
+        order.setSpecsCount(countDto.getSpecsCount()); //TODO 设置产品件数
+        order.setTotalCommission(countDto.getTotalCommission()); //TODO 设置佣金金额
+        order.setTotalCount(countDto.getTotalCount()); //TODO 设置产品总数量
+        order.setTotalMoney(countDto.getTotalMoney()); //TODO 设置总金额
+        ordersDao.save(order);
+        return order;
+    }
+
+    /**
+     * 构建计数DTO
+     * @param dtoList
+     * @param commissionRecordList
+     * @return
+     */
+    private OrdersHandlerDto buildHandlerDto(List<OrdersProductDto> dtoList, List<CustomCommissionRecord> commissionRecordList) {
+        /** 基金金额 */
+        Float fundMoney=0f;
+        /** 总件数 */
+        Integer specsCount=0;
+        /** 总佣金金额 */
+        Float totalCommission=0f;
+        /** 产品总数量 */
+        Integer totalCount=0;
+        /** 总金额 */
+        Float totalMoney=0f;
+        List<Integer> proIdsList = new ArrayList<>();
+        for(OrdersProductDto dto:dtoList) {
+            if(!proIdsList.contains(dto.getProduct().getId())) {proIdsList.add(dto.getProduct().getId());}
+            specsCount += dto.getAmount();
+            totalMoney += dto.getSpecs().getPrice()*dto.getAmount();
+            fundMoney += (dto.getProduct().getFund()*dto.getAmount());//
+        }
+        totalCount = proIdsList.size();
+        for(CustomCommissionRecord ccr : commissionRecordList) {
+            totalCommission += ccr.getMoney();
+        }
+
+        return new OrdersHandlerDto(fundMoney, specsCount, totalCommission, totalCount, totalMoney);
+    }
+
+    private void saveOrderProducts(Orders order, Agent agent, AgentLevel level, WxCustomDto custom, List<OrdersProductDto> productDtoList) {
+        for(OrdersProductDto dto:productDtoList) {
+            Product pro = dto.getProduct();
+            OrdersProduct op = new OrdersProduct();
+            if(level!=null) {
+                op.setAgentLevelId(level.getId());
+                op.setAgentLevelName(level.getName());
+            }
+            if(agent!=null) {
+                op.setAgentOpenid(agent.getOpenid());
+                op.setAgentUnionid(agent.getUnionid());
+                op.setAgentId(agent.getId());
+            }
+            op.setAmount(dto.getAmount());
+            op.setCustomId(custom.getCustomId());
+            op.setDeliveryDate(pro.getDeliveryDate());
+            op.setFund(pro.getFund()*dto.getAmount());
+            op.setHasAfterSale("0");
+            op.setNickname(custom.getNickname());
+            op.setOpenid(custom.getOpenid());
+            op.setOrdersId(order.getId());
+            op.setOrdersKey(order.getOrdersKey());
+            op.setOrdersNo(order.getOrdersNo());
+            op.setOriPrice(dto.getSpecs().getOriPrice());
+            op.setPrice(dto.getSpecs().getPrice());
+            op.setProId(pro.getId());
+            op.setProTitle(pro.getTitle());
+            op.setSaleMode(pro.getSaleMode());
+            op.setSpecsId(dto.getSpecs().getId());
+            op.setSpecsName(dto.getSpecs().getName());
+            op.setUnionid(custom.getUnionid());
+            ordersProductDao.save(op); //保存
+            productDao.plusSaleCount(dto.getAmount(), pro.getId()); //增加销量
+        }
+    }
+
+    /**
+     * //TODO 除了当级代理的佣金还有上级代理的佣金
+     * 构建佣金记录
+     * 添加时要遍历设置ordersId
+     * @param agent 代理信息
+     * @param custom 客户信息
+     * @param level 代理等级
+     * @param proDtoList 产品对象列表
+     * @param ordersKey 订单Key
+     * @param ordersNo 订单编号
+     * @return
+     */
+    private List<CustomCommissionRecord> buildCommission(Agent agent, WxCustomDto custom, AgentLevel level, List<OrdersProductDto> proDtoList, String ordersKey, String ordersNo) {
+        List<CustomCommissionRecord> result = new ArrayList<>();
+        if(agent==null || level==null) {return result;}
+        Agent leaderAgent = null;
+        if(agent.getLeaderId()!=null && agent.getLeaderId()>0) {leaderAgent = agentDao.findOne(agent.getLeaderId());} //获取上级代理
+        for(OrdersProductDto proDto:proDtoList) {
+            OrdersRateDto rateDto = rateTools.getRate(level.getId(), proDto.getSpecs().getId()); //佣金DTO对象
+            result.add(buildRecord(agent, level, custom, rateDto.getThisAmount(), ordersKey, ordersNo, proDto));
+            if(leaderAgent!=null) { //如果有上级代理，也添加进去
+                result.add(buildRecord(leaderAgent, level, custom, rateDto.getLeaderAmount(), ordersKey, ordersNo, proDto));
+            }
+        }
+        return result;
+    }
+
+    private CustomCommissionRecord buildRecord(Agent agent, AgentLevel level, WxCustomDto custom, Float money,
+                                               String ordersKey, String ordersNo, OrdersProductDto proDto) {
+        CustomCommissionRecord ccr = new CustomCommissionRecord();
+        ccr.setAgentId(agent.getId());
+        ccr.setAgentLevelId(level.getId());
+        ccr.setAgentLevelName(level.getName());
+        ccr.setAgentName(agent.getName());
+        ccr.setAgentOpenid(agent.getOpenid());
+        ccr.setAgentPhone(agent.getPhone());
+        ccr.setAgentUnionid(agent.getUnionid());
+        ccr.setCreateDay(NormalTools.curDate());
+        ccr.setCreateLong(System.currentTimeMillis());
+        ccr.setCreateTime(NormalTools.curDatetime());
+        ccr.setCustomId(agent.getCustomId());
+        ccr.setCustomNickname(custom.getNickname());
+        ccr.setCustomOpenid(custom.getOpenid());
+        ccr.setCustomUnionid(custom.getUnionid());
+        ccr.setMoney(money); //TODO 设置佣金
+        ccr.setOrdersKey(ordersKey);
+        ccr.setOrdersNo(ordersNo);
+        ccr.setProId(proDto.getProduct().getId());
+        ccr.setProTitle(proDto.getProduct().getTitle());
+        ccr.setSpecsId(proDto.getSpecs().getId());
+        ccr.setSpecsName(proDto.getSpecs().getName());
+        ccr.setStatus("0"); //默认为0，用户刚下单
+        return ccr;
+    }
+
+    /**
+     * 处理优惠券
+     * @param order
+     * @param coupon
+     */
+    private void buildCoupon(Orders order, CustomCoupon coupon) {
+        if(coupon!=null) {
+            OrdersCoupon oc = new OrdersCoupon();
+            oc.setCouponId(coupon.getCouponId());
+            oc.setCouponName(coupon.getCouponName());
+            oc.setDiscountMoney(coupon.getWorth());
+            oc.setOpenid(coupon.getOpenid());
+            oc.setOrdersKey(order.getOrdersKey());
+            oc.setOrdersNo(order.getOrdersNo());
+            oc.setOrdersId(order.getId());
+            oc.setUnionid(coupon.getUnionid());
+            oc.setUsedDay(NormalTools.curDate());
+            oc.setUsedLong(System.currentTimeMillis());
+            oc.setUsedTime(NormalTools.curDatetime());
+            oc.setCustomCouponId(coupon.getId());
+            ordersCouponDao.save(oc);
+            customCouponDao.updateStatus("3", coupon.getId()); //设置为已使用
+        }
+    }
+
+    private List<OrdersProductDto> generateProducts(String productData) {
+        List<OrdersProductDto> result = new ArrayList<>();
+        String [] array = productData.split("_");
+        for(String str : array) {
+            if(str!=null && !"".equals(str.trim())) {
+                Integer [] ids = getIds(str); //0-产品ID；1-规格ID；2-数量
+                if(ids!=null) {
+                    Product product = productDao.findOne(ids[0]);
+                    ProductSpecs specs = productSpecsDao.findOne(ids[1]); //产品规格
+                    Integer amount = ids[2]; //数量
+                    result.add(new OrdersProductDto(product, specs, amount));
+                }
+            }
+        }
+        return result;
+    }
+
+    private Integer [] getIds(String str) {
+        String [] ids = str.split("-");
+        if(ids.length==3) {
+            return new Integer[]{Integer.parseInt(ids[0]), Integer.parseInt(ids[1]), Integer.parseInt(ids[2])};
+        } else {return null;} //如果长度不够则过虑；
+    }
+
+    private String buildAddressCon(CustomAddress address) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(address.getName()).append(",")
+                .append(address.getProvinceName())
+                .append(address.getCityName())
+                .append(address.getCountyName())
+                .append(address.getStreet()).append(",")
+                .append(address.getPhone());
+        return sb.toString();
+    }
+
+    /**
+     * 订单编号规则
+     * 前14位是时间，后3位是随机数，中间数字为用户ID
+     * @param customId 用户ID
+     * @return
+     */
+    public String buildOrdersNo(Integer customId) {
+        String curDate = NormalTools.getNow("yyyyMMddHHmmss")+customId;
+        int random = genRandomInt();
+        return  curDate+random;
+    }
+
+    private Integer genRandomInt() {
+        int res = 0;
+        Random ran = new Random();
+        while(res<100) {
+            res = ran.nextInt(999);
+        }
+        return res;
+    };
 }

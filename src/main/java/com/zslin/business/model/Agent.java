@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 代理
  * @author 钟述林
- * @data generate on: 2020-02-19
+ * @data generate on: 2020-02-21
  */
 @Data
 @Entity
@@ -104,6 +104,8 @@ public class Agent implements Serializable {
 	* @remark 0-否；1-是
 	*/
 	private String hasExperience;
+
+	private Integer customId;
 
 	private String openid;
 

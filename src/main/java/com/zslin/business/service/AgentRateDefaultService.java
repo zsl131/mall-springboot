@@ -94,6 +94,7 @@ public class AgentRateDefaultService {
             AgentRateDefault obj = agentRateDefaultDao.findOne(o.getId());
 //            MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay");
             obj.setAmount(o.getAmount());
+            obj.setLeaderAmount(o.getLeaderAmount());
             agentRateDefaultDao.save(obj);
             return JsonResult.getInstance().set("obj", obj);
         } catch (Exception e) {

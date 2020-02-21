@@ -3,7 +3,9 @@ package com.zslin.business.dao;
 import com.zslin.business.model.CustomCoupon;
 import com.zslin.core.repository.BaseRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,4 +26,9 @@ public interface ICustomCouponDao extends BaseRepository<CustomCoupon, Integer>,
 
     @Query("FROM CustomCoupon c WHERE c.customId=?1 AND c.status='1' AND c.reachMoney<=?2 AND (c.proId IN ?3 OR c.proId IS NULL OR c.proId=0)")
     List<CustomCoupon> findByCanUse(Integer customId, Float reachMoney, Integer [] ids);
+
+    @Query("UPDATE CustomCoupon c SET c.status=?1 WHERE c.id=?2")
+    @Modifying
+    @Transactional
+    void updateStatus(String status, Integer id);
 }

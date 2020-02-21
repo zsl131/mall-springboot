@@ -1,4 +1,4 @@
-package com.zslin.business.app.dto;
+package com.zslin.business.app.dto.orders;
 
 import lombok.Data;
 
@@ -18,4 +18,12 @@ public class OrdersHandlerDto {
     private Integer totalCount=0;
     /** 总金额 */
     private Float totalMoney=0f;
+
+    public OrdersHandlerDto(Float fundMoney, Integer specsCount, Float totalCommission, Integer totalCount, Float totalMoney) {
+        this.fundMoney = fundMoney;
+        this.specsCount = specsCount;
+        TotalCommission = totalCommission;
+        this.totalCount = totalCount;
+        this.totalMoney = totalMoney;
+    }
 }

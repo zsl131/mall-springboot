@@ -1,11 +1,15 @@
 package com.zslin.business.app.service;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.app.dto.ProductSpecsDto;
+import com.zslin.business.app.dto.SubmitOrdersDto;
 import com.zslin.business.dao.*;
 import com.zslin.business.model.*;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.WxCustomDto;
+import com.zslin.core.rabbit.RabbitUpdateTools;
 import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +35,9 @@ public class MiniOrdersService {
 
     @Autowired
     private IProductDao productDao;
+
+    @Autowired
+    private RabbitUpdateTools rabbitUpdateTools;
 
     @NeedAuth(openid = true)
     public JsonResult onPay(String params) {
@@ -84,6 +91,26 @@ public class MiniOrdersService {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return result;
+    }
+
+    /**
+     * 提交订单
+     * @param params
+     * @return
+     */
+    @NeedAuth(openid = true)
+    public JsonResult submitOrders(String params) {
+        JsonResult result = JsonResult.getInstance();
+        WxCustomDto custom = JsonTools.getCustom(params);
+        //提交的数据对象
+        SubmitOrdersDto objDto = JSONObject.toJavaObject(JSON.parseObject(params), SubmitOrdersDto.class);
+        /*Integer addressId = JsonTools.getParamInteger(params, "addressId"); //地址ID
+        Integer couponId = JsonTools.getParamInteger(params, "couponId"); //优惠券ID
+        String remark = JsonTools.getJsonParam(params, "remark");
+        String productData = JsonTools.getJsonParam(params, "productData"); //提交的产品ID，_23-89-8_20-82-3_*/
+
+        rabbitUpdateTools.updateData("ordersHandlerTools", "addOrders", custom, objDto);
         return result;
     }
 

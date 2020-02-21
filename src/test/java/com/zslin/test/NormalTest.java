@@ -3,6 +3,7 @@ package com.zslin.test;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.app.tools.CouponTools;
+import com.zslin.business.app.tools.OrdersHandlerTools;
 import com.zslin.business.dao.ICouponDao;
 import com.zslin.business.dao.IProductDao;
 import com.zslin.business.dao.IProductFavoriteRecordDao;
@@ -44,6 +45,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.Random;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -95,6 +97,13 @@ public class NormalTest implements ApplicationContextAware {
 
     @Autowired
     private ICouponDao couponDao;
+
+    @Test
+    public void test22() {
+        /*for(int i=0;i<15;i++) {
+            System.out.println(OrdersHandlerTools.buildOrdersNo(1));
+        }*/
+    }
 
     @Test
     public void test21() {

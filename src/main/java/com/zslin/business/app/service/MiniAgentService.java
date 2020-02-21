@@ -69,6 +69,7 @@ public class MiniAgentService {
         agent.setSex(o.getSex());
         agent.setStreet(o.getStreet());
         agent.setAddressIndex(o.getAddressIndex());
+        agent.setCustomId(dto.getCustomId());
         agent.setStatus("0"); //再次提交后状态需要修改为待审核
         agentDao.save(agent);
 

@@ -73,4 +73,10 @@ public interface IProductDao extends BaseRepository<Product, Integer>, JpaSpecif
     @Modifying
     @Transactional
     void updateSurplus(Integer amount, Integer id);
+
+    /** 增加销量 */
+    @Query("UPDATE Product p SET p.saleCount=p.saleCount+?1 WHERE p.id=?2")
+    @Modifying
+    @Transactional
+    void plusSaleCount(Integer amount, Integer id);
 }

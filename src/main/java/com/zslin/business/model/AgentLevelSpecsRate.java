@@ -11,7 +11,7 @@ import org.hibernate.validator.constraints.Range;
 /**
  * 代理提成标准
  * @author 钟述林
- * @data generate on: 2020-02-19
+ * @data generate on: 2020-02-21
  */
 @Data
 @Entity
@@ -58,5 +58,10 @@ public class AgentLevelSpecsRate implements Serializable {
 	*/
 	@Range(min=0, message="提成金额不能小于0")
 	private Float amount;
+
+	/**
+	* 上级提成金额
+	*/
+	private Float leaderAmount;
 
 }

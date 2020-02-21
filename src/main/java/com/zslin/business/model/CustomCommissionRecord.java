@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理佣金明细
  * @author 钟述林
- * @data generate on: 2020-02-20
+ * @data generate on: 2020-02-21
  */
 @Data
 @Entity
@@ -36,14 +36,14 @@ public class CustomCommissionRecord implements Serializable {
 	private String agentPhone;
 
 	/**
-	* 订单编号
+	* 当前等级ID
 	*/
-	private String ordersNo;
+	private Integer agentLevelId;
 
 	/**
-	* 订单ID
+	* 当前等级名称
 	*/
-	private Integer ordersId;
+	private String agentLevelName;
 
 	/**
 	* 规格ID
@@ -101,5 +101,20 @@ public class CustomCommissionRecord implements Serializable {
 	* 对应用户Unionid
 	*/
 	private String customUnionid;
+
+	/**
+	* 订单编号
+	*/
+	private String ordersNo;
+
+	/**
+	* 订单ID
+	*/
+	private Integer ordersId;
+
+	/**
+	* 订单KEY
+	*/
+	private String ordersKey;
 
 }
