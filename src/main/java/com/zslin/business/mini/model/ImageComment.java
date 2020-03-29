@@ -1,4 +1,4 @@
-package com.zslin.business.model;
+package com.zslin.business.mini.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -8,15 +8,15 @@ import java.io.Serializable;
 
 
 /**
- * 留声机
+ * 影像评论
  * @author 钟述林
  * @data generate on: 2020-03-25
  */
 @Data
 @Entity
-@Table(name = "business_phonograph")
+@Table(name = "mini_image_comment")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Phonograph implements Serializable {
+public class ImageComment implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,40 +41,36 @@ public class Phonograph implements Serializable {
 	private Long createLong;
 
 	/**
-	* 订单编号
+	* 评论内容
 	*/
-	private String ordersNo;
+	@Lob
+	private String content;
 
 	/**
-	* 密码
-	* @remark 播放时需要输入该密码，可以是：无密码、收货人电话、自定义
+	* 显示状态
+	* @remark 0-隐藏（评论者可见）；1-显示
 	*/
-	private String password;
+	private String status="0";
 
 	/**
-	* 播放次数
+	* 点赞次数
 	*/
-	private Integer playRecord=0;
+	private Integer goodCount=0;
 
 	/**
-	* 留声人openid
+	* 用户ID
 	*/
-	private String openid;
+	private Integer customId;
+
+	private String customOpenid;
+
+	private String customNickname;
+
+	private String customUnionid;
 
 	/**
-	* 留声人nickname
+	* 用户头像
 	*/
-	private String nickname;
-
-	/**
-	* 录音地址
-	*/
-	private String url;
-
-	/**
-	* 上传录音的token
-	* @remark 用于获取具体的录音对象
-	*/
-	private String ticket;
+	private String headImgUrl;
 
 }

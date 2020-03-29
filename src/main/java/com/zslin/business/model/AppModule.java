@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 移动端首页大功能展示
  * @author 钟述林
- * @data generate on: 2020-02-21
+ * @data generate on: 2020-03-25
  */
 @Data
 @Entity
