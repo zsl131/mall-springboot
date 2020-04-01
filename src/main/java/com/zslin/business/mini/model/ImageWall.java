@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 影像墙
  * @author 钟述林
- * @data generate on: 2020-03-25
+ * @data generate on: 2020-04-01
  */
 @Data
 @Entity
@@ -39,6 +39,12 @@ public class ImageWall implements Serializable {
 	* @remark Long格式
 	*/
 	private Long createLong;
+
+	/**
+	* 关联标识
+	* @remark 0-未关联；1-已关联
+	*/
+	private String relationFlag="0";
 
 	/**
 	* 关联产品ID

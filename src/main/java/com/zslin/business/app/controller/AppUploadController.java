@@ -66,7 +66,7 @@ public class AppUploadController {
                 BufferedOutputStream bw = null;
                 try {
                     //System.out.println("---->"+extra);
-                    log.info("上传参数：{}。", customId);
+                    //log.info("上传参数：{}。", customId);
 //                    UploadParam param = UploadParamsTools.buildParams(extra); //参数DTO对象
 
                     String fileName = file.getOriginalFilename();
@@ -110,6 +110,7 @@ public class AppUploadController {
                         wall.setStatus("0");
                         wall.setUrl(qiniuConfigTools.getQiniuConfig().getUrl() + key);
                         imageWallDao.save(wall);
+                        result.add(wall.getId(), wall.getUrl());
                     }
 
                 } catch (IOException e) {

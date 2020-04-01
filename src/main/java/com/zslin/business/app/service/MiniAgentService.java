@@ -5,9 +5,11 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.dao.IAgentApplyVerifyDao;
 import com.zslin.business.dao.IAgentDao;
+import com.zslin.business.dao.IAgentLevelDao;
 import com.zslin.business.dao.IAgentPaperDao;
 import com.zslin.business.model.Agent;
 import com.zslin.business.model.AgentApplyVerify;
+import com.zslin.business.model.AgentLevel;
 import com.zslin.business.model.AgentPaper;
 import com.zslin.business.tools.MediumTools;
 import com.zslin.core.annotations.NeedAuth;
@@ -30,6 +32,9 @@ public class MiniAgentService {
 
     @Autowired
     private IAgentPaperDao agentPaperDao;
+
+    @Autowired
+    private IAgentLevelDao agentLevelDao;
 
     @Autowired
     private IAgentApplyVerifyDao agentApplyVerifyDao;
@@ -153,6 +158,11 @@ public class MiniAgentService {
             List<AgentApplyVerify> verifyList = agentApplyVerifyDao.findByUnionid(dto.getUnionid(), SimpleSortBuilder.generateSort("id_d"));
             List<AgentPaper> paperList = agentPaperDao.findByAgentId(agent.getId());
             result.set("verifyList", verifyList).set("paperList", paperList);
+
+            if("1".equals(agent.getStatus())) { //如果是正式代理
+                List<AgentLevel> levelList = agentLevelDao.findAll();
+                result.set("levelList", levelList);
+            }
         }
         return result.set("obj", agent);
     }

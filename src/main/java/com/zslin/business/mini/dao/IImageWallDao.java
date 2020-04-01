@@ -24,4 +24,9 @@ public interface IImageWallDao extends BaseRepository<ImageWall, Integer>, JpaSp
     @Modifying
     @Transactional
     void plusGoodCount(Integer count, Integer id);
+
+    @Query("UPDATE ImageWall w SET w.status=?1 WHERE w.id=?2")
+    @Modifying
+    @Transactional
+    void modifyStatus(String status, Integer id);
 }

@@ -2,6 +2,7 @@ package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.app.tools.RateTools;
 import com.zslin.business.dao.*;
 import com.zslin.business.dto.CategoryTreeDto;
 import com.zslin.business.model.*;
@@ -13,6 +14,7 @@ import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
+import com.zslin.core.dto.RateDto;
 import com.zslin.core.exception.BusinessException;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
@@ -55,6 +57,9 @@ public class AgentLevelSpecsRateService {
 
     @Autowired
     private IAgentLevelDao agentLevelDao;
+
+    @Autowired
+    private RateTools rateTools;
 
     @ExplainOperation(name = "添加或修改代理提成标准", notes = "添加或修改代理提成标准", params = {
             @ExplainParam(value = "id", name = "代理提成标准id", type = "int", example = "1"),
@@ -230,5 +235,24 @@ public class AgentLevelSpecsRateService {
             e.printStackTrace();
             return JsonResult.error(e.getMessage());
         }
+    }
+
+    @ExplainOperation(name = "获取提成标准", notes = "通过代理等级获取提成标准", params = {
+            @ExplainParam(value = "levelId", name = "代理等级ID", type = "int", require = true, example = "1")
+    }, back = {
+            @ExplainReturn(field = "message", notes = "提示信息"),
+            @ExplainReturn(field = "rateList", notes = "标准列表")
+    })
+    public JsonResult queryRate(String params) {
+        QueryListDto qld = QueryTools.buildQueryListDto(params);
+        Page<Product> res = productDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList()),
+                SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
+
+        //System.out.println(res.getContent());
+
+        Integer levelId = JsonTools.getParamInteger(params, "levelId");
+        List<RateDto> rateList = rateTools.buildRates(res.getContent(), levelId);
+
+        return JsonResult.success().set("rateList", rateList);
     }
 }

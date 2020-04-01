@@ -3,11 +3,18 @@ package com.zslin.business.app.tools;
 import com.zslin.business.app.dto.orders.OrdersRateDto;
 import com.zslin.business.dao.IAgentLevelSpecsRateDao;
 import com.zslin.business.dao.IAgentRateDefaultDao;
+import com.zslin.business.dao.IProductSpecsDao;
 import com.zslin.business.model.AgentLevelSpecsRate;
 import com.zslin.business.model.AgentRateDefault;
-import org.aspectj.weaver.ast.Or;
+import com.zslin.business.model.Product;
+import com.zslin.business.model.ProductSpecs;
+import com.zslin.core.dto.RateDto;
+import com.zslin.core.repository.SimpleSortBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 提成标准工具类
@@ -20,6 +27,9 @@ public class RateTools {
 
     @Autowired
     private IAgentRateDefaultDao agentRateDefaultDao;
+
+    @Autowired
+    private IProductSpecsDao productSpecsDao;
 
     /** 获取提成标准 */
     public OrdersRateDto getRate(Integer levelId, Integer specsId) {
@@ -42,5 +52,31 @@ public class RateTools {
         if(dto.getLeaderAmount()==null || dto.getLeaderAmount()<0) {dto.setLeaderAmount(0f);}
         if(dto.getThisAmount()==null || dto.getThisAmount()<0) {dto.setThisAmount(0f);}
         return dto;
+    }
+
+    public List<RateDto> buildRates(List<Product> proList, Integer levelId) {
+        List<RateDto> result = new ArrayList<>();
+        for(Product pro:proList) {
+            List<ProductSpecs> specsList = productSpecsDao.findByProId(pro.getId(), SimpleSortBuilder.generateSort("orderNo_a"));
+//            List<AgentLevelSpecsRate> rates = agentLevelSpecsRateDao.findByProduct(pro.getId());
+            for(ProductSpecs spe : specsList) {
+                RateDto rd = new RateDto();
+                rd.setProId(pro.getId());
+                rd.setProTitle(pro.getTitle());
+                rd.setSpecsId(spe.getId());
+                rd.setSpecsName(spe.getName());
+                rd.setUnitName(pro.getUnits());
+                AgentLevelSpecsRate rate = agentLevelSpecsRateDao.getRate(levelId, spe.getId());
+                if(rate==null) {
+                    AgentRateDefault def = agentRateDefaultDao.getRate(levelId);
+                    rd.setRate(def.getAmount());
+                } else {
+                    rd.setRate(rate.getAmount());
+                }
+                result.add(rd);
+            }
+        }
+        //System.out.println(result);
+        return result;
     }
 }

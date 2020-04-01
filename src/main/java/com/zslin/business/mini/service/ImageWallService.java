@@ -136,5 +136,26 @@ public class ImageWallService {
         }
     }
 
+    public JsonResult modifyStatus(String params) {
+        Integer id = JsonTools.getId(params);
+        String status = JsonTools.getJsonParam(params, "status");
+        imageWallDao.modifyStatus(status, id);
+        return JsonResult.success("操作成功");
+    }
 
+    public JsonResult relationProduct(String params) {
+        try {
+            Integer id = JsonTools.getId(params);
+            String title = JsonTools.getJsonParam(params, "proTitle");
+            Integer proId = JsonTools.getParamInteger(params, "proId");
+            ImageWall wall = imageWallDao.findOne(id);
+            wall.setRelationProId(proId);
+            wall.setRelationProTitle(title);
+            wall.setRelationFlag("1");
+            imageWallDao.save(wall);
+            return JsonResult.success("设置成功");
+        } catch (Exception e) {
+            return JsonResult.error(e.getMessage());
+        }
+    }
 }
