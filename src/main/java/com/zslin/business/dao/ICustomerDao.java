@@ -18,4 +18,11 @@ public interface ICustomerDao extends BaseRepository<Customer, Integer>, JpaSpec
     @Modifying
     @Transactional
     void updateName(String name, String phone, Integer agentId, String openid);
+
+    Customer findByPhone(String phone);
+
+    @Query("UPDATE Customer c SET c.phone=?1 WHERE c.id=?2")
+    @Modifying
+    @Transactional
+    void updatePhone(String phone, Integer id);
 }

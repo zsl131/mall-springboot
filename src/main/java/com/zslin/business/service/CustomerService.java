@@ -3,12 +3,14 @@ package com.zslin.business.service;
 import com.zslin.business.dao.ICustomerDao;
 import com.zslin.business.model.Customer;
 import com.zslin.core.annotations.AdminAuth;
+import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
+import com.zslin.core.dto.WxCustomDto;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
@@ -47,18 +49,32 @@ public class CustomerService {
      }
 
     @AdminAuth(name = "获取客户", orderNum = 5)
-    @ExplainOperation(name = "获取客户信息", notes = "通过ID获取角色对象", params = {
+    @ExplainOperation(name = "获取客户信息", notes = "通过ID获取客户信息", params = {
             @ExplainParam(value = "id", name = "客户ID", require = true, type = "int", example = "1")
     }, back = {
             @ExplainReturn(field = "obj", type = "Object", notes = "获取到的对象信息")
     })
     public JsonResult loadOne(String params) {
         try {
-            Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
+//            Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
+            Integer id = JsonTools.getId(params);
             Customer obj = customerDao.findOne(id);
             return JsonResult.getInstance().set("obj", obj);
         } catch (Exception e) {
             e.printStackTrace();
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
+    /** 绑定手机号码 */
+    @NeedAuth(openid = true)
+    public JsonResult bindPhone(String params) {
+        try {
+            String phone = JsonTools.getJsonParam(params, "phone");
+            WxCustomDto customDto = JsonTools.getCustom(params);
+            customerDao.updatePhone(phone, customDto.getCustomId());
+            return JsonResult.success("绑定成功");
+        } catch (Exception e) {
             return JsonResult.error(e.getMessage());
         }
     }
