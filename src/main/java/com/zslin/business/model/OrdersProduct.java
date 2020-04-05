@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单产品
  * @author 钟述林
- * @data generate on: 2020-04-01
+ * @data generate on: 2020-04-05
  */
 @Data
 @Entity
@@ -82,6 +82,11 @@ public class OrdersProduct implements Serializable {
 	* 产品ID
 	*/
 	private Integer proId;
+
+	/**
+	* 产品照片
+	*/
+	private String proImg;
 
 	/**
 	* 产品标题

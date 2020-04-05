@@ -63,7 +63,7 @@ public class AgentService {
             @ExplainReturn(field = "message", notes = "提示信息"),
     })
     public JsonResult verify(String params) {
-        System.out.println(params);
+        //System.out.println(params);
         Integer id = JsonTools.getId(params);
         String status = JsonTools.getJsonParam(params, "status");
         Integer level = JsonTools.getParamInteger(params, "level");
@@ -92,6 +92,7 @@ public class AgentService {
         if("1".equals(status)) { //只有审核通过才进行等级调整
             agentDao.plusRelationCount(1, a.getId());
         }
+
         return JsonResult.success("操作成功");
     }
 

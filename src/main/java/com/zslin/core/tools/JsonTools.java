@@ -141,12 +141,14 @@ public class JsonTools {
 
     public static WxCustomDto getCustom(String params) {
         try {
+            //参数自动转为小写
             JSONObject jsonObj = str2JsonObj(getJsonParam(params, JsonParamTools.HEADER_PARAM_NAME));
             WxCustomDto res = new WxCustomDto();
             res.setCustomId(jsonObj.getInteger("customid"));
             res.setNickname(jsonObj.getString("nickname"));
             res.setOpenid(jsonObj.getString("openid"));
-            res.setUnionid(jsonObj.getString("unionid"));
+            try { res.setUnionid(jsonObj.getString("unionid")); } catch (Exception e) { }
+            try { res.setHeadImgUrl(jsonObj.getString("headimgurl")); } catch (Exception e) { }
             return res;
         } catch (Exception e) {
             throw e;

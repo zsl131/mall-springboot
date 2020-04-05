@@ -57,7 +57,7 @@ public class MiniAgentService {
         //System.out.println("+++++++++ID::: "+id);
         Agent agent = agentDao.findOne(id); //获取信息
         if(!"2".equals(agent.getStatus())) {throw new BusinessException(BusinessException.Code.STATUS_ERROR, "当前状态不可修改");}
-        if(!dto.getUnionid().equals(agent.getUnionid())) {throw new BusinessException(BusinessException.Code.AUTH_ERROR, "无权限修改");}
+        if(!dto.getOpenid().equals(agent.getOpenid())) {throw new BusinessException(BusinessException.Code.AUTH_ERROR, "无权限修改");}
 
         Agent o = JSONObject.toJavaObject(JSON.parseObject(params), Agent.class);
 
@@ -76,6 +76,12 @@ public class MiniAgentService {
         agent.setAddressIndex(o.getAddressIndex());
         agent.setCustomId(dto.getCustomId());
         agent.setStatus("0"); //再次提交后状态需要修改为待审核
+        if(o.getLeaderId()!=null && o.getLeaderId()>0) { //如果有上级代理
+            agent.setLeaderId(o.getLeaderId());
+            agent.setLeaderName(o.getLeaderName());
+            agent.setLeaderPhone(o.getLeaderPhone());
+            agent.setLeaderOpenid(o.getLeaderOpenid());
+        }
         agentDao.save(agent);
 
         JSONArray jsonArray = JsonTools.str2JsonArray(JsonTools.getJsonParam(params, "papers")); //获取资质
@@ -116,7 +122,7 @@ public class MiniAgentService {
         WxCustomDto dto = JsonTools.getCustom(params);
         //System.out.println(dto);
 
-        Agent old = agentDao.findByUnionid(dto.getUnionid());
+        Agent old = agentDao.findByOpenid(dto.getOpenid());
         if(old!=null) {
             throw new BusinessException(BusinessException.Code.HAS_EXISTS, "您已提交申请，请勿重复提交！");
         }
@@ -152,10 +158,10 @@ public class MiniAgentService {
     @NeedAuth(openid = true)
     public JsonResult loadOne(String params) {
         WxCustomDto dto = JsonTools.getCustom(params);
-        Agent agent = agentDao.findByUnionid(dto.getUnionid());
+        Agent agent = agentDao.findByOpenid(dto.getOpenid());
         JsonResult result = JsonResult.getInstance();
         if(agent!=null) {
-            List<AgentApplyVerify> verifyList = agentApplyVerifyDao.findByUnionid(dto.getUnionid(), SimpleSortBuilder.generateSort("id_d"));
+            List<AgentApplyVerify> verifyList = agentApplyVerifyDao.findByOpenid(dto.getOpenid(), SimpleSortBuilder.generateSort("id_d"));
             List<AgentPaper> paperList = agentPaperDao.findByAgentId(agent.getId());
             result.set("verifyList", verifyList).set("paperList", paperList);
 

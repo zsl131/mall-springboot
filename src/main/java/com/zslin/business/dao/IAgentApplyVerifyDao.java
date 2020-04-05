@@ -12,5 +12,5 @@ import java.util.List;
  */
 public interface IAgentApplyVerifyDao extends BaseRepository<AgentApplyVerify, Integer>, JpaSpecificationExecutor<AgentApplyVerify> {
 
-    List<AgentApplyVerify> findByUnionid(String unionid, Sort sort);
+    List<AgentApplyVerify> findByOpenid(String openid, Sort sort);
 }

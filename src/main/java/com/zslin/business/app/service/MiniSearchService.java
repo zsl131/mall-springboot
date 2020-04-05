@@ -10,7 +10,7 @@ import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.dto.WxCustomDto;
-import com.zslin.core.rabbit.RabbitUpdateTools;
+import com.zslin.core.rabbit.RabbitNormalTools;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.repository.SpecificationOperator;
@@ -32,7 +32,7 @@ public class MiniSearchService {
     private IProductDao productDao;
 
     @Autowired
-    private RabbitUpdateTools rabbitUpdateTools;
+    private RabbitNormalTools rabbitNormalTools;
 
     @Autowired
     private IProductTagDao productTagDao;
@@ -58,7 +58,7 @@ public class MiniSearchService {
                     SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
             result.set("productList", res.getContent());*/
         }
-        rabbitUpdateTools.updateData("searchRecordTools", "record", params);
+        rabbitNormalTools.updateData("searchRecordTools", "record", params);
         return result.set("tag", queryTag(keyword));
     }
 

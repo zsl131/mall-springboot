@@ -27,6 +27,18 @@ public class MiniUtils {
      * @return
      */
     public static NewCustomDto decryptionUserInfo(String encryptedData, String sessionKey, String iv) {
+        String str = decryption(encryptedData, sessionKey, iv);
+        if(str!=null) {
+            return JSONObject.toJavaObject(JSON.parseObject(str), NewCustomDto.class);
+        }
+        return null;
+    }
+
+    public static String getPhone(String encryptedData, String sessionKey, String iv) {
+        return decryption(encryptedData, sessionKey, iv);
+    }
+
+    private static String decryption(String encryptedData, String sessionKey, String iv) {
         encryptedData = encryptedData.replaceAll(" ", "+"); //传入之后+号全部自动变成了空格
         iv = iv.replaceAll(" ", "+");
         // 被加密的数据
@@ -55,9 +67,9 @@ public class MiniUtils {
             cipher.init(Cipher.DECRYPT_MODE, spec, parameters);// 初始化
             byte[] resultByte = cipher.doFinal(dataByte);
             if (null != resultByte && resultByte.length > 0) {
-                String result = new String(resultByte, "UTF-8");
-                NewCustomDto dto = JSONObject.toJavaObject(JSON.parseObject(result), NewCustomDto.class);
-                return dto;
+//                String result = new String(resultByte, "UTF-8");
+//                NewCustomDto dto = JSONObject.toJavaObject(JSON.parseObject(result), NewCustomDto.class);
+                return new String(resultByte, "UTF-8");
 
             }
         } catch (Exception e) {

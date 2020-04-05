@@ -2,6 +2,7 @@ package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.app.tools.OrdersHandlerTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
@@ -34,6 +35,9 @@ public class OrdersService {
     @Autowired
     private IOrdersDao ordersDao;
 
+    @Autowired
+    private OrdersHandlerTools ordersHandlerTools;
+
     @AdminAuth(name = "订单列表", orderNum = 1)
     @ExplainOperation(name = "订单列表", notes = "订单列表", params= {
              @ExplainParam(value = "page", name = "页码，从0开始，默认0", require = false, type = "int", example = "0"),
@@ -49,7 +53,7 @@ public class OrdersService {
          Page<Orders> res = ordersDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList()),
                  SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
 
-         return JsonResult.getInstance().set("size", (int) res.getTotalElements()).set("datas", res.getContent());
+         return JsonResult.getInstance().set("size", (int) res.getTotalElements()).set("datas", ordersHandlerTools.rebuildOrders(res.getContent()));
      }
 
     @AdminAuth(name = "获取订单", orderNum = 5)

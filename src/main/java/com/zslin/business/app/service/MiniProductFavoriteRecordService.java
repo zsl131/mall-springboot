@@ -6,7 +6,7 @@ import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.dto.WxCustomDto;
-import com.zslin.core.rabbit.RabbitUpdateTools;
+import com.zslin.core.rabbit.RabbitNormalTools;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.repository.SpecificationOperator;
@@ -23,7 +23,7 @@ public class MiniProductFavoriteRecordService {
     private IProductFavoriteRecordDao productFavoriteRecordDao;
 
     @Autowired
-    private RabbitUpdateTools rabbitUpdateTools;
+    private RabbitNormalTools rabbitNormalTools;
 
     public JsonResult list(String params) {
         QueryListDto qld = QueryTools.buildQueryListDto(params);
@@ -73,6 +73,6 @@ public class MiniProductFavoriteRecordService {
     }
 
     private void plusCount(Integer amount, Integer proId) {
-        rabbitUpdateTools.updateData("productDao", "plusFavoriteCount", amount, proId);
+        rabbitNormalTools.updateData("productDao", "plusFavoriteCount", amount, proId);
     }
 }

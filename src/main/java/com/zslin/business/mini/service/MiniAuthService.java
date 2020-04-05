@@ -2,8 +2,10 @@ package com.zslin.business.mini.service;
 
 import com.zslin.business.dao.ICustomerDao;
 import com.zslin.business.mini.dao.IMiniConfigDao;
+import com.zslin.business.mini.dao.ISessionKeyDao;
 import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.model.MiniConfig;
+import com.zslin.business.mini.model.SessionKey;
 import com.zslin.business.mini.tools.MiniUtils;
 import com.zslin.business.model.Customer;
 import com.zslin.core.api.Explain;
@@ -12,9 +14,10 @@ import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
+import com.zslin.core.dto.WxCustomDto;
 import com.zslin.core.exception.BusinessException;
 import com.zslin.core.qiniu.tools.QiniuTools;
-import com.zslin.core.rabbit.RabbitUpdateTools;
+import com.zslin.core.rabbit.RabbitNormalTools;
 import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.MyBeanUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +38,10 @@ public class MiniAuthService {
     private RabbitTemplate rabbitTemplate;
 
     @Autowired
-    private RabbitUpdateTools rabbitUpdateTools;
+    private RabbitNormalTools rabbitNormalTools;
+
+    @Autowired
+    private ISessionKeyDao sessionKeyDao;
 
     @ExplainOperation(name = "获取微信用户信息", params = {
             @ExplainParam(value = "code", name = "loginCode", require = true, example = "通过uni.login获取"),
@@ -69,6 +75,13 @@ public class MiniAuthService {
         String openid = JsonTools.getJsonParam(str, "openid");
         String sessionKey = JsonTools.getJsonParam(str, "session_key");
         NewCustomDto dto = MiniUtils.decryptionUserInfo(enc, sessionKey, iv);
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                addOrUpdateSessionKey(0, openid, sessionKey, code);
+            }
+        }).run();
         if(openid!=null && !"".equals(openid)) {
             //System.out.println(str);
             Customer customer = new Customer();
@@ -87,6 +100,66 @@ public class MiniAuthService {
         }
     }
 
+    /** 获取用户手机号码 */
+    public JsonResult getPhone(String params) {
+        try {
+            WxCustomDto customDto = JsonTools.getCustom(params);
+            //System.out.println(params);
+            String code = JsonTools.getJsonParam(params, "code");
+            String enc = JsonTools.getJsonParam(params, "encryptedData"); //
+            String iv = JsonTools.getJsonParam(params, "iv");
+            String phone = "";
+            if(code==null || "".equals(code)) {
+                SessionKey sessionKey = sessionKeyDao.findByOpenid(customDto.getOpenid());
+                if(sessionKey!=null) {
+                    String res = MiniUtils.getPhone(enc, sessionKey.getSk(), iv);
+    //                log.info(res);
+                    phone = JsonTools.getJsonParam(res, "phoneNumber");
+                }
+            }
+
+            if(phone==null || "".equals(phone)) { //如果没有处理则重新处理
+                if(NormalTools.isNullOr(code, enc, iv)) {
+                    throw new BusinessException(BusinessException.Code.PARAM_NULL, "code、encryptedData、iv三者均不能为空");
+                }
+                MiniConfig config = miniConfigDao.loadOne();
+                if(config==null || NormalTools.isNullOr(config.getAppid(), config.getAppSecret())) {
+                    throw new BusinessException(BusinessException.Code.CONFIG_NULL, "小程序未配置或Appid、AppSecret为空");
+                }
+                RestTemplate template = new RestTemplate();
+                String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+config.getAppid()
+                        +"&secret="+config.getAppSecret()+"&js_code="+code+"&grant_type=authorization_code";
+                String str = template.getForObject(url, String.class);
+                //System.out.println("====================================");
+                //log.info(str);
+                String sessionKey = JsonTools.getJsonParam(str, "session_key");
+                String res = MiniUtils.getPhone(enc, sessionKey, iv);
+                phone = JsonTools.getJsonParam(res, "phoneNumber");
+                //log.info(res);
+            }
+            if(phone!=null && !"".equals(phone.trim())) { //如果有手机号码，则保存
+                customerDao.updatePhone(phone, customDto.getCustomId());
+            }
+            return JsonResult.success().set("phone", phone);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return JsonResult.success("绑定失败").set("phone", "");
+        }
+    }
+
+    /** 添加或修改SessionKey */
+    private void addOrUpdateSessionKey(Integer customId, String openid, String sk, String code) {
+        SessionKey key = sessionKeyDao.findByOpenid(openid);
+        if(key==null) {
+            key = new SessionKey();
+        }
+        key.setCustomId(customId);
+        key.setCode(code);
+        key.setSk(sk);
+        key.setOpenid(openid);
+        sessionKeyDao.save(key);
+    }
+
     @Autowired
     private ICustomerDao customerDao;
     @Autowired
@@ -96,7 +169,7 @@ public class MiniAuthService {
         Customer old = customerDao.findByOpenid(customer.getOpenid());
         String headimg = customer.getHeadImgUrl();
         if(customer.getHeadImgUrl()!=null && !"".equals(customer.getHeadImgUrl())) { //如果有头像
-            headimg = qiniuTools.uploadCustomerHeadImg(headimg, customer.getUnionid()+".jpg");
+            headimg = qiniuTools.uploadCustomerHeadImg(headimg, customer.getOpenid()+".jpg");
         }
         customer.setHeadImgUrl(headimg);
         Customer res = null;
@@ -117,7 +190,7 @@ public class MiniAuthService {
             customerDao.save(old);
             res = old;
         }
-        rabbitUpdateTools.updateData("couponTools", "handlerFirstFollowCoupon", res);
+        rabbitNormalTools.updateData("couponTools", "handlerFirstFollowCoupon", res);
         return res;
     }
 }

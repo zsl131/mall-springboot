@@ -37,5 +37,7 @@ public interface IAgentDao extends BaseRepository<Agent, Integer>, JpaSpecificat
     @Transactional
     void plusVerifyCount(Integer count, Integer id);
 
-    Agent findByUnionid(String unionid);
+//    Agent findByUnionid(String unionid);
+
+    Agent findByOpenid(String openid);
 }

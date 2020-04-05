@@ -12,7 +12,7 @@ import com.zslin.core.api.ExplainReturn;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.exception.BusinessException;
-import com.zslin.core.rabbit.RabbitUpdateTools;
+import com.zslin.core.rabbit.RabbitNormalTools;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
@@ -38,7 +38,7 @@ public class ProductService {
     private IProductDao productDao;
 
     @Autowired
-    private RabbitUpdateTools rabbitUpdateTools;
+    private RabbitNormalTools rabbitNormalTools;
 
     @AdminAuth(name = "产品信息列表", orderNum = 1)
     @ExplainOperation(name = "产品信息列表", notes = "产品信息列表", params= {
@@ -145,7 +145,7 @@ public class ProductService {
 
     //更新产品关联更新
     private void onUpdateProduct(Product pro) {
-        rabbitUpdateTools.updateData("productTools", "onUpdateProduct", pro);
+        rabbitNormalTools.updateData("productTools", "onUpdateProduct", pro);
     }
 
     @AdminAuth(name = "获取产品信息", orderNum = 5)

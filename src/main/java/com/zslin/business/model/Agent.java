@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 代理
  * @author 钟述林
- * @data generate on: 2020-04-01
+ * @data generate on: 2020-04-05
  */
 @Data
 @Entity
@@ -115,6 +115,11 @@ public class Agent implements Serializable {
 	* 上级AgentID
 	*/
 	private Integer leaderId;
+
+	/**
+	* 上级代理Openid
+	*/
+	private String leaderOpenid;
 
 	/**
 	* 上级代理姓名

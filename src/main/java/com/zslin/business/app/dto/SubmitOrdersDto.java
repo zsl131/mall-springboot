@@ -20,6 +20,9 @@ public class SubmitOrdersDto implements Serializable {
     /** 对应代理ID */
     private Integer agentId;
 
+    /** 对应的代理Openid */
+    private String agentOpenid;
+
     private String remark;
 
     /**

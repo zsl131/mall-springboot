@@ -18,4 +18,6 @@ public class WxCustomDto implements Serializable {
     private String unionid;
 
     private String nickname;
+
+    private String headImgUrl;
 }

@@ -4,24 +4,18 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.app.tools.CouponTools;
 import com.zslin.business.app.tools.OrdersHandlerTools;
-import com.zslin.business.dao.ICouponDao;
-import com.zslin.business.dao.IProductDao;
-import com.zslin.business.dao.IProductFavoriteRecordDao;
-import com.zslin.business.dao.IProductSpecsDao;
+import com.zslin.business.dao.*;
+import com.zslin.business.mini.dto.MsgDto;
 import com.zslin.business.mini.dto.NewCustomDto;
-import com.zslin.business.mini.tools.AccessTokenTools;
-import com.zslin.business.mini.tools.MiniCommonTools;
-import com.zslin.business.mini.tools.MiniUtils;
-import com.zslin.business.model.Coupon;
-import com.zslin.business.model.Product;
-import com.zslin.business.model.ProductFavoriteRecord;
-import com.zslin.business.model.ProductSpecs;
+import com.zslin.business.mini.tools.*;
+import com.zslin.business.model.*;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.service.TestService;
 import com.zslin.core.tasker.BeanCheckTools;
 import com.zslin.core.tools.*;
+import org.bouncycastle.util.encoders.Base64;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.BeansException;
@@ -98,11 +92,51 @@ public class NormalTest implements ApplicationContextAware {
     @Autowired
     private ICouponDao couponDao;
 
+    @Autowired
+    private PushMessageTools pushMessageTools;
+
+    @Autowired
+    private IAgentLevelDao agentLevelDao;
+
+    @Autowired
+    private QrTools qrTools;
+
     @Test
-    public void test22() {
-        /*for(int i=0;i<15;i++) {
-            System.out.println(OrdersHandlerTools.buildOrdersNo(1));
-        }*/
+    public void test25() {
+        //制作800*1137的照片
+        qrTools.getQrB("", "1");
+    }
+
+    @Test
+    public void test24() {
+        AgentLevel al = agentLevelDao.findByAgentId(68);
+        System.out.println(al);
+    }
+
+    @Test
+    public void test23() {
+        pushMessageTools.push("oIguM5UvbfNglnWYj7W7_aBkS-3w", "a7uRVse33w7zjMik362eMXJCp8cu45vjpaVNQesish8",
+                "",
+                new MsgDto("thing1", "代理审核结果"),
+                new MsgDto("phrase2", "不通过"),
+                new MsgDto("date3", NormalTools.curDate()),
+                new MsgDto("thing4", "只是测试一下"),
+                new MsgDto("name5", "钟述林"));
+    }
+
+    @Test
+    public void test22() throws Exception {
+//      String enc = "1nd8fmlQhvy4cY8pTATXq4nSb5Hybt0KXjLQwYZ2BJjBPbJrtsHttVjLxbmhpY/Pf hj7uEFS27joxyRw6SXaZuV5SHOQs9t3RvCpzp6XVsxxblVVbs48gUq3NyeqNLJyX815guJQ8OrMFLqBrC7GqRbf3DitSuAX7FGhRr9idmA67dK74qteRletIgZXuVvJhZ9/CxanyD3OTAy55qZGQ==";
+        String enc = "WESx5YpvF9 Mhq3IqAsyrsDSgQja0hW4uwXDSXLIRRnfRaPjmvTsVsMi w5sZu5KvR6kipAwvZyPCR2sVtbPm5oOYP94dAAmrVy7bzUMTxdBItdlmgxy4xf22GHDTMmmw3SBrLTRCAjYgJHoCkNZyByVPRYlhi2jtHM8rntJkLwtQO12rx/w7rGAQVQ8gyiZfnbgSVvbxJ0C8vUXBTEtdQ==";
+        String session = "MACea/t1c+He45nADD4fbw==";
+        String iv = "ccJVXB46olfuEYjl9pH/YQ==";
+
+        Base64.decode(session);
+
+//        String result = MiniPhoneTools.decrypt(session, iv, enc);
+        String result = MiniUtils.getPhone(enc, session, iv);
+//        String result = AES.wxDecrypt(enc, session, iv);
+        System.out.println(result);
     }
 
     @Test

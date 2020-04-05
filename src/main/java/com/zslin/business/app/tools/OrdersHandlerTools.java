@@ -5,6 +5,7 @@ import com.zslin.business.app.dto.orders.OrdersHandlerDto;
 import com.zslin.business.app.dto.orders.OrdersProductDto;
 import com.zslin.business.app.dto.orders.OrdersRateDto;
 import com.zslin.business.dao.*;
+import com.zslin.business.dto.OrdersShowDto;
 import com.zslin.business.model.*;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.WxCustomDto;
@@ -67,8 +68,9 @@ public class OrdersHandlerTools {
         AgentLevel level = null; //代理对应的代理等级对象
         if(ordersDto.getCouponId()!=null && ordersDto.getCouponId()>0) {coupon = customCouponDao.findOne(ordersDto.getCouponId());}
         if(ordersDto.getAddressId()!=null && ordersDto.getAddressId()>0) {address = customAddressDao.findOne(ordersDto.getAddressId());}
-        if(ordersDto.getAgentId()!=null && ordersDto.getAgentId()>0) {agent = agentDao.findOne(ordersDto.getAgentId());}
-        if(agent!=null) {level = agentLevelDao.findByAgentId(agent.getId());}
+//        if(ordersDto.getAgentId()!=null && ordersDto.getAgentId()>0) {agent = agentDao.findOne(ordersDto.getAgentId());} //由于前端获取的是Customer，所以不能通过agentId获取对象
+        if(ordersDto.getAgentOpenid()!=null && !"".equals(ordersDto.getAgentOpenid())) {agent = agentDao.findByOpenid(ordersDto.getAgentOpenid());} //通过Openid获取对象
+        if(agent!=null && agent.getLevelId()!=null && agent.getLevelId()>0) {level = agentLevelDao.findOne(agent.getLevelId());}
 
         String ordersKey = ordersDto.getOrdersKey();
         String ordersNo = buildOrdersNo(custom.getCustomId());
@@ -110,6 +112,7 @@ public class OrdersHandlerTools {
         order.setOpenid(custom.getOpenid());
         order.setUnionid(custom.getUnionid());
         order.setNickname(custom.getNickname());
+        order.setHeadImgUrl(custom.getHeadImgUrl());
         order.setStatus("0");
         order.setHasAfterSale("0"); //默认为无售后问题
         order.setOrdersKey(ordersKey);
@@ -188,6 +191,7 @@ public class OrdersHandlerTools {
             op.setProId(pro.getId());
             op.setProTitle(pro.getTitle());
             op.setSaleMode(pro.getSaleMode());
+            op.setProImg(pro.getHeadImgUrl()); //图片
             op.setSpecsId(dto.getSpecs().getId());
             op.setSpecsName(dto.getSpecs().getName());
             op.setUnionid(custom.getUnionid());
@@ -330,5 +334,20 @@ public class OrdersHandlerTools {
             res = ran.nextInt(999);
         }
         return res;
-    };
+    }
+
+    /**
+     * 为了方便显示，重新构建订单列表
+     * @param ordersList
+     * @return
+     */
+    public List<OrdersShowDto> rebuildOrders(List<Orders> ordersList) {
+        List<OrdersShowDto> result = new ArrayList<>();
+        for(Orders orders : ordersList) {
+            result.add(new OrdersShowDto(orders, ordersProductDao.findByOrdersId(orders.getId()),
+                    customCommissionRecordDao.findByOrdersId(orders.getId())));
+        }
+        return result;
+    }
 }
+

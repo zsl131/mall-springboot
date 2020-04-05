@@ -9,7 +9,7 @@ import com.zslin.business.model.*;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.WxCustomDto;
-import com.zslin.core.rabbit.RabbitUpdateTools;
+import com.zslin.core.rabbit.RabbitNormalTools;
 import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,7 +37,7 @@ public class MiniOrdersService {
     private IProductDao productDao;
 
     @Autowired
-    private RabbitUpdateTools rabbitUpdateTools;
+    private RabbitNormalTools rabbitNormalTools;
 
     @NeedAuth(openid = true)
     public JsonResult onPay(String params) {
@@ -110,7 +110,7 @@ public class MiniOrdersService {
         String remark = JsonTools.getJsonParam(params, "remark");
         String productData = JsonTools.getJsonParam(params, "productData"); //提交的产品ID，_23-89-8_20-82-3_*/
 
-        rabbitUpdateTools.updateData("ordersHandlerTools", "addOrders", custom, objDto);
+        rabbitNormalTools.updateData("ordersHandlerTools", "addOrders", custom, objDto);
         return result;
     }
 

@@ -8,6 +8,7 @@ import com.zslin.business.model.AgentLevel;
 import com.zslin.business.model.AgentLevelRecord;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.LoginUserDto;
+import com.zslin.core.rabbit.RabbitNormalTools;
 import com.zslin.core.tools.JsonTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,6 +21,9 @@ public class AgentTools {
 
     @Autowired
     private IAgentLevelRecordDao agentLevelRecordDao;
+
+    @Autowired
+    private RabbitNormalTools rabbitNormalTools;
 
     public void verify(String params, Agent agent, AgentLevel al) {
         Integer id = JsonTools.getId(params);
@@ -44,6 +48,14 @@ public class AgentTools {
         aav.setVerifyRes(status);
 
         agentApplyVerifyDao.save(aav);
+
+        String remark = "恭喜您！";
+        if("1".equals(status) && al!=null) {remark = al.getName();}
+        else if("2".equals(status)) {remark = reason;}
+        rabbitNormalTools.pushMessage("AGENT-VERIFY", agent.getOpenid(), "pages/agent/apply/apply",
+                "代理审核", "1".equals(status)?"审核通过":"审核不通过", NormalTools.curDate(),
+                remark, agent.getName());
+
         addLevelRecord(agent, al, reason);
     }
 

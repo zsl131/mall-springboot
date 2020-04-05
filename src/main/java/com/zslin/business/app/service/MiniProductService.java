@@ -10,7 +10,7 @@ import com.zslin.business.model.ProductSpecs;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.dto.WxCustomDto;
-import com.zslin.core.rabbit.RabbitUpdateTools;
+import com.zslin.core.rabbit.RabbitNormalTools;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.repository.SpecificationOperator;
@@ -42,7 +42,7 @@ public class MiniProductService {
     private IProductFavoriteRecordDao productFavoriteRecordDao;
 
     @Autowired
-    private RabbitUpdateTools rabbitUpdateTools;
+    private RabbitNormalTools rabbitNormalTools;
 
     @Autowired
     private IShoppingBasketDao shoppingBasketDao;
@@ -84,6 +84,6 @@ public class MiniProductService {
     }
 
     private void plusCount(Integer proId) {
-        rabbitUpdateTools.updateData("productDao", "plusReadCount", 1, proId);
+        rabbitNormalTools.updateData("productDao", "plusReadCount", 1, proId);
     }
 }

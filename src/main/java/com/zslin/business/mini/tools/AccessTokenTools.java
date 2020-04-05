@@ -37,7 +37,7 @@ public class AccessTokenTools {
 
     private String getNewAccessToken() {
         MiniConfig config = miniConfigTools.getMiniConfig();
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "client_credential");
         params.put("appid", config.getAppid());
         params.put("secret", config.getAppSecret());

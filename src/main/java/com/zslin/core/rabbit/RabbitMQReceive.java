@@ -2,6 +2,13 @@ package com.zslin.core.rabbit;
 
 import com.zslin.business.dao.ICustomerDao;
 import com.zslin.business.dao.IShoppingBasketDao;
+import com.zslin.business.mini.dao.ICustomSubscribeDao;
+import com.zslin.business.mini.dao.ISubscribeMessageDao;
+import com.zslin.business.mini.dto.MsgDto;
+import com.zslin.business.mini.dto.PushMsgRabbitDto;
+import com.zslin.business.mini.model.CustomSubscribe;
+import com.zslin.business.mini.model.SubscribeMessage;
+import com.zslin.business.mini.tools.PushMessageTools;
 import com.zslin.business.model.Customer;
 import com.zslin.business.model.ShoppingBasket;
 import com.zslin.core.common.NormalTools;
@@ -143,4 +150,50 @@ public class RabbitMQReceive implements ApplicationContextAware {
             customerDao.save(old);
         }
     }
+
+    /////订阅消息处理
+
+    @Autowired
+    private ISubscribeMessageDao subscribeMessageDao;
+
+    @Autowired
+    private ICustomSubscribeDao customSubscribeDao;
+
+    @Autowired
+    private PushMessageTools pushMessageTools;
+
+    /**
+     * 处理推送订阅消息
+     * @param dto
+     */
+    @RabbitHandler
+    public void handlePushMessage(PushMsgRabbitDto dto) {
+        //log.info(dto.toString());
+        SubscribeMessage sm = subscribeMessageDao.findBySn(dto.getTempSn()); //获取模板
+        if(sm==null || sm.getTempId()==null || "".equals(sm.getTempId())) {return;} //如果不存在，直接返回
+
+        //log.info("111111111111");
+        CustomSubscribe cs = customSubscribeDao.findByCustomOpenidAndMessageId(dto.getToUser(), sm.getId());
+        if(cs==null || !"1".equals(cs.getStatus())) {return;}//如果不存在或未订阅，直接返回
+
+        //log.info("22222222222");
+        MsgDto[] msgDtos = buildContent(sm.getContent(), dto.getContent());
+        if(msgDtos==null) {return; } //如果没有参数则直接返回
+
+        //log.info("3333333333333");
+        pushMessageTools.push(dto.getToUser(), sm.getTempId(), dto.getPage(), msgDtos);
+    }
+
+    private MsgDto[] buildContent(String conKeys, List<String> conValues) {
+        String [] keys = conKeys.split("_");
+        if(keys.length>conValues.size()) {return null;} //如果实际值小于需要值则返回空
+
+        MsgDto[] result = new MsgDto[keys.length];
+        for(int i=0;i<keys.length;i++) {
+            result[i] = new MsgDto(keys[i], conValues.get(i));
+        }
+        return result;
+    }
+
+    /////订阅消息处理
 }
