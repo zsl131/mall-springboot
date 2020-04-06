@@ -130,6 +130,11 @@ public class JsonTools {
         return openid;
     }
 
+    /** 获取IP地址 */
+    public static String getIP(String params) {
+        return getHeaderParams(params, "ip");
+    }
+
     /**
      * 获取Nickname
      * @param params

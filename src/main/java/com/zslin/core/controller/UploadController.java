@@ -72,9 +72,9 @@ public class UploadController {
                 BufferedOutputStream bw = null;
                 try {
                     //System.out.println("---->"+extra);
-                    log.info("上传参数：{}。", extra);
+                    //log.info("上传参数：{}。", extra);
                     UploadParam param = UploadParamsTools.buildParams(extra); //参数DTO对象
-                    log.info(param.toString());
+                    //log.info(param.toString());
                     boolean isEditor = param.isEditor();
                     String objType = param.getObjClassName(); //上传的文件归属对象类型
                     String fileName = file.getOriginalFilename();

@@ -15,10 +15,13 @@ public class ApiDto {
 
     private String params;
 
-    public ApiDto(Method method, Object obj, boolean hasParams, String params) {
+    private String ip;
+
+    public ApiDto(Method method, Object obj, boolean hasParams, String params, String ip) {
         this.method = method;
         this.obj = obj;
         this.hasParams = hasParams;
         this.params = params;
+        this.ip = ip;
     }
 }

@@ -20,7 +20,7 @@ public class QrTools {
     @Autowired
     private AccessTokenTools  accessTokenTools;
 
-    public void getQrB(String page, String scene) {
+    public BufferedImage getQrB(String page, String scene) {
         String accessToken = accessTokenTools.getAccessToken();
         String url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token="+accessToken;
 
@@ -40,7 +40,7 @@ public class QrTools {
             JSONObject paramJson = new JSONObject();
             paramJson.put("scene", scene);
             paramJson.put("page", page);
-            paramJson.put("width", 430);
+            paramJson.put("width", 190);
             printWriter.write(paramJson.toString());
             // flush输出流的缓冲
             printWriter.flush();
@@ -59,18 +59,20 @@ public class QrTools {
 
             ByteArrayInputStream inputStream= new ByteArrayInputStream(swapStream.toByteArray());
             BufferedImage image = ImageIO.read(inputStream);
+            return image;
             /**裁剪原图  目前访问微信 微信返回的是 470*535 像素 170620*/
-            BufferedImage subImage = image.getSubimage(0, 0, image.getWidth(), image.getHeight());
+            /*BufferedImage subImage = image.getSubimage(0, 0, image.getWidth(), image.getHeight());
 
 
-            BufferedImage inputbig = new BufferedImage(430, 430, BufferedImage.TYPE_INT_BGR);
+            BufferedImage inputbig = new BufferedImage(190, 190, BufferedImage.TYPE_INT_BGR);
             Graphics2D g = (Graphics2D) inputbig.getGraphics();
-            g.drawImage(subImage, 0, 0,430,430,null); //画图
+            g.drawImage(subImage, 0, 0,190,190,null); //画图
             g.dispose();
             inputbig.flush();
-            ImageIO.write(inputbig, "jpg", new File("D:/temp/123.jpg"));
+            ImageIO.write(inputbig, "jpg", new File("D:/temp/123.jpg"));*/
         } catch (IOException e) {
             e.printStackTrace();
+            return null;
         }
 
     }

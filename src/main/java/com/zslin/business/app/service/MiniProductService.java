@@ -49,6 +49,10 @@ public class MiniProductService {
 
     public JsonResult loadOne(String params) {
         try {
+            String ip = JsonTools.getIP(params);
+
+            System.out.println("---MiniProductService IP::---"+ip);
+
             Integer id = JsonTools.getId(params);
             Product product = productDao.findOne(id);
             Sort sort = SimpleSortBuilder.generateSort("orderNo");

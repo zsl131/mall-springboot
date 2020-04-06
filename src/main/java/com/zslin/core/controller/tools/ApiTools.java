@@ -55,6 +55,8 @@ public class ApiTools implements ApplicationContextAware {
         Method specificMethod = ClassUtils.getMostSpecificMethod(method, userClass);
         specificMethod = BridgeMethodResolver.findBridgedMethod(specificMethod);
 
-        return new ApiDto(specificMethod, obj, hasParams, params);
+        String ip = request.getRemoteAddr();
+
+        return new ApiDto(specificMethod, obj, hasParams, params, ip);
     }
 }

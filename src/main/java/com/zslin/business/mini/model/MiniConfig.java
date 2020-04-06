@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 小程序配置
  * @author 钟述林
- * @data generate on: 2020-04-05
+ * @data generate on: 2020-04-07
  */
 @Data
 @Entity
@@ -28,6 +28,12 @@ public class MiniConfig implements Serializable {
 	*/
 	@NotBlank(message="appid不能为空")
 	private String appid;
+
+	/**
+	* 商户号id
+	* @remark 微信支付
+	*/
+	private String mchid;
 
 	/**
 	* 小程序密钥

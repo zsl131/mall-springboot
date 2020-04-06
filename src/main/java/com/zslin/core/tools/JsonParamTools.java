@@ -34,9 +34,11 @@ public class JsonParamTools {
         ignoreNames.add("sec-fetch-site");
         ignoreNames.add("same-origin");
         ignoreNames.add("cookie");
+        String ip = request.getRemoteAddr(); //IP地址
 
         Enumeration<String> names = request.getHeaderNames();
         Map<String, Object> headerMap = new HashMap<>();
+        headerMap.put("ip", ip);
         while(names.hasMoreElements()) {
             String name = names.nextElement();
             if(!ignoreNames.contains(name)) {

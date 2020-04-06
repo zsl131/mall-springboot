@@ -102,9 +102,17 @@ public class NormalTest implements ApplicationContextAware {
     private QrTools qrTools;
 
     @Test
+    public void test26() {
+        String str = PayUtils.buildSignXml("111111", "222222", "这里是标题", "333333");
+        System.out.println(str);
+        //appid=111111&body=这里是标题&device_info=WEB&mch_id=222222&nonce_str=MXY93QYOCU4CWYJP8IBPDO8H542K38C2
+        //A72BB4CDC12E3AF10A7A7CC546B19B7B
+    }
+
+    @Test
     public void test25() {
         //制作800*1137的照片
-        qrTools.getQrB("", "1");
+        //qrTools.getQrB("", "1");
     }
 
     @Test
