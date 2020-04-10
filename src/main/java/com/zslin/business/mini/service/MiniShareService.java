@@ -53,7 +53,7 @@ public class MiniShareService {
             return JsonResult.success("生成失败").set("flag", "0").set("url", "");
         } else {
             try {
-                String key = scene+".jpg";
+                String key = "share_"+scene+".jpg";
                 File outFile = new File(configTools.getFilePath("share") + File.separator + key);
                 ImageIO.write(bi, "jpg", outFile);
 
