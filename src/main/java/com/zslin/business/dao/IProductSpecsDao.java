@@ -4,7 +4,9 @@ import com.zslin.business.model.ProductSpecs;
 import com.zslin.core.repository.BaseRepository;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,4 +37,9 @@ public interface IProductSpecsDao extends BaseRepository<ProductSpecs, Integer>,
 
     @Query("FROM ProductSpecs p WHERE p.id in ?1")
     List<ProductSpecs> findByIds(Integer [] ids);
+
+    @Query("UPDATE ProductSpecs p SET p.amount=p.amount-?1 WHERE p.id=?2")
+    @Modifying
+    @Transactional
+    void minusAmount(Integer amount, Integer id);
 }

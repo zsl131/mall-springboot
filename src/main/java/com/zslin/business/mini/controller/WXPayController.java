@@ -7,6 +7,7 @@ import com.zslin.business.mini.model.MiniConfig;
 import com.zslin.business.mini.tools.MiniConfigTools;
 import com.zslin.business.mini.tools.PayNotifyTools;
 import com.zslin.business.model.Orders;
+import com.zslin.core.common.NormalTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -58,6 +59,9 @@ public class WXPayController {
                     Orders orders = ordersDao.findByOrdersNo(ordersNo);
                     if ("0".equals(orders.getStatus())) { //如果是未支付状态
                         //TODO 通知相关人员，已经付款成功
+                        orders.setPayDay(NormalTools.curDate());
+                        orders.setPayLong(System.currentTimeMillis());
+                        orders.setPayTime(NormalTools.curDatetime());
                         orders.setStatus("1");
                         customCommissionRecordDao.updateStatus("1", ordersNo);
                     }

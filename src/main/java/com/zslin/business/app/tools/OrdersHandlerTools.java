@@ -86,7 +86,7 @@ public class OrdersHandlerTools {
         Orders orders = addOrders(ordersKey, ordersNo, custom, address, agent, coupon, countDto);
         //订单生成后要处理用户优惠券
         buildCoupon(orders, coupon);
-        //保存佣金， //TODO 还差一个设置上级的佣金
+        //保存佣金，
         for(CustomCommissionRecord ccr : commissionRecordList) {
             ccr.setOrdersId(orders.getId());
             customCommissionRecordDao.save(ccr);
@@ -199,7 +199,17 @@ public class OrdersHandlerTools {
             op.setUnionid(custom.getUnionid());
             ordersProductDao.save(op); //保存
             productDao.plusSaleCount(dto.getAmount(), pro.getId()); //增加销量
+            minusSpecsCount(dto.getSpecs().getId(), dto.getAmount()); //减少库存
         }
+    }
+
+    /**
+     * 减库存
+     * @param specsId 规格ID
+     * @param amount 数量
+     */
+    private void minusSpecsCount(Integer specsId, Integer amount) {
+        productSpecsDao.minusAmount(amount, specsId);
     }
 
     /**
