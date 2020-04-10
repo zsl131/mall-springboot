@@ -144,6 +144,8 @@ public class PayTools {
             dto.setFlag("1");
         } else {dto.setFlag("0");}
         dto.setUnifiedOrder(unifiedOrder);
+
+        log.info(dto.toString());
         return dto;
     }
 
