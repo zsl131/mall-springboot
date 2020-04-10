@@ -1,6 +1,5 @@
 package com.zslin.business.mini.dto;
 
-import com.zslin.business.mini.model.UnifiedOrder;
 import lombok.Data;
 
 /** 提交支付的DTO对象 */
@@ -22,5 +21,9 @@ public class PaySubmitDto {
     private String flag; //1-表示可支付；0-表示不可支付
 
     /** 统一订单 */
-    private UnifiedOrder unifiedOrder;
+//    private UnifiedOrder unifiedOrder;
+
+    private String errCode;
+
+    private String errCodeDes;
 }

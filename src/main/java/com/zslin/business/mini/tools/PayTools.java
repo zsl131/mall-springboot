@@ -143,9 +143,11 @@ public class PayTools {
         if("0".equals(status) && prepayId!=null && !"".equals(prepayId)) {
             dto.setFlag("1");
         } else {dto.setFlag("0");}
-        dto.setUnifiedOrder(unifiedOrder);
+//        dto.setUnifiedOrder(unifiedOrder);
+        dto.setErrCode(unifiedOrder.getErrCode());
+        dto.setErrCodeDes(unifiedOrder.getErrCodeDes());
 
-        log.info(dto.toString());
+        //log.info(dto.toString());
         return dto;
     }
 
