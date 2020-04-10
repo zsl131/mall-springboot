@@ -87,7 +87,7 @@ public class MiniOrdersService {
             String ip = JsonTools.getIP(params);
             String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
             PaySubmitDto dto = payTools.unifiedOrder(customDto, ip, ordersNo);
-//            System.out.println("-------MiniOrdersService.prepay--"+dto.toString());
+            System.out.println("-------MiniOrdersService.prepay--"+dto.toString());
             return JsonResult.success("下单成功").set("flag", "1").set("dto", dto);
         } catch (Exception e) {
 //            System.out.println("++++++++MiniOrdersService.prepay++"+e.getMessage());
