@@ -47,7 +47,7 @@ public class WXPayController {
         MiniConfig miniConfig = miniConfigTools.getMiniConfig();
 
         Map<String, String> paramsToMap = PayNotifyTools.payRequest2Map(request);
-        log.info("微信回调参数map===>"+paramsToMap);
+        //log.info("微信回调参数map===>"+paramsToMap);
         //校验微信的sign值
         try {
             boolean flag = WXPayUtil.isSignatureValid(paramsToMap, miniConfig.getApiKey());
@@ -77,7 +77,7 @@ public class WXPayController {
         map.put("return_code","SUCCESS");
         map.put("return_msg","OK");
         String xml = createSuccessXml();
-        log.info("微信异步回调结束====> "+xml);
+        //log.info("微信异步回调结束====> "+xml);
         response.setCharacterEncoding("UTF-8");
         response.setContentType("text/html;charset=UTF-8");
         response.setHeader("Access-Control-Allow-Origin", "*");

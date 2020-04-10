@@ -89,6 +89,7 @@ public class MiniOrdersService {
             PaySubmitDto dto = payTools.unifiedOrder(customDto, ip, ordersNo);
             return JsonResult.success("下单成功").set("flag", "1").set("dto", dto);
         } catch (Exception e) {
+            e.printStackTrace();
             return JsonResult.success("下单失败").set("flag", "0");
         }
     }
