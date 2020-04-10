@@ -58,7 +58,27 @@ public class MiniOrdersService {
     private IOrdersProductDao ordersProductDao;
 
     @Autowired
+    private ICustomCommissionRecordDao customCommissionRecordDao;
+
+    @Autowired
     private PayTools payTools;
+
+    /** 支付成功后回调此接口 */
+    @NeedAuth(openid = true)
+    public JsonResult payRes(String params) {
+        try {
+            WxCustomDto customDto = JsonTools.getCustom(params);
+            String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
+            String flag = JsonTools.getJsonParam(params, "flag");
+            if("1".equals(flag)) {
+                ordersDao.updateStatus("1", ordersNo, customDto.getCustomId()); //修改订单状态
+                customCommissionRecordDao.updateStatus("1", ordersNo); //修改提成状态
+            }
+            return JsonResult.success("操作成功").set("flag", "1");
+        } catch (Exception e) {
+            return JsonResult.success("操作失败").set("flag", "0");
+        }
+    }
 
     @NeedAuth(openid = true)
     public JsonResult pay(String params) {
