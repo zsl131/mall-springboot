@@ -81,7 +81,7 @@ public class MiniOrdersService {
     }
 
     @NeedAuth(openid = true)
-    public JsonResult pay(String params) {
+    public JsonResult prepay(String params) {
         try {
             WxCustomDto customDto = JsonTools.getCustom(params);
             String ip = JsonTools.getIP(params);
