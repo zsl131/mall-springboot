@@ -41,6 +41,9 @@ public class PayUtils {
                     .append("&signType=MD5&timeStamp=").append(timestamp)
                     .append("&key=").append(apiKey);
             String sign = SecurityUtil.md5(sb.toString()).toUpperCase();
+            System.out.println("======================PayUtils.buildPaySign===========");
+            System.out.println("str:: "+sb.toString());
+            System.out.println("sign:: "+sign);
             return sign;
         } catch (Exception e) {
             return "";
