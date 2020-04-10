@@ -19,6 +19,8 @@ public interface IOrdersDao extends BaseRepository<Orders, Integer>, JpaSpecific
     @Query("FROM Orders o WHERE o.id=?1 AND o.customId=?2")
     Orders findOne(Integer id, Integer customId);
 
+    Orders findByOrdersNoAndCustomId(String ordersNo, Integer customId);
+
     /** 查询订单编号，用于支付 */
     @Query("SELECT o.ordersNo FROM Orders o WHERE o.ordersKey=?1 AND o.customId=?2")
     String queryOrdersNo(String ordersKey, Integer customId);

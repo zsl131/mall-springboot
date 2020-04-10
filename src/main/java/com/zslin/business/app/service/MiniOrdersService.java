@@ -10,6 +10,7 @@ import com.zslin.business.mini.dto.PaySubmitDto;
 import com.zslin.business.mini.tools.PayTools;
 import com.zslin.business.model.*;
 import com.zslin.core.annotations.NeedAuth;
+import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.dto.WxCustomDto;
@@ -71,7 +72,15 @@ public class MiniOrdersService {
             String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
             String flag = JsonTools.getJsonParam(params, "flag");
             if("1".equals(flag)) {
-                ordersDao.updateStatus("1", ordersNo, customDto.getCustomId()); //修改订单状态
+                Float money = Float.parseFloat(JsonTools.getJsonParam(params, "payMoney")); //支付金额
+                Orders orders = ordersDao.findByOrdersNoAndCustomId(ordersNo, customDto.getCustomId());
+                orders.setStatus("1");
+                orders.setPayTime(NormalTools.curDatetime());
+                orders.setPayDay(NormalTools.curDate());
+                orders.setPayLong(System.currentTimeMillis());
+                orders.setPayMoney(money);
+                ordersDao.save(orders);
+//                ordersDao.updateStatus("1", ordersNo, customDto.getCustomId()); //修改订单状态
                 customCommissionRecordDao.updateStatus("1", ordersNo); //修改提成状态
             }
             return JsonResult.success("操作成功").set("flag", "1");
@@ -87,7 +96,7 @@ public class MiniOrdersService {
             String ip = JsonTools.getIP(params);
             String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
             PaySubmitDto dto = payTools.unifiedOrder(customDto, ip, ordersNo);
-            System.out.println("-------MiniOrdersService.prepay--"+dto.toString());
+            //System.out.println("-------MiniOrdersService.prepay--"+dto.toString());
             return JsonResult.success("下单成功").set("flag", "1").set("dto", dto);
         } catch (Exception e) {
 //            System.out.println("++++++++MiniOrdersService.prepay++"+e.getMessage());

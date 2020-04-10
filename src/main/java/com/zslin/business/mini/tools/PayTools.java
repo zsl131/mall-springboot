@@ -70,6 +70,7 @@ public class PayTools {
         data.put("openid", customDto.getOpenid());
         data.put("sign", sign);
 
+        resOrder.setPayMoney(orders.getTotalMoney()); //支付金额
         resOrder.setCustomId(customDto.getCustomId());
         resOrder.setHeadImgUrl(customDto.getHeadImgUrl());
         resOrder.setNickname(customDto.getNickname());
@@ -143,9 +144,7 @@ public class PayTools {
         if("0".equals(status) && prepayId!=null && !"".equals(prepayId)) {
             dto.setFlag("1");
         } else {dto.setFlag("0");}
-//        dto.setUnifiedOrder(unifiedOrder);
-        dto.setErrCode(unifiedOrder.getErrCode());
-        dto.setErrCodeDes(unifiedOrder.getErrCodeDes());
+        dto.setUnifiedOrder(unifiedOrder);
 
         //log.info(dto.toString());
         return dto;

@@ -69,4 +69,9 @@ public class UnifiedOrder implements Serializable {
 
 	private Long createLong;
 
+	/**
+	* 支付金额
+	*/
+	private Float payMoney;
+
 }
