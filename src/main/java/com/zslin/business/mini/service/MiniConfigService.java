@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.mini.dao.IMiniConfigDao;
 import com.zslin.business.mini.model.MiniConfig;
+import com.zslin.business.mini.tools.MiniConfigTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.api.Explain;
@@ -30,6 +31,9 @@ public class MiniConfigService {
     @Autowired
     private IMiniConfigDao miniConfigDao;
 
+    @Autowired
+    private MiniConfigTools miniConfigTools;
+
     @AdminAuth(name = "添加修改小程序配置", orderNum = 2)
     @ExplainOperation(name = "添加修改小程序配置", notes = "添加修改小程序配置信息", params = {
             @ExplainParam(value = "id", name = "小程序配置id", require = true, type = "int", example = "1"),
@@ -49,9 +53,11 @@ public class MiniConfigService {
         MiniConfig old = miniConfigDao.loadOne();
         if(old==null) {
             miniConfigDao.save(obj);
+            miniConfigTools.setConfig(obj);
         } else {
             MyBeanUtils.copyProperties(obj, old);
             miniConfigDao.save(old);
+            miniConfigTools.setConfig(old);
         }
         return JsonResult.succ(obj);
     }

@@ -19,4 +19,8 @@ public class MiniConfigTools {
         }
         return instance;
     }
+
+    public void setConfig(MiniConfig config) {
+        instance = config;
+    }
 }
