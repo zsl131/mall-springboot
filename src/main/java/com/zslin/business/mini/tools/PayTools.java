@@ -84,7 +84,7 @@ public class PayTools {
             WXPay wxpay = new WXPay(payConfig);
 
             Map<String, String> rMap = wxpay.unifiedOrder(data);
-            //System.out.println("统一下单接口返回: " + rMap);
+            System.out.println("统一下单接口返回: " + rMap);
             //log.info(rMap.toString()); //显示结果
             String return_code = rMap.get("return_code");
             String result_code = rMap.get("result_code");
@@ -115,7 +115,7 @@ public class PayTools {
         }
 
         String status = resOrder.getStatus();
-        log.info(resOrder.toString());
+//        log.info(resOrder.toString());
         //在没有出错且prepayId存在时返回DTO
         if("0".equals(status) && resOrder.getPrepayId()!=null && !"".equals(resOrder.getPrepayId())) {
             unifiedOrderDao.save(resOrder); //存入数据库
