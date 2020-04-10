@@ -8,6 +8,7 @@ import com.zslin.business.mini.dto.PaySubmitDto;
 import com.zslin.business.mini.model.MiniConfig;
 import com.zslin.business.mini.model.UnifiedOrder;
 import com.zslin.business.model.Orders;
+import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.WxCustomDto;
 import com.zslin.core.tools.ConfigTools;
 import com.zslin.core.tools.RandomTools;
@@ -112,6 +113,9 @@ public class PayTools {
 
         //String status = resOrder.getStatus();
 //        log.info(resOrder.toString());
+        resOrder.setCreateDay(NormalTools.curDate());
+        resOrder.setCreateTime(NormalTools.curDatetime());
+        resOrder.setCreateLong(System.currentTimeMillis());
         unifiedOrderDao.save(resOrder); //存入数据库
         //在没有出错且prepayId存在时返回DTO
         return buildSubmitData(appId, apiKey, resOrder);
