@@ -101,6 +101,23 @@ public class NormalTest implements ApplicationContextAware {
     @Autowired
     private QrTools qrTools;
 
+    @Autowired
+    private ConfigTools configTools;
+
+    @Test
+    public void test28() {
+        String sign = PayUtils.buildPaySign("111111", "222222", "333333", "444444", "555555");
+        //51592969BD633CA352457A1DECEA4AC6
+        System.out.println(sign);
+    }
+
+    @Test
+    public void test27() {
+        String certPath = configTools.getFilePath("cert") + "apiclient_cert.p12";
+        File file = new File(certPath);
+        System.out.println(file.exists());
+    }
+
     @Test
     public void test26() {
         String str = PayUtils.buildSignXml("111111", "222222", "这里是标题", "333333");

@@ -36,6 +36,18 @@ public class MiniConfig implements Serializable {
 	private String mchid;
 
 	/**
+	* Api密钥
+	* @remark 微信支付
+	*/
+	private String apiKey;
+
+	/**
+	* 支付结果通知地址
+	* @remark 微信支付
+	*/
+	private String payNotifyUrl;
+
+	/**
 	* 小程序密钥
 	*/
 	@NotBlank(message="appSecret不能为空")

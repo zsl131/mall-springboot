@@ -2,9 +2,6 @@ package com.zslin.business.mini.tools;
 
 import com.zslin.core.tools.RandomTools;
 import com.zslin.core.tools.SecurityUtil;
-import sun.security.provider.MD5;
-
-import java.security.NoSuchAlgorithmException;
 
 /**
  * 微信支付常用工具
@@ -19,6 +16,7 @@ public class PayUtils {
         return RandomTools.randomString(32).toUpperCase();
     }
 
+    /** 统一支付订单生成的签名 */
     public static String buildSign(String appid, String mchid, String body, String apiKey, String nonceStr) {
         try {
             StringBuffer sb = new StringBuffer();
@@ -26,7 +24,22 @@ public class PayUtils {
                     .append("&device_info=WEB&mch_id=").append(mchid)
                     .append("&nonce_str=").append(nonceStr);
             sb.append("&key=").append(apiKey);
-            System.out.println(sb.toString());
+           // System.out.println(sb.toString());
+            String sign = SecurityUtil.md5(sb.toString()).toUpperCase();
+            return sign;
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    /** 实际支付所生成的签名 */
+    public static String buildPaySign(String appId, String nonceStr, String prepayId, String timestamp, String apiKey) {
+        try {
+            StringBuffer sb = new StringBuffer();
+            sb.append("appId=").append(appId).append("&nonceStr=").append(nonceStr)
+                    .append("&package=prepay_id=").append(prepayId)
+                    .append("&signType=MD5&timeStamp=").append(timestamp)
+                    .append("&key=").append(apiKey);
             String sign = SecurityUtil.md5(sb.toString()).toUpperCase();
             return sign;
         } catch (Exception e) {

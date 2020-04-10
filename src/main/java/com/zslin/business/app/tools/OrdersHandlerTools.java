@@ -59,6 +59,8 @@ public class OrdersHandlerTools {
 
     @Transactional
     public void addOrders(WxCustomDto custom, SubmitOrdersDto ordersDto) {
+        Orders oldOrders = ordersDao.findByOrdersKey(ordersDto.getOrdersKey());
+        if(oldOrders!=null) {return;} //如果订单已经存在，则不能再操作
 //        System.out.println(custom);
 //        System.out.println("------------------------------");
         //SubmitOrdersDto(ordersKey=1_442098271, addressId=5, agentId=0 couponId=0, remark=, productData=_23-89-8_20-82-3_)

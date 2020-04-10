@@ -4,15 +4,24 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.app.dto.ProductSpecsDto;
 import com.zslin.business.app.dto.SubmitOrdersDto;
+import com.zslin.business.app.tools.OrdersHandlerTools;
 import com.zslin.business.dao.*;
+import com.zslin.business.mini.dto.PaySubmitDto;
+import com.zslin.business.mini.tools.PayTools;
 import com.zslin.business.model.*;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.dto.JsonResult;
+import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.dto.WxCustomDto;
 import com.zslin.core.rabbit.RabbitNormalTools;
+import com.zslin.core.repository.SimplePageBuilder;
+import com.zslin.core.repository.SimpleSortBuilder;
+import com.zslin.core.repository.SpecificationOperator;
 import com.zslin.core.tools.JsonTools;
+import com.zslin.core.tools.QueryTools;
 import com.zslin.core.tools.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -38,6 +47,65 @@ public class MiniOrdersService {
 
     @Autowired
     private RabbitNormalTools rabbitNormalTools;
+
+    @Autowired
+    private IOrdersDao ordersDao;
+
+    @Autowired
+    private OrdersHandlerTools ordersHandlerTools;
+
+    @Autowired
+    private IOrdersProductDao ordersProductDao;
+
+    @Autowired
+    private PayTools payTools;
+
+    @NeedAuth(openid = true)
+    public JsonResult pay(String params) {
+        try {
+            WxCustomDto customDto = JsonTools.getCustom(params);
+            String ip = JsonTools.getIP(params);
+            String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
+            PaySubmitDto dto = payTools.unifiedOrder(customDto, ip, ordersNo);
+            return JsonResult.success("下单成功").set("flag", "1").set("dto", dto);
+        } catch (Exception e) {
+            return JsonResult.success("下单失败").set("flag", "0");
+        }
+    }
+
+    /**
+     * 小程序获取订单信息
+     * @param params
+     * @return
+     */
+    @NeedAuth(openid = true)
+    public JsonResult loadOne(String params) {
+        WxCustomDto customDto = JsonTools.getCustom(params);
+        Integer id = JsonTools.getId(params); //OrdersId
+        Orders orders = ordersDao.findOne(id, customDto.getCustomId());
+        List<OrdersProduct> proList = ordersProductDao.findByOrdersId(id);
+        return JsonResult.success("获取成功").set("orders", orders).set("proList", proList);
+    }
+
+    /**
+     * 小程序中获取订单列表
+     * @param params
+     * @return
+     */
+    @NeedAuth(openid = true)
+    public JsonResult listOrders(String params) {
+        WxCustomDto customDto = JsonTools.getCustom(params);
+        String status = JsonTools.getJsonParam(params, "status");
+
+        QueryListDto qld = QueryTools.buildQueryListDto(params);
+        Page<Orders> res = ordersDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
+                new SpecificationOperator("customId", "eq", customDto.getCustomId()),
+                (status!=null&&!"".equals(status))?new SpecificationOperator("status", "eq", status, "and"):null),
+                SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
+
+        return JsonResult.getInstance().set("size", (int) res.getTotalElements())
+                .set("data", ordersHandlerTools.rebuildOrders(res.getContent()));
+    }
 
     @NeedAuth(openid = true)
     public JsonResult onPay(String params) {
@@ -111,7 +179,16 @@ public class MiniOrdersService {
         String productData = JsonTools.getJsonParam(params, "productData"); //提交的产品ID，_23-89-8_20-82-3_*/
 
         rabbitNormalTools.updateData("ordersHandlerTools", "addOrders", custom, objDto);
-        return result;
+        return result.set("ordersKey", objDto.getOrdersKey());
+    }
+
+    @NeedAuth(openid = true)
+    public JsonResult queryOrdersNo(String params) {
+        String ordersKey = JsonTools.getJsonParam(params, "ordersKey");
+        WxCustomDto customDto = JsonTools.getCustom(params);
+        String ordersNo = ordersDao.queryOrdersNo(ordersKey, customDto.getCustomId());
+        boolean suc = (ordersNo!=null && !"".equals(ordersNo.trim())) ;
+        return JsonResult.success("获取成功").set("flag", suc?"1":"0").set("ordersNo", ordersNo);
     }
 
     private List<ProductSpecsDto> buildDtoListFromBasket(String openid, List<ShoppingBasket> basketList, List<Product> proList) {
