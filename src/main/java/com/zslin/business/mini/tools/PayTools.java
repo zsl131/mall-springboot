@@ -115,6 +115,7 @@ public class PayTools {
         }
 
         String status = resOrder.getStatus();
+        log.info(resOrder.toString());
         //在没有出错且prepayId存在时返回DTO
         if("0".equals(status) && resOrder.getPrepayId()!=null && !"".equals(resOrder.getPrepayId())) {
             unifiedOrderDao.save(resOrder); //存入数据库
