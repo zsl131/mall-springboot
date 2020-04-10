@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 统一订单
  * @author 钟述林
- * @data generate on: 2020-04-07
+ * @data generate on: 2020-04-10
  */
 @Data
 @Entity
@@ -50,5 +50,17 @@ public class UnifiedOrder implements Serializable {
 	* 订单ID
 	*/
 	private Integer ordersId;
+
+	/**
+	* 微信返回的err_code
+	* @remark 错误代码
+	*/
+	private String errCode;
+
+	/**
+	* 微信返回的err_code_des
+	* @remark 错误描述
+	*/
+	private String errCodeDes;
 
 }

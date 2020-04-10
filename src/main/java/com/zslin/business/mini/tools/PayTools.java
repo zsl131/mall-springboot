@@ -84,10 +84,15 @@ public class PayTools {
             WXPay wxpay = new WXPay(payConfig);
 
             Map<String, String> rMap = wxpay.unifiedOrder(data);
-            System.out.println("统一下单接口返回: " + rMap);
+            //System.out.println("统一下单接口返回: " + rMap);
             //log.info(rMap.toString()); //显示结果
+            //  err_code=ORDERPAID, return_msg=OK, result_code=FAIL, err_code_des=??????
             String return_code = rMap.get("return_code");
             String result_code = rMap.get("result_code");
+            String err_code = rMap.get("err_code");
+            String err_code_des = rMap.get("err_code_des");
+            resOrder.setErrCode(err_code);
+            resOrder.setErrCodeDes(err_code_des);
             /*resultMap.put("nonceStr", nonceStr);*/
             //Long timeStamp = System.currentTimeMillis() / 1000;
             if ("SUCCESS".equals(return_code) && return_code.equals(result_code)) {
@@ -95,15 +100,6 @@ public class PayTools {
 
                 resOrder.setPrepayId(prepayid);
                 resOrder.setStatus("0"); //表示获取成功
-
-                /*resultMap.put("package", "prepay_id="+prepayid);
-                resultMap.put("signType", "MD5");
-                //这边要将返回的时间戳转化成字符串，不然小程序端调用wx.requestPayment方法会报签名错误
-                resultMap.put("timeStamp", timeStamp + "");
-                //再次签名，这个签名用于小程序端调用wx.requesetPayment方法
-                resultMap.put("appId",config.getAppid());
-                resultMap.put("paySign", sign);
-                System.out.println("生成的签名paySign : "+ sign);*/
             }else{
 //                return  response;
                 resOrder.setStatus("-1");
@@ -114,22 +110,20 @@ public class PayTools {
             resOrder.setStatus("-2");
         }
 
-        String status = resOrder.getStatus();
+        //String status = resOrder.getStatus();
 //        log.info(resOrder.toString());
+        unifiedOrderDao.save(resOrder); //存入数据库
         //在没有出错且prepayId存在时返回DTO
-        if("0".equals(status) && resOrder.getPrepayId()!=null && !"".equals(resOrder.getPrepayId())) {
-            unifiedOrderDao.save(resOrder); //存入数据库
-            return buildSubmitData(appId, resOrder.getPrepayId(), apiKey);
-        } else {
-            return null;
-        }
+        return buildSubmitData(appId, apiKey, resOrder);
     }
 
     /**
      * 生成调起支付的DTO对象
      * @return
      */
-    private PaySubmitDto buildSubmitData(String appId, String prepayId, String apiKey) {
+    private PaySubmitDto buildSubmitData(String appId, String apiKey, UnifiedOrder unifiedOrder) {
+        String prepayId = unifiedOrder.getPrepayId();
+        String status = unifiedOrder.getStatus();
         String nonceStr = RandomTools.randomString(32);
         String timestamp = (System.currentTimeMillis() / 1000)+"";
         String sign = PayUtils.buildPaySign(appId, nonceStr, prepayId, timestamp, apiKey);
@@ -142,6 +136,10 @@ public class PayTools {
         dto.setSignType("MD5");
         dto.setPaySign(sign);
 
+        if("0".equals(status) && prepayId!=null && !"".equals(prepayId)) {
+            dto.setFlag("1");
+        } else {dto.setFlag("0");}
+        dto.setUnifiedOrder(unifiedOrder);
         return dto;
     }
 
