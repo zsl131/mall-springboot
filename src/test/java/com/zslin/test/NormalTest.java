@@ -12,6 +12,7 @@ import com.zslin.business.model.*;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
+import com.zslin.core.dto.express.ExpressResultDto;
 import com.zslin.core.service.TestService;
 import com.zslin.core.tasker.BeanCheckTools;
 import com.zslin.core.tools.*;
@@ -103,6 +104,32 @@ public class NormalTest implements ApplicationContextAware {
 
     @Autowired
     private ConfigTools configTools;
+
+    @Autowired
+    private ExpressTools expressTools;
+
+    @Test
+    public void test31() {
+        String str = "张三,广东省广州市海珠区新港中路397号,020-81167888";
+        String res = str.substring(str.length()-4);
+        System.out.println(res);
+    }
+
+    @Test
+    public void test30() {
+        String str = "{\"status\":\"0\",\"msg\":\"ok\",\"result\":{\"number\":\"780098068058\",\"type\":\"zto\",\"list\":[{\"time\":\"2018-03-09 11:59:26\",\"status\":\"【石家庄市】 快件已在 【长安三部】 签收,签收人: 本人, 感谢使用中通快递,期待再次为您服务!\"},{\"time\":\"2018-03-09 09:03:10\",\"status\":\"【石家庄市】快件已到达【长安三部】（0311-85344265）,业务员 容晓光（13081105270）正在第1次派件\"},{\"time\":\"2018-03-08 23:43:44\",\"status\":\"【石家庄市】 快件离开 【石家庄】 发往 【长安三部】\"},{\"time\":\"2018-03-08 21:00:44\",\"status\":\"【石家庄市】 快件到达 【石家庄】\"},{\"time\":\"2018-03-07 01:38:45\",\"status\":\"【广州市】 快件离开 【广州中心】 发往 【石家庄】\"},{\"time\":\"2018-03-07 01:36:53\",\"status\":\"【广州市】 快件到达 【广州中心】\"},{\"time\":\"2018-03-07 00:40:57\",\"status\":\"【广州市】 快件离开 【广州花都】 发往 【石家庄中转】\"},{\"time\":\"2018-03-07 00:01:55\",\"status\":\"【广州市】 【广州花都】（020-37738523） 的 马溪 （18998345739） 已揽收\"}],\"deliverystatus\":\"3\",\"issign\":\"1\",\"expName\":\"中通快递\",\"expSite\":\"www.zto.com\",\"expPhone\":\"95311\",\"courier\":\"容晓光\",\"courierPhone\":\"13081105270\",\"updateTime\":\"2019-08-27 13:56:19\",\"takeTime\":\"2天20小时14分\",\"logo\":\"http://img3.fegine.com/express/zto.jpg\"}}";
+        ExpressResultDto dto = expressTools.query2DtoByStr(str);
+        System.out.println(dto);
+    }
+
+    @Test
+    public void test29() {
+        //{"status":"0","msg":"ok","result":{"number":"780098068058","type":"zto","list":[{"time":"2018-03-09 11:59:26","status":"【石家庄市】 快件已在 【长安三部】 签收,签收人: 本人, 感谢使用中通快递,期待再次为您服务!"},{"time":"2018-03-09 09:03:10","status":"【石家庄市】快件已到达【长安三部】（0311-85344265）,业务员 容晓光（13081105270）正在第1次派件"},{"time":"2018-03-08 23:43:44","status":"【石家庄市】 快件离开 【石家庄】 发往 【长安三部】"},{"time":"2018-03-08 21:00:44","status":"【石家庄市】 快件到达 【石家庄】"},{"time":"2018-03-07 01:38:45","status":"【广州市】 快件离开 【广州中心】 发往 【石家庄】"},{"time":"2018-03-07 01:36:53","status":"【广州市】 快件到达 【广州中心】"},{"time":"2018-03-07 00:40:57","status":"【广州市】 快件离开 【广州花都】 发往 【石家庄中转】"},{"time":"2018-03-07 00:01:55","status":"【广州市】 【广州花都】（020-37738523） 的 马溪 （18998345739） 已揽收"}],"deliverystatus":"3","issign":"1","expName":"中通快递","expSite":"www.zto.com","expPhone":"95311","courier":"容晓光","courierPhone":"13081105270","updateTime":"2019-08-27 13:56:19","takeTime":"2天20小时14分","logo":"http://img3.fegine.com/express/zto.jpg"}}
+        String no = "780098068058";
+        ExpressResultDto dto = expressTools.query2Dto(no);
+        System.out.println("------------------");
+        System.out.println(dto);
+    }
 
     @Test
     public void test28() {

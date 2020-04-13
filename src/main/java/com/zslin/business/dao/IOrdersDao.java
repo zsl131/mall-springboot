@@ -28,5 +28,5 @@ public interface IOrdersDao extends BaseRepository<Orders, Integer>, JpaSpecific
     @Query("UPDATE Orders o SET o.status=?1 WHERE o.ordersNo=?2 AND o.customId=?3")
     @Modifying
     @Transactional
-    void updateStatus(String status, String ordersNo, Integer customId);
+    int updateStatus(String status, String ordersNo, Integer customId);
 }

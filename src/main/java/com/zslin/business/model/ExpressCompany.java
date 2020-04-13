@@ -8,30 +8,26 @@ import java.io.Serializable;
 
 
 /**
- * 产品标签关系
+ * 物流公司
  * @author 钟述林
  * @data generate on: 2020-04-13
  */
 @Data
 @Entity
-@Table(name = "business_product_tag_relation")
+@Table(name = "business_express_company")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProductTagRelation implements Serializable {
+public class ExpressCompany implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
-	/**
-	* 产品ID
-	* @remark 外键
-	*/
-	private Integer proId;
+	private String name;
 
 	/**
-	* 标签ID
-	* @remark 外键
+	* 联系方式等信息
 	*/
-	private Integer tagId;
+	@Lob
+	private String remark;
 
 }

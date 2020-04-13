@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 代理等级
  * @author 钟述林
- * @data generate on: 2020-04-11
+ * @data generate on: 2020-04-13
  */
 @Data
 @Entity

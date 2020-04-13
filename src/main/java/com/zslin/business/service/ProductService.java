@@ -103,6 +103,18 @@ public class ProductService {
         return JsonResult.success(message).set("flag", flag);
     }
 
+    /** 设置产品是否推荐 */
+    public JsonResult modifyRecommend(String params) {
+        try {
+            Integer id = JsonTools.getId(params);
+            String flag = JsonTools.getJsonParam(params, "flag");
+            productDao.updateRecommend(flag, id);
+            return JsonResult.success("操作成功");
+        } catch (Exception e) {
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
     @AdminAuth(name = "修改产品信息", orderNum = 3)
     @ExplainOperation(name = "修改产品信息", notes = "修改产品信息信息", params = {
             @ExplainParam(value = "id", name = "产品信息id", require = true, type = "int", example = "1"),
@@ -134,6 +146,7 @@ public class ProductService {
             obj.setContent(o.getContent());
             obj.setFund(o.getFund());
             obj.setSurplusCount(o.getSurplusCount());
+            obj.setOrderNo(o.getOrderNo());
             productDao.save(obj);
             onUpdateProduct(obj);
             return JsonResult.getInstance().set("obj", obj);

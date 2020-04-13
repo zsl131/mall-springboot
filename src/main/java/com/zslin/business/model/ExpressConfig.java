@@ -8,30 +8,38 @@ import java.io.Serializable;
 
 
 /**
- * 产品标签关系
+ * 物流接口配置
  * @author 钟述林
  * @data generate on: 2020-04-13
  */
 @Data
 @Entity
-@Table(name = "business_product_tag_relation")
+@Table(name = "business_express_config")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ProductTagRelation implements Serializable {
+public class ExpressConfig implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
 	/**
-	* 产品ID
-	* @remark 外键
+	* 请求地址
 	*/
-	private Integer proId;
+	private String url;
 
 	/**
-	* 标签ID
-	* @remark 外键
+	* 接口路径
 	*/
-	private Integer tagId;
+	private String path;
+
+	/**
+	* 接口方提供代码
+	*/
+	private String appCode;
+
+	/**
+	* 接口方名称
+	*/
+	private String name;
 
 }

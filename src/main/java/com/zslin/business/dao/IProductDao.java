@@ -27,6 +27,11 @@ public interface IProductDao extends BaseRepository<Product, Integer>, JpaSpecif
     @Transactional
     void updateStatus(String status, Integer id);
 
+    @Query("UPDATE Product p SET p.isRecommend=?1 WHERE p.id=?2 ")
+    @Modifying
+    @Transactional
+    void updateRecommend(String flag, Integer id);
+
     @Query("UPDATE Product p SET p.specsCount=p.specsCount+?1 WHERE p.id=?2 ")
     @Modifying
     @Transactional

@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单
  * @author 钟述林
- * @data generate on: 2020-04-11
+ * @data generate on: 2020-04-13
  */
 @Data
 @Entity
@@ -175,5 +175,11 @@ public class Orders implements Serializable {
 	* @remark 姓名,地址,电话
 	*/
 	private String addressCon;
+
+	/**
+	* 备注信息
+	*/
+	@Lob
+	private String remark;
 
 }

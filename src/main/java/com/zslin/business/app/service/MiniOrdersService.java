@@ -23,6 +23,7 @@ import com.zslin.core.tools.QueryTools;
 import com.zslin.core.tools.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -64,6 +65,30 @@ public class MiniOrdersService {
     @Autowired
     private PayTools payTools;
 
+    /**
+     * 确认收货
+     * @param params
+     * @return
+     */
+    @NeedAuth(openid = true)
+    public JsonResult confirmOrders(String params) {
+        WxCustomDto customDto = JsonTools.getCustom(params);
+        String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
+        int count = ordersDao.updateStatus("3", ordersNo, customDto.getCustomId());
+        if(count>0) {
+            return JsonResult.success("确认成功").set("flag", "1");
+        } else {
+            return JsonResult.success("确认成功").set("flag", "0");
+        }
+    }
+
+    @NeedAuth(openid = true)
+    public JsonResult noticeOrders(String params) {
+        String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
+        //TODO 处理崔单业务逻辑
+        return JsonResult.success("崔单成功");
+    }
+
     /** 支付成功后回调此接口 */
     @NeedAuth(openid = true)
     public JsonResult payRes(String params) {
@@ -72,13 +97,13 @@ public class MiniOrdersService {
             String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
             String flag = JsonTools.getJsonParam(params, "flag");
             if("1".equals(flag)) {
-                Float money = Float.parseFloat(JsonTools.getJsonParam(params, "payMoney")); //支付金额
+                //Float money = Float.parseFloat(JsonTools.getJsonParam(params, "payMoney")); //支付金额
                 Orders orders = ordersDao.findByOrdersNoAndCustomId(ordersNo, customDto.getCustomId());
                 orders.setStatus("1");
                 orders.setPayTime(NormalTools.curDatetime());
                 orders.setPayDay(NormalTools.curDate());
                 orders.setPayLong(System.currentTimeMillis());
-                orders.setPayMoney(money);
+                orders.setPayMoney(orders.getTotalMoney()); //totalMoney就是支付金额
                 ordersDao.save(orders);
 //                ordersDao.updateStatus("1", ordersNo, customDto.getCustomId()); //修改订单状态
                 customCommissionRecordDao.updateStatus("1", ordersNo); //修改提成状态
@@ -116,7 +141,13 @@ public class MiniOrdersService {
         Integer id = JsonTools.getId(params); //OrdersId
         Orders orders = ordersDao.findOne(id, customDto.getCustomId());
         List<OrdersProduct> proList = ordersProductDao.findByOrdersId(id);
-        return JsonResult.success("获取成功").set("orders", orders).set("proList", proList);
+
+        QueryTools qt = new QueryTools();
+        Page<Product> res = productDao.findAll(qt.buildSearch(new SpecificationOperator("status", "eq", "1", "and"),
+                new SpecificationOperator("isRecommend", "eq", "1")),
+                SimplePageBuilder.generate(0, 8, SimpleSortBuilder.generateSort("orderNo_a")));
+
+        return JsonResult.success("获取成功").set("orders", orders).set("proList", proList).set("recommendList", res.getContent());
     }
 
     /**

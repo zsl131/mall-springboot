@@ -83,7 +83,7 @@ public class OrdersHandlerTools {
         OrdersHandlerDto countDto = buildHandlerDto(productDtoList, commissionRecordList);
 
 //        System.out.println(ordersDto);
-        Orders orders = addOrders(ordersKey, ordersNo, custom, address, agent, coupon, countDto);
+        Orders orders = addOrders(ordersKey, ordersNo, custom, address, agent, coupon, countDto, ordersDto.getRemark());
         //订单生成后要处理用户优惠券
         buildCoupon(orders, coupon);
         //保存佣金，
@@ -96,10 +96,11 @@ public class OrdersHandlerTools {
     }
 
     private Orders addOrders(String ordersKey, String ordersNo, WxCustomDto custom, CustomAddress address,
-                           Agent agent, CustomCoupon coupon, OrdersHandlerDto countDto) {
+                           Agent agent, CustomCoupon coupon, OrdersHandlerDto countDto, String remark) {
         Orders order = new Orders();
         order.setAddressCon(buildAddressCon(address));
         order.setAddressId(address.getId());
+        order.setRemark(remark);
 
         if(agent!=null) {
             order.setAgentName(agent.getName());
