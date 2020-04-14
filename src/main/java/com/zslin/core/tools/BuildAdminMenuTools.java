@@ -112,7 +112,8 @@ public class BuildAdminMenuTools {
     private AdminMenu buildClassMenu(String serviceName, Map<String, Object> classRes) {
         String cpsn = (String) classRes.get("psn");
         boolean isEnglish = cpsn.getBytes().length==cpsn.length(); //无汉字
-        String cpsnEn = isEnglish?cpsn: PinyinToolkit.cn2Spell(cpsn, "_"); //类上的父菜单SN
+//        String cpsnEn = isEnglish?cpsn: PinyinToolkit.cn2Spell(cpsn, "_"); //类上的父菜单SN
+        String cpsnEn = PinyinToolkit.cn2Spell(cpsn, "_");
         AdminMenu cpm = menuDao.findBySn(cpsnEn);
         if(cpm==null) {
             cpm = new AdminMenu();
