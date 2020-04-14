@@ -70,7 +70,7 @@ public class BindCodeTools {
                 return "验证码【"+code+"】不存在或忆过期";
             }
         } catch (Exception e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             return "绑定出错！";
         }
     }
