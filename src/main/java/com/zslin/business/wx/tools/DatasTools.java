@@ -141,7 +141,6 @@ public class DatasTools {
             a.setCreateLong(System.currentTimeMillis());
             a.setCreateDay(NormalTools.curDate());
             a.setCreateTime(NormalTools.curDatetime());
-            a.setFollowDay(NormalTools.curDate());
             isFirst = true;
         } else {
 //            accountService.updateStatus(id, "1");
@@ -151,6 +150,10 @@ public class DatasTools {
                 a.setStatus("1");
             }
         }
+        a.setFollowDay(NormalTools.curDate());
+        a.setFollowLong(System.currentTimeMillis());
+        a.setFollowTime(NormalTools.curDatetime());
+
         JSONObject jsonObj = exchangeTools.getUserInfo(openid);
         if(jsonObj!=null) {
             String jsonStr = jsonObj.toString();

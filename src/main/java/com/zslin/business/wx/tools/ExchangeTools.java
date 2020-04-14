@@ -27,7 +27,7 @@ import java.util.Map;
 public class ExchangeTools {
 
     @Autowired
-    private AccessTokenTools accessTokenTools;
+    private WxAccessTokenTools accessTokenTools;
 
     @Autowired
     private WxConfigTools wxConfigTools;
