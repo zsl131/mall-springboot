@@ -22,4 +22,8 @@ public class WxConfigTools {
         }
         return wxConfig;
     }
+
+    public void setConfig(WxConfig config) {
+        wxConfig = config;
+    }
 }
