@@ -70,8 +70,8 @@ public class MiniAuthService {
         String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+config.getAppid()
                 +"&secret="+config.getAppSecret()+"&js_code="+code+"&grant_type=authorization_code";
         String str = template.getForObject(url, String.class);
-        //System.out.println("====================================");
-        //log.info(str);
+//        System.out.println("====================================");
+//        log.info(str);
         String openid = JsonTools.getJsonParam(str, "openid");
         String sessionKey = JsonTools.getJsonParam(str, "session_key");
         NewCustomDto dto = MiniUtils.decryptionUserInfo(enc, sessionKey, iv);
@@ -183,7 +183,7 @@ public class MiniAuthService {
             customerDao.save(customer);
             res = customer;
         } else {
-            MyBeanUtils.copyProperties(customer, old, "id", "firstFollowDay", "firstFollowTime", "firstFollowLong");
+            MyBeanUtils.copyProperties(customer, old, "id", "phone", "name", "agentId", "firstFollowDay", "firstFollowTime", "firstFollowLong");
             old.setFollowDay(NormalTools.curDate());
             old.setFollowTime(NormalTools.curDatetime());
             old.setFollowLong(System.currentTimeMillis());

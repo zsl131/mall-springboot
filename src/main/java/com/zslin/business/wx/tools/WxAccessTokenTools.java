@@ -1,6 +1,9 @@
-package com.zslin.business.mini.tools;
+package com.zslin.business.wx.tools;
 
 import com.zslin.business.mini.model.MiniConfig;
+import com.zslin.business.mini.tools.InternetTools;
+import com.zslin.business.mini.tools.MiniConfigTools;
+import com.zslin.business.wx.model.WxConfig;
 import com.zslin.core.cache.CacheTools;
 import com.zslin.core.tools.JsonTools;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,9 +16,9 @@ import java.util.Map;
  * Created by 钟述林 393156105@qq.com on 2017/1/24 11:05.
  */
 @Component
-public class AccessTokenTools {
+public class WxAccessTokenTools {
 
-    private static final String NAME = "mini-access-token";
+    private static final String NAME = "wx-access-token";
     private static final String TOKEN_URL = "https://api.weixin.qq.com/cgi-bin/token";
 
     private static final String TICKET_NAME = "wx-jsapi-ticket";
@@ -24,7 +27,7 @@ public class AccessTokenTools {
     @Autowired
     private CacheTools cacheTools;
     @Autowired
-    private MiniConfigTools miniConfigTools;
+    private WxConfigTools wxConfigTools;
 
     public String getAccessToken() {
         String token = (String) cacheTools.getKey(NAME);
@@ -36,11 +39,11 @@ public class AccessTokenTools {
     }
 
     private String getNewAccessToken() {
-        MiniConfig config = miniConfigTools.getMiniConfig();
+        WxConfig config = wxConfigTools.getWxConfig();
         Map<String, Object> params = new HashMap<>();
         params.put("grant_type", "client_credential");
         params.put("appid", config.getAppid());
-        params.put("secret", config.getAppSecret());
+        params.put("secret", config.getSecret());
         String result = InternetTools.doGet(TOKEN_URL, params);
         return JsonTools.getJsonParam(result, "access_token");
     }

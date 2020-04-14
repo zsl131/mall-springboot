@@ -128,7 +128,7 @@ public class Orders implements Serializable {
 
 	/**
 	* 订单状态
-	* @remark 0-未付款；1-已付款，未发货；2-付款已发货；3-收货未点评；4-已完成
+	* @remark 0-未付款；1-已付款，未发货；2-已发货；3-未点评；4-已完成
 	*/
 	private String status;
 

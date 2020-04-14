@@ -11,6 +11,8 @@ import com.zslin.business.mini.model.SubscribeMessage;
 import com.zslin.business.mini.tools.PushMessageTools;
 import com.zslin.business.model.Customer;
 import com.zslin.business.model.ShoppingBasket;
+import com.zslin.business.wx.dto.SendMessageDto;
+import com.zslin.business.wx.tools.TemplateMessageTools;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.qiniu.tools.QiniuTools;
 import com.zslin.core.tools.MyBeanUtils;
@@ -41,6 +43,17 @@ public class RabbitMQReceive implements ApplicationContextAware {
 
     public ApplicationContext getApplicationContext() {
         return applicationContext;
+    }
+
+    @Autowired
+    private TemplateMessageTools templateMessageTools;
+
+    /** 处理模板消息 */
+    @RabbitHandler
+    public void handlerSendMessage(SendMessageDto dto) {
+//        System.out.println("==============================");
+//        System.out.println(dto);
+        templateMessageTools.sendMessageByDto(dto);
     }
 
     /*@Autowired
