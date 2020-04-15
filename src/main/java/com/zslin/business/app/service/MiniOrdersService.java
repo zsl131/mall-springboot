@@ -83,14 +83,23 @@ public class MiniOrdersService {
      */
     @NeedAuth(openid = true)
     public JsonResult confirmOrders(String params) {
-        WxCustomDto customDto = JsonTools.getCustom(params);
-        String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
-        int count = ordersDao.updateStatus("3", ordersNo, customDto.getCustomId());
-        if(count>0) {
+        try {
+            WxCustomDto customDto = JsonTools.getCustom(params);
+            String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
+//        int count = ordersDao.updateStatus("3", ordersNo, customDto.getCustomId());
+            Orders orders = ordersDao.findByOrdersNoAndCustomId(ordersNo, customDto.getCustomId());
+            orders.setStatus("3");
+            orders.setEndLong(System.currentTimeMillis());
+            orders.setEndTime(NormalTools.curDatetime());
+            orders.setEndDay(NormalTools.curDate());
+            ordersDao.save(orders);
+
+            customCommissionRecordDao.updateStatus("2", ordersNo); //修改提成状态
             return JsonResult.success("确认成功").set("flag", "1");
-        } else {
-            return JsonResult.success("确认成功").set("flag", "0");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return JsonResult.success("确认成功").set("flag", "0");
     }
 
     /** 催单 */

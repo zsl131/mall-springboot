@@ -128,7 +128,7 @@ public class Orders implements Serializable {
 
 	/**
 	* 订单状态
-	* @remark 0-未付款；1-已付款，未发货；2-已发货；3-未点评；4-已完成
+	* @remark  -1：关闭；0-未付款；1-已付款，未发货；2-已发货；3-未点评；4-已完成
 	*/
 	private String status;
 
@@ -137,6 +137,16 @@ public class Orders implements Serializable {
 	* @remark 0-不存在；1-存在；默认0
 	*/
 	private String hasAfterSale="0";
+
+	/**
+	* 是否有代理
+	*/
+	private String hasAgent="0";
+
+	/**
+	* 代理ID
+	*/
+	private Integer agentId;
 
 	/**
 	* 代理Openid
@@ -186,5 +196,23 @@ public class Orders implements Serializable {
 	*/
 	@Lob
 	private String remark;
+
+	/**
+	* 结束日期
+	*/
+	private String endDay;
+
+	private String endTime;
+
+	private Long endLong;
+
+	/**
+	* 发货日期
+	*/
+	private String sendDay;
+
+	private String sendTime;
+
+	private Long sendLong;
 
 }

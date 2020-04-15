@@ -72,7 +72,7 @@ public class CustomCommissionRecord implements Serializable {
 
 	/**
 	* 状态
-	* @remark 0-用户下单；1-用户付款，但不在提现期；2-在提现期；3-纳入结算清单；4-结算到账；5-结算失败
+	* @remark  -1：用户取消；0-用户下单；1-用户付款，但不在提现期；2-在提现期；3-纳入结算清单；4-结算到账；5-结算失败
 	*/
 	private String status;
 

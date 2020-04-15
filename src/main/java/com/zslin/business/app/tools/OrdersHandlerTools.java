@@ -118,12 +118,15 @@ public class OrdersHandlerTools {
         order.setAddressCon(buildAddressCon(address));
         order.setAddressId(address.getId());
         order.setRemark(remark);
+        order.setHasAgent("0"); //默认为没有代理
 
-        if(agent!=null) {
+        if(agent!=null) { //如果有代理信息，则设置
             order.setAgentName(agent.getName());
             order.setAgentOpenid(agent.getOpenid());
             order.setAgentPhone(agent.getPhone());
             order.setAgentUnionid(agent.getUnionid());
+            order.setAgentId(agent.getId());
+            order.setHasAgent("1"); //设置为有代理
         }
         order.setCreateDay(NormalTools.curDate());
         order.setCreateTime(NormalTools.curDatetime());

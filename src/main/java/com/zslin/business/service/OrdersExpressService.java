@@ -130,8 +130,12 @@ public class OrdersExpressService {
 
         ordersExpressDao.save(express); //保存
 
-        //TODO 处次应该通知用户订单已发货
-        ordersDao.updateStatus("2", ordersNo, orders.getCustomId()); //修改状态为已发货
+//        ordersDao.updateStatus("2", ordersNo, orders.getCustomId()); //修改状态为已发货
+        orders.setStatus("2");//修改状态为已发货
+        orders.setSendDay(NormalTools.curDate());
+        orders.setSendTime(NormalTools.curDatetime());
+        orders.setSendLong(System.currentTimeMillis());
+        ordersDao.save(orders);
 
         //快递公司-快递单号-商品信息-商品数量
         sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "商品发货通知", "", "您购买的商品已发货啦~",

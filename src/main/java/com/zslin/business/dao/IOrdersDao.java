@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 /**
  * Created by 钟述林 on 2019-12-18.
  */
@@ -32,4 +34,12 @@ public interface IOrdersDao extends BaseRepository<Orders, Integer>, JpaSpecific
 
     @Query("SELECT COUNT(o.id) FROM Orders o WHERE o.status=?1 AND o.customId=?2 ")
     Integer queryCount(String status, Integer customId);
+
+    /** 获取超时未付款的订单 */
+    @Query("FROM Orders o WHERE o.status='0' AND o.createLong<=?1")
+    List<Orders> findTimeoutOrders(Long timeout);
+
+    /** 获取长时间未确认收货的订单 */
+    @Query("FROM Orders o WHERE o.status='2' AND o.sendLong<=?1")
+    List<Orders> findTimeoutConfirmOrders(Long timeout);
 }

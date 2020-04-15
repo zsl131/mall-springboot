@@ -7,6 +7,11 @@ import com.zslin.business.mini.model.MiniConfig;
 import com.zslin.business.mini.tools.MiniConfigTools;
 import com.zslin.business.mini.tools.PayNotifyTools;
 import com.zslin.business.model.Orders;
+import com.zslin.business.tools.SendTemplateMessageTools;
+import com.zslin.business.wx.annotations.HasTemplateMessage;
+import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
+import com.zslin.business.wx.tools.TemplateMessageTools;
+import com.zslin.business.wx.tools.WxAccountTools;
 import com.zslin.core.common.NormalTools;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +30,7 @@ import java.util.Map;
 @Controller
 @RequestMapping(value = "wxPay")
 @Slf4j
+@HasTemplateMessage
 public class WXPayController {
 
     @Autowired
@@ -36,6 +42,9 @@ public class WXPayController {
     @Autowired
     private ICustomCommissionRecordDao customCommissionRecordDao;
 
+    @Autowired
+    private SendTemplateMessageTools sendTemplateMessageTools;
+
     /**
      * 支付结果通知地址
      * @param request
@@ -43,6 +52,7 @@ public class WXPayController {
      * @return
      */
     @RequestMapping(value = "notify")
+    @TemplateMessageAnnotation(name = "订单付款成功通知", keys = "订单号-支付时间-支付金额-支付方式")
     public String notify(HttpServletRequest request, HttpServletResponse response) {
 
         MiniConfig miniConfig = miniConfigTools.getMiniConfig();
@@ -63,7 +73,16 @@ public class WXPayController {
                         orders.setPayLong(System.currentTimeMillis());
                         orders.setPayTime(NormalTools.curDatetime());
                         orders.setStatus("1");
+                        ordersDao.save(orders);
                         customCommissionRecordDao.updateStatus("1", ordersNo);
+
+                        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单付款成功通知", "", "有订单付款了",
+                                TemplateMessageTools.field("订单号", orders.getOrdersNo()),
+                                TemplateMessageTools.field("支付时间", orders.getPayTime()),
+                                TemplateMessageTools.field("支付金额", orders.getTotalMoney()+""),
+                                TemplateMessageTools.field("支付方式", "在线支付"),
+
+                                TemplateMessageTools.field("请核对信息后尽快处理~~"));
                     }
                 }
 
