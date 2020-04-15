@@ -62,6 +62,8 @@ public class BindCodeTools {
                     wm.setNickname(customer.getNickname());
                     wm.setWxOpenid(wxOpenid);
                     wxMiniDao.save(wm);
+
+                    customerDao.updateBindWx("1", miniOpenid); //修改绑定标记
                     return "微信与小程序绑定成功";
                 } else {
                     return "已经绑定，不用重复操作";

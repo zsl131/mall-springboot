@@ -8,6 +8,11 @@ import com.zslin.business.model.ExpressCompany;
 import com.zslin.business.model.Orders;
 import com.zslin.business.model.OrdersExpress;
 import com.zslin.business.model.Product;
+import com.zslin.business.tools.SendTemplateMessageTools;
+import com.zslin.business.wx.annotations.HasTemplateMessage;
+import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
+import com.zslin.business.wx.tools.TemplateMessageTools;
+import com.zslin.business.wx.tools.WxAccountTools;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.repository.SimplePageBuilder;
@@ -26,6 +31,7 @@ import java.util.List;
  * 订单物流
  */
 @Service
+@HasTemplateMessage
 public class OrdersExpressService {
 
     @Autowired
@@ -42,6 +48,9 @@ public class OrdersExpressService {
 
     @Autowired
     private IProductDao productDao;
+
+    @Autowired
+    private SendTemplateMessageTools sendTemplateMessageTools;
 
     /** 查询物流详情 */
     public JsonResult queryDetail(String params) {
@@ -93,6 +102,7 @@ public class OrdersExpressService {
     }
 
     /** 为订单发货 */
+    @TemplateMessageAnnotation(name = "商品发货通知", keys = "快递公司-快递单号-商品信息-商品数量")
     public JsonResult express(String params) {
         String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
         Orders orders = ordersDao.findByOrdersNo(ordersNo);
@@ -122,6 +132,16 @@ public class OrdersExpressService {
 
         //TODO 处次应该通知用户订单已发货
         ordersDao.updateStatus("2", ordersNo, orders.getCustomId()); //修改状态为已发货
+
+        //快递公司-快递单号-商品信息-商品数量
+        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "商品发货通知", "", "您购买的商品已发货啦~",
+                TemplateMessageTools.field("快递公司", express.getExpName()),
+                TemplateMessageTools.field("快递单号", express.getExpNo()),
+                TemplateMessageTools.field("商品信息", "-"),
+                TemplateMessageTools.field("商品数量", orders.getTotalCount()+" 件"),
+
+                TemplateMessageTools.field("您可以在“满山晴”小程序中查看物流信息"));
+
         return JsonResult.success("保存成功");
     }
 

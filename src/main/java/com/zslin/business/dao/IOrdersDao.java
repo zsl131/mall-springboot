@@ -29,4 +29,7 @@ public interface IOrdersDao extends BaseRepository<Orders, Integer>, JpaSpecific
     @Modifying
     @Transactional
     int updateStatus(String status, String ordersNo, Integer customId);
+
+    @Query("SELECT COUNT(o.id) FROM Orders o WHERE o.status=?1 AND o.customId=?2 ")
+    Integer queryCount(String status, Integer customId);
 }

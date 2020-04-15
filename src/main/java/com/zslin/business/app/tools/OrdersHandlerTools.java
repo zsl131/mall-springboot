@@ -7,6 +7,11 @@ import com.zslin.business.app.dto.orders.OrdersRateDto;
 import com.zslin.business.dao.*;
 import com.zslin.business.dto.OrdersShowDto;
 import com.zslin.business.model.*;
+import com.zslin.business.tools.SendTemplateMessageTools;
+import com.zslin.business.wx.annotations.HasTemplateMessage;
+import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
+import com.zslin.business.wx.tools.TemplateMessageTools;
+import com.zslin.business.wx.tools.WxAccountTools;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.WxCustomDto;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +27,7 @@ import java.util.Random;
  *
  */
 @Component("ordersHandlerTools")
+@HasTemplateMessage
 public class OrdersHandlerTools {
 
     @Autowired
@@ -57,7 +63,11 @@ public class OrdersHandlerTools {
     @Autowired
     private RateTools rateTools;
 
+    @Autowired
+    private SendTemplateMessageTools sendTemplateMessageTools;
+
     @Transactional
+    @TemplateMessageAnnotation(name = "订单创建成功通知", keys = "订单号-商品数量-商品金额")
     public void addOrders(WxCustomDto custom, SubmitOrdersDto ordersDto) {
         Orders oldOrders = ordersDao.findByOrdersKey(ordersDto.getOrdersKey());
         if(oldOrders!=null) {return;} //如果订单已经存在，则不能再操作
@@ -93,6 +103,13 @@ public class OrdersHandlerTools {
         }
         //保存订单产品
         saveOrderProducts(orders, agent, level, custom, productDtoList);
+
+        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单创建成功通知", "", "有顾客下单单了",
+                TemplateMessageTools.field("订单号", ordersNo),
+                TemplateMessageTools.field("商品数量", orders.getTotalCount()+" 件"),
+                TemplateMessageTools.field("商品金额", orders.getTotalMoney()+" 元"),
+
+                TemplateMessageTools.field("可以前往后台管理系统查看"));
     }
 
     private Orders addOrders(String ordersKey, String ordersNo, WxCustomDto custom, CustomAddress address,

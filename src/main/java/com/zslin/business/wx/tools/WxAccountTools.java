@@ -20,14 +20,12 @@ public class WxAccountTools {
     /**
      * 类型
      * 0-游客；
-     * 1-学生；
-     * 2-学生家长；
+     * 1-代理；
      * 5-公司员工；
      * 10-超级管理人员
      */
     public static final String CUSTOMER = "0"; //游客
-    public static final String WORKER = "1"; //学生
-    public static final String MANAGER = "2"; //学生家长
+    public static final String AGENT = "1"; //代理
     public static final String PARTNER = "5"; //公司员工
     public static final String ADMIN = "10"; //超级管理员
 
@@ -46,7 +44,7 @@ public class WxAccountTools {
      * @return
      */
     public List<String> getAllOpenids() {
-        return getOpenid(CUSTOMER, WORKER, MANAGER, PARTNER, ADMIN);
+        return getOpenid(CUSTOMER, AGENT, PARTNER, ADMIN);
     }
 
     public List<String> getOpenid(String... types) {

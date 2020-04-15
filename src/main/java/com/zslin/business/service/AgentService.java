@@ -10,6 +10,10 @@ import com.zslin.business.model.Agent;
 import com.zslin.business.model.AgentLevel;
 import com.zslin.business.model.AgentPaper;
 import com.zslin.business.tools.AgentTools;
+import com.zslin.business.tools.SendTemplateMessageTools;
+import com.zslin.business.wx.annotations.HasTemplateMessage;
+import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
+import com.zslin.business.wx.tools.TemplateMessageTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
@@ -38,6 +42,7 @@ import java.util.List;
 @Service
 @AdminAuth(name = "代理管理", psn = "销售管理", orderNum = 2, type = "1", url = "/admin/agent")
 @Explain(name = "代理管理", notes = "代理管理")
+@HasTemplateMessage
 public class AgentService {
 
     @Autowired
@@ -55,6 +60,9 @@ public class AgentService {
     @Autowired
     private ICustomerDao customerDao;
 
+    @Autowired
+    private SendTemplateMessageTools sendTemplateMessageTools;
+
     @ExplainOperation(name = "代理申请审核", notes = "代理申请审核", params= {
             @ExplainParam(value = "id", name = "代理ID", require = true, type = "int", example = "1"),
             @ExplainParam(value = "status", name = "审核状态结果", require = true, type = "String", example = "1"),
@@ -62,6 +70,7 @@ public class AgentService {
     }, back = {
             @ExplainReturn(field = "message", notes = "提示信息"),
     })
+    @TemplateMessageAnnotation(name = "申请审核通知", keys = "申请人-申请内容")
     public JsonResult verify(String params) {
         //System.out.println(params);
         Integer id = JsonTools.getId(params);
@@ -89,9 +98,15 @@ public class AgentService {
         }
 
         agentDao.plusVerifyCount(1, a.getId());
+        String msgTitle = "很遗憾，审核不通过！";
         if("1".equals(status)) { //只有审核通过才进行等级调整
             agentDao.plusRelationCount(1, a.getId());
+            msgTitle = "恭喜，审核通过！";
         }
+
+        sendTemplateMessageTools.send(a.getOpenid(), "申请审核通知", "", msgTitle,
+                TemplateMessageTools.field("申请人", a.getNickname()),
+                TemplateMessageTools.field("申请内容", "1".equals(status)?"通过":"驳回"));
 
         return JsonResult.success("操作成功");
     }

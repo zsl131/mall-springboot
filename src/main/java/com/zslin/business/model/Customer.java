@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 客户
  * @author 钟述林
- * @data generate on: 2020-04-14
+ * @data generate on: 2020-04-15
  */
 @Data
 @Entity
@@ -92,5 +92,11 @@ public class Customer implements Serializable {
 	* 代理ID
 	*/
 	private Integer agentId;
+
+	/**
+	* 微信绑定标记
+	* @remark 0-未标记；1-已标记
+	*/
+	private String bindWx="0";
 
 }

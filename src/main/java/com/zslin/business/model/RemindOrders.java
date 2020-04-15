@@ -8,32 +8,28 @@ import java.io.Serializable;
 
 
 /**
- * 代理等级关系
+ * 催单
  * @author 钟述林
  * @data generate on: 2020-04-15
  */
 @Data
 @Entity
-@Table(name = "business_agent_level_relation")
+@Table(name = "business_remind_orders")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class AgentLevelRelation implements Serializable {
+public class RemindOrders implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
-	/**
-	* 代理ID
-	*/
-	private Integer agentId;
+	private String ordersNo;
 
-	private String openid;
+	private Integer ordersId;
 
-	private String unionid;
+	private String createDay;
 
-	/**
-	* 等级ID
-	*/
-	private Integer levelId;
+	private String createTime;
+
+	private Long createLong;
 
 }

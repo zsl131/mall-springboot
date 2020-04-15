@@ -332,7 +332,7 @@ public class EventTools {
 		if(tempUrl!=null && tempUrl.indexOf("{openid}")>=0) {tempUrl = tempUrl.replaceAll("\\{openid\\}", toUser);}
 
 		String token = accessTokenTools.getAccessToken();
-		System.out.println("-----EventTools Current Token :: "+token);
+		//System.out.println("-----EventTools Current Token :: "+token);
 		String postUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token="+token;
 		String params = createTemplateMessageXml(toUser, tempId, tempUrl, topColor, paramList);
 		JSONObject jsonObj = WeixinUtil.httpRequest(postUrl, "POST", params);

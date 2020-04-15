@@ -2,13 +2,13 @@ package com.zslin.test;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.zslin.business.app.tools.CouponTools;
-import com.zslin.business.app.tools.OrdersHandlerTools;
 import com.zslin.business.dao.*;
 import com.zslin.business.mini.dto.MsgDto;
 import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.tools.*;
 import com.zslin.business.model.*;
+import com.zslin.business.wx.dto.TemplateMessageDto;
+import com.zslin.business.wx.tools.TemplateMessageAnnotationTools;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
@@ -28,7 +28,6 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.BridgeMethodResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.transaction.interceptor.TransactionAttribute;
 import org.springframework.util.ClassUtils;
 import org.springframework.web.client.RestTemplate;
 
@@ -40,7 +39,6 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
 import java.util.List;
-import java.util.Random;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -107,6 +105,16 @@ public class NormalTest implements ApplicationContextAware {
 
     @Autowired
     private ExpressTools expressTools;
+
+    @Autowired
+    private TemplateMessageAnnotationTools templateMessageAnnotationTools;
+
+    @Test
+    public void test32() {
+        List<TemplateMessageDto> noConfig = templateMessageAnnotationTools.findNoConfigTemplateMessage();
+        System.out.println("--------------------");
+        System.out.println(noConfig);
+    }
 
     @Test
     public void test31() {

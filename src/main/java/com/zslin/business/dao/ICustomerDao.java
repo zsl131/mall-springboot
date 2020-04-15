@@ -25,4 +25,9 @@ public interface ICustomerDao extends BaseRepository<Customer, Integer>, JpaSpec
     @Modifying
     @Transactional
     void updatePhone(String phone, Integer id);
+
+    @Query("UPDATE Customer c SET c.bindWx=?1 WHERE c.openid=?2 ")
+    @Modifying
+    @Transactional
+    void updateBindWx(String flag, String openid);
 }

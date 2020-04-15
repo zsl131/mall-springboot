@@ -29,7 +29,7 @@ public class TemplateMessageAnnotationTools {
     @Autowired
     private ITemplateMessageRelationDao templateMessageRelationDao;
 
-    private String [] packages = new String []{"com/zslin/bus/*/service/*.class", "com/zslin/bus/*/tools/*.class"};
+    private String [] packages = new String []{"classpath*:com/zslin/**/service/*.class"};
 
     public Map<String, String> checkTemplateMessage() {
         Map<String, String> result = new HashMap<>();

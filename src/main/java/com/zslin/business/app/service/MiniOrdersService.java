@@ -9,6 +9,11 @@ import com.zslin.business.dao.*;
 import com.zslin.business.mini.dto.PaySubmitDto;
 import com.zslin.business.mini.tools.PayTools;
 import com.zslin.business.model.*;
+import com.zslin.business.tools.SendTemplateMessageTools;
+import com.zslin.business.wx.annotations.HasTemplateMessage;
+import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
+import com.zslin.business.wx.tools.TemplateMessageTools;
+import com.zslin.business.wx.tools.WxAccountTools;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
@@ -23,13 +28,13 @@ import com.zslin.core.tools.QueryTools;
 import com.zslin.core.tools.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@HasTemplateMessage
 public class MiniOrdersService {
 
     @Autowired
@@ -65,6 +70,12 @@ public class MiniOrdersService {
     @Autowired
     private PayTools payTools;
 
+    @Autowired
+    private SendTemplateMessageTools sendTemplateMessageTools;
+
+    @Autowired
+    private IRemindOrdersDao remindOrdersDao;
+
     /**
      * 确认收货
      * @param params
@@ -82,15 +93,44 @@ public class MiniOrdersService {
         }
     }
 
+    /** 催单 */
     @NeedAuth(openid = true)
+    @TemplateMessageAnnotation(name = "催单通知", keys = "订单号-下单时间-收货人-收货人联系方式-收货人地址")
     public JsonResult noticeOrders(String params) {
-        String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
-        //TODO 处理崔单业务逻辑
+        try {
+            String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
+            //TODO 处理崔单业务逻辑
+            Orders orders = ordersDao.findByOrdersNo(ordersNo);
+            //3小时内不能重复催单
+            RemindOrders ro = remindOrdersDao.findByOrdersNoAndTime(ordersNo, System.currentTimeMillis() - 3*3600*1000);
+            if(ro==null) {
+                ro = new RemindOrders();
+                ro.setCreateDay(NormalTools.curDate());
+                ro.setCreateLong(System.currentTimeMillis());
+                ro.setCreateTime(NormalTools.curDatetime());
+                ro.setOrdersId(orders.getId());
+                ro.setOrdersNo(ordersNo);
+                remindOrdersDao.save(ro);
+
+                CustomAddress ca = customAddressDao.findOne(orders.getAddressId()); //获取地址
+                sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "催单通知", "", "有顾客催单了",
+                    TemplateMessageTools.field("订单号", ordersNo),
+                    TemplateMessageTools.field("下单时间", orders.getPayTime()),
+                    TemplateMessageTools.field("收货人", ca.getName()),
+                    TemplateMessageTools.field("收货人联系方式", ca.getPhone()),
+                    TemplateMessageTools.field("收货人地址", ca.getProvinceName()+ca.getCityName()+ca.getCountyName()+ca.getStreet()),
+
+                    TemplateMessageTools.field("请核对信息后尽快处理~~"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return JsonResult.success("崔单成功");
     }
 
     /** 支付成功后回调此接口 */
     @NeedAuth(openid = true)
+    @TemplateMessageAnnotation(name = "订单付款成功通知", keys = "订单号-支付时间-支付金额-支付方式")
     public JsonResult payRes(String params) {
         try {
             WxCustomDto customDto = JsonTools.getCustom(params);
@@ -107,6 +147,14 @@ public class MiniOrdersService {
                 ordersDao.save(orders);
 //                ordersDao.updateStatus("1", ordersNo, customDto.getCustomId()); //修改订单状态
                 customCommissionRecordDao.updateStatus("1", ordersNo); //修改提成状态
+
+                sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单付款成功通知", "", "有订单付款了",
+                        TemplateMessageTools.field("订单号", orders.getOrdersNo()),
+                        TemplateMessageTools.field("支付时间", orders.getPayTime()),
+                        TemplateMessageTools.field("支付金额", orders.getTotalMoney()+""),
+                        TemplateMessageTools.field("支付方式", "在线支付"),
+
+                        TemplateMessageTools.field("请核对信息后尽快处理~~"));
             }
             return JsonResult.success("操作成功").set("flag", "1");
         } catch (Exception e) {
