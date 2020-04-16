@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 微信模板消息
  * @author 钟述林
- * @data generate on: 2020-04-15
+ * @data generate on: 2020-04-17
  */
 @Data
 @Entity

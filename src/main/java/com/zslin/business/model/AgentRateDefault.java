@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理默认提成标准
  * @author 钟述林
- * @data generate on: 2020-04-15
+ * @data generate on: 2020-04-17
  */
 @Data
 @Entity

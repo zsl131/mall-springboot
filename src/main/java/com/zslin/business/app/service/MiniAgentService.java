@@ -131,6 +131,7 @@ public class MiniAgentService {
         o.setOpenid(dto.getOpenid());
         o.setUnionid(dto.getUnionid());
         o.setNickname(dto.getNickname());
+        o.setCustomId(dto.getCustomId());
         agentDao.save(o);
 
         JSONArray jsonArray = JsonTools.str2JsonArray(JsonTools.getJsonParam(params, "papers")); //获取资质
@@ -165,10 +166,10 @@ public class MiniAgentService {
             List<AgentPaper> paperList = agentPaperDao.findByAgentId(agent.getId());
             result.set("verifyList", verifyList).set("paperList", paperList);
 
-            if("1".equals(agent.getStatus())) { //如果是正式代理
+            /*if("1".equals(agent.getStatus())) { //如果是正式代理
                 List<AgentLevel> levelList = agentLevelDao.findAll();
                 result.set("levelList", levelList);
-            }
+            }*/
         }
         return result.set("obj", agent);
     }

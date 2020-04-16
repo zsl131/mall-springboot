@@ -3,6 +3,7 @@ package com.zslin.test;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.dao.*;
+import com.zslin.business.mini.dto.AgentCommissionDto;
 import com.zslin.business.mini.dto.MsgDto;
 import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.tools.*;
@@ -108,6 +109,42 @@ public class NormalTest implements ApplicationContextAware {
 
     @Autowired
     private TemplateMessageAnnotationTools templateMessageAnnotationTools;
+
+    @Autowired
+    private ICustomCommissionRecordDao customCommissionRecordDao;
+
+    @Test
+    public void test34() {
+        for(int i=0;i<50;i++) {
+            CustomCommissionRecord ccr = new CustomCommissionRecord();
+            ccr.setAgentId(1);
+            ccr.setStatus(getStatus());
+            ccr.setMoney(getMoney());
+            ccr.setCustomNickname("顾客【"+i+"】");
+            ccr.setCreateTime(NormalTools.curDatetime());
+            ccr.setCreateLong(System.currentTimeMillis());
+            ccr.setCreateDay(NormalTools.curDate());
+            ccr.setProTitle("其中一项产品"+i);
+            ccr.setSpecsName("规格"+i);
+            customCommissionRecordDao.save(ccr);
+        }
+    }
+
+    private Float getMoney() {
+        return Float.parseFloat((int)((Math.random()*10)+5)+"");
+    }
+
+    private String getStatus() {
+        String [] array = new String[]{"-1", "0", "1", "2", "3", "4"};
+        int index =Integer.parseInt(((int)(Math.random()*array.length))+"");
+        return array[index];
+    }
+
+    @Test
+    public void test33() {
+        AgentCommissionDto dto = customCommissionRecordDao.queryCountDto("9", 1);
+        System.out.println(dto);
+    }
 
     @Test
     public void test32() {

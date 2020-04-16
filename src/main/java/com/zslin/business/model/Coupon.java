@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 优惠券
  * @author 钟述林
- * @data generate on: 2020-04-15
+ * @data generate on: 2020-04-17
  */
 @Data
 @Entity

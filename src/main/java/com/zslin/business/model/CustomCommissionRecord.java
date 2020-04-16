@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理佣金明细
  * @author 钟述林
- * @data generate on: 2020-04-15
+ * @data generate on: 2020-04-17
  */
 @Data
 @Entity
@@ -116,5 +116,10 @@ public class CustomCommissionRecord implements Serializable {
 	* 订单KEY
 	*/
 	private String ordersKey;
+
+	/**
+	* 提现的批次号
+	*/
+	private String cashOutBatchNo;
 
 }
