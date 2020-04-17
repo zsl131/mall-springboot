@@ -48,7 +48,8 @@ public class WxAccount implements Serializable {
 
 	/**
 	* 用户类型
+	* @remark 0-顾客；1-代理；5-公司员工；10-管理员
 	*/
-	private String type;
+	private String type="0";
 
 }

@@ -30,6 +30,18 @@ public class WxAccountTools {
     public static final String ADMIN = "10"; //超级管理员
 
     /**
+     * 获取身份名称
+     * @param type 用户类型
+     * @return
+     */
+    public static String genTypeName(String type) {
+        if("1".equals(type)) {return "代理";}
+        else if("5".equals(type)) {return "员工";}
+        else if("10".equals(type)) {return "管理员";}
+        else {return "顾客";}
+    }
+
+    /**
      * 判断type是否为股东或超级管理员
      * @param type 用户类型
      * @return

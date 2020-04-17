@@ -16,6 +16,11 @@ public interface IWxAccountDao extends BaseRepository<WxAccount, Integer>, JpaSp
 
     WxAccount findByOpenid(String openid);
 
+    @Query("UPDATE WxAccount a SET a.type=?1 WHERE a.id=?2")
+    @Modifying
+    @Transactional
+    void updateType(String type, Integer id);
+
     @Query("UPDATE WxAccount a SET a.status=?2 WHERE a.id=?1")
     @Modifying
     @Transactional

@@ -9,9 +9,13 @@ import com.zslin.business.dao.IAgentLevelDao;
 import com.zslin.business.dao.IAgentPaperDao;
 import com.zslin.business.model.Agent;
 import com.zslin.business.model.AgentApplyVerify;
-import com.zslin.business.model.AgentLevel;
 import com.zslin.business.model.AgentPaper;
 import com.zslin.business.tools.MediumTools;
+import com.zslin.business.tools.SendTemplateMessageTools;
+import com.zslin.business.wx.annotations.HasTemplateMessage;
+import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
+import com.zslin.business.wx.tools.TemplateMessageTools;
+import com.zslin.business.wx.tools.WxAccountTools;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.WxCustomDto;
@@ -25,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+@HasTemplateMessage
 public class MiniAgentService {
 
     @Autowired
@@ -42,11 +47,15 @@ public class MiniAgentService {
     @Autowired
     private MediumTools mediumTools;
 
+    @Autowired
+    private SendTemplateMessageTools sendTemplateMessageTools;
+
     /**
      * 申请被驳回时重新提交
      * @param params
      * @return
      */
+    @TemplateMessageAnnotation(name = "申请审核通知", keys = "申请人-申请内容")
     public JsonResult updateAgent(String params) {
         //System.out.println("=======>"+params);
         WxCustomDto dto = JsonTools.getCustom(params);
@@ -99,6 +108,11 @@ public class MiniAgentService {
             agentPaperDao.save(ap);
         }
 
+        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "申请审核通知", "", agent.getName()+"重新提交了代理申请",
+                TemplateMessageTools.field("申请人", agent.getName()),
+                TemplateMessageTools.field("申请内容", agent.getName()+"-"+agent.getPhone()),
+                TemplateMessageTools.field("请及时登陆后台查看审核"));
+
         return JsonResult.success("提交成功，等待审核");
     }
 
@@ -117,6 +131,7 @@ public class MiniAgentService {
      */
     @NeedAuth(openid = true)
     @Transactional
+    @TemplateMessageAnnotation(name = "申请审核通知", keys = "申请人-申请内容")
     public JsonResult addAgent(String params) {
         //System.out.println("---->"+params);
         WxCustomDto dto = JsonTools.getCustom(params);
@@ -148,6 +163,12 @@ public class MiniAgentService {
         }
 
         agentDao.updatePaperCount(jsonArray.size(), o.getId());
+
+        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "申请审核通知", "", o.getName()+"提交了代理申请",
+                TemplateMessageTools.field("申请人", o.getName()),
+                TemplateMessageTools.field("申请内容", o.getName()+"-"+o.getPhone()),
+                TemplateMessageTools.field("请及时登陆后台查看审核"));
+
         return JsonResult.success("操作成功");
     }
 

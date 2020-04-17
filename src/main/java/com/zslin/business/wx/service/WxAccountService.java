@@ -2,12 +2,18 @@ package com.zslin.business.wx.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.tools.SendTemplateMessageTools;
+import com.zslin.business.wx.annotations.HasTemplateMessage;
+import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
+import com.zslin.business.wx.tools.TemplateMessageTools;
+import com.zslin.business.wx.tools.WxAccountTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
 import com.zslin.business.wx.dao.IWxAccountDao;
+import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.business.wx.model.WxAccount;
@@ -30,10 +36,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AdminAuth(name = "微信用户管理", psn = "微信管理", orderNum = 2, type = "1", url = "/admin/wxAccount")
 @Explain(name = "微信用户管理", notes = "微信用户管理")
+@HasTemplateMessage
 public class WxAccountService {
 
     @Autowired
     private IWxAccountDao wxAccountDao;
+
+    @Autowired
+    private SendTemplateMessageTools sendTemplateMessageTools;
 
     @AdminAuth(name = "微信用户列表", orderNum = 1)
     @ExplainOperation(name = "微信用户列表", notes = "微信用户列表", params= {
@@ -70,5 +80,27 @@ public class WxAccountService {
         }
     }
 
+    /** 修改用户类型 */
+    @TemplateMessageAnnotation(name = "身份级别变更通知", keys = "变动前级别-变动后级别-时间")
+    public JsonResult updateType(String params) {
+        try {
+            Integer id = JsonTools.getId(params);
+            String type = JsonTools.getJsonParam(params, "type");
+            String oldType = JsonTools.getJsonParam(params, "oldType");
+            String openid = JsonTools.getJsonParam(params, "openid");
+            wxAccountDao.updateType(type, id);
 
+            sendTemplateMessageTools.send2Wx(openid, "身份级别变更通知", "", "您的身份发生了变化",
+                    TemplateMessageTools.field("变动前级别", WxAccountTools.genTypeName(oldType)),
+                    TemplateMessageTools.field("变动后级别", WxAccountTools.genTypeName(type)),
+                    TemplateMessageTools.field("时间", NormalTools.curDatetime()),
+                    TemplateMessageTools.field("请知晓"));
+            return JsonResult.success("保存成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return JsonResult.error(e.getMessage());
+        }
+
+
+    }
 }

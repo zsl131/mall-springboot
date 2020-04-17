@@ -34,7 +34,25 @@ public class SendTemplateMessageTools {
      * @param fields 消息内容
      */
     public void send(String miniOpenid, String tempName, String url, String title, String ...fields) {
-        String wxOpenid = gueryWxOpenid(miniOpenid);
+        String wxOpenid = queryWxOpenid(miniOpenid);
+        //System.out.println("-----------------"+wxOpenid);
+        /*if(wxOpenid!=null && !"".equals(wxOpenid)) {
+            SendMessageDto smd = new SendMessageDto(tempName, wxOpenid, url, title, fields);
+            rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, smd);
+        }*/
+        send2Wx(wxOpenid, tempName, url, title, fields);
+    }
+
+    /**
+     * 发送模板消息
+     * @param wxOpenid 微信Openid
+     * @param tempName 模板名称
+     * @param url 请求地址
+     * @param title 模板消息主题
+     * @param fields 消息内容
+     */
+    public void send2Wx(String wxOpenid, String tempName, String url, String title, String ...fields) {
+        //String wxOpenid = gueryWxOpenid(miniOpenid);
         //System.out.println("-----------------"+wxOpenid);
         if(wxOpenid!=null && !"".equals(wxOpenid)) {
             SendMessageDto smd = new SendMessageDto(tempName, wxOpenid, url, title, fields);
@@ -58,7 +76,7 @@ public class SendTemplateMessageTools {
         }
     }
 
-    private String gueryWxOpenid(String miniOpenid) {
+    private String queryWxOpenid(String miniOpenid) {
         return wxMiniDao.queryWxOpenid(miniOpenid);
     }
 }

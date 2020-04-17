@@ -2,12 +2,18 @@ package com.zslin.business.wx.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.tools.SendTemplateMessageTools;
+import com.zslin.business.wx.annotations.HasTemplateMessage;
+import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
+import com.zslin.business.wx.tools.TemplateMessageTools;
+import com.zslin.business.wx.tools.WxAccountTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
 import com.zslin.business.wx.dao.IFeedbackDao;
+import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.business.wx.model.Feedback;
@@ -30,10 +36,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AdminAuth(name = "微信反馈管理", psn = "微信管理", orderNum = 2, type = "1", url = "/admin/feedback")
 @Explain(name = "微信反馈管理", notes = "微信反馈管理")
+@HasTemplateMessage
 public class FeedbackService {
 
     @Autowired
     private IFeedbackDao feedbackDao;
+
+    @Autowired
+    private SendTemplateMessageTools sendTemplateMessageTools;
 
     @AdminAuth(name = "微信反馈列表", orderNum = 1)
     @ExplainOperation(name = "微信反馈列表", notes = "微信反馈列表", params= {
@@ -115,5 +125,49 @@ public class FeedbackService {
         }
     }
 
+    public JsonResult updateStatus(String params) {
+        try {
+            Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
+            String status = JsonTools.getJsonParam(params, "status");
+            feedbackDao.updateStatus(id, status);
+            return JsonResult.success("设置成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return JsonResult.error(e.getMessage());
+        }
+    }
+
+    /**
+     * 回复
+     * @param params {id:1, reply: 回复}
+     * @return
+     */
+    @TemplateMessageAnnotation(name = "问题反馈结果通知", keys = "提问内容-回复内容")
+    public JsonResult reply(String params) {
+        try {
+            Integer id = Integer.parseInt(JsonTools.getJsonParam(params, "id"));
+            String reply = JsonTools.getJsonParam(params, "reply");
+            Feedback f = feedbackDao.findOne(id);
+            f.setReply(reply);
+            f.setReplyDay(NormalTools.curDate());
+            f.setReplyTime(NormalTools.curDatetime());
+            f.setReplyLong(System.currentTimeMillis());
+            feedbackDao.save(f);
+
+            //TODO 通知反馈者
+//            boolean result = eventToolsThread.eventRemind(f.getOpenid(), "回复反馈啦", "反馈回复", NormalTools.curDate(), reply, "#");
+//            templateMessageTools.sendMessageByThread("反馈回复", f.getOpenid(), "#", "您的反馈信息已得到回复", TemplateMessageTools.field("反馈日期", f.getCreateDate()), TemplateMessageTools.field("反馈内容", f.getContent()), TemplateMessageTools.field("回复内容", reply));
+
+            sendTemplateMessageTools.send2Wx(f.getOpenid(), "问题反馈结果通知", "", "您的消息得到回复",
+                    TemplateMessageTools.field("提问内容", f.getContent()),
+                    TemplateMessageTools.field("回复内容", reply),
+                    TemplateMessageTools.field("请知晓"));
+
+            return JsonResult.succ(f);
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            return JsonResult.error(e.getMessage());
+        }
+    }
 
 }
