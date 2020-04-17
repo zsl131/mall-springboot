@@ -6,14 +6,17 @@ import com.zslin.business.model.Agent;
 import com.zslin.business.model.AgentApplyVerify;
 import com.zslin.business.model.AgentLevel;
 import com.zslin.business.model.AgentLevelRecord;
+import com.zslin.business.wx.annotations.HasTemplateMessage;
+import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
+import com.zslin.business.wx.tools.TemplateMessageTools;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.LoginUserDto;
-import com.zslin.core.rabbit.RabbitNormalTools;
 import com.zslin.core.tools.JsonTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
+@HasTemplateMessage
 public class AgentTools {
 
     @Autowired
@@ -23,8 +26,9 @@ public class AgentTools {
     private IAgentLevelRecordDao agentLevelRecordDao;
 
     @Autowired
-    private RabbitNormalTools rabbitNormalTools;
+    private SendTemplateMessageTools sendTemplateMessageTools;
 
+    @TemplateMessageAnnotation(name = "申请审核通知", keys = "申请人-申请内容")
     public void verify(String params, Agent agent, AgentLevel al) {
         Integer id = JsonTools.getId(params);
         String status = JsonTools.getJsonParam(params, "status");
@@ -49,14 +53,24 @@ public class AgentTools {
 
         agentApplyVerifyDao.save(aav);
 
-        String remark = "恭喜您！";
+        /*String remark = "恭喜您！";
         if("1".equals(status) && al!=null) {remark = al.getName();}
         else if("2".equals(status)) {remark = reason;}
         rabbitNormalTools.pushMessage("AGENT-VERIFY", agent.getOpenid(), "pages/agent/apply/apply",
                 "代理审核", "1".equals(status)?"审核通过":"审核不通过", NormalTools.curDate(),
-                remark, agent.getName());
+                remark, agent.getName());*/
 
         addLevelRecord(agent, al, reason);
+
+        String msgTitle = "很遗憾，审核不通过！";
+        if("1".equals(status)) { //只有审核通过才进行等级调整
+            msgTitle = "恭喜，审核通过！";
+        }
+
+        sendTemplateMessageTools.send(agent.getOpenid(), "申请审核通知", "", msgTitle,
+                TemplateMessageTools.field("申请人", agent.getName()),
+                TemplateMessageTools.field("申请内容", "1".equals(status)?"通过":"驳回"),
+                TemplateMessageTools.field("1".equals(status)?msgTitle:"原因："+reason));
     }
 
     private void addLevelRecord(Agent agent, AgentLevel al, String reason) {

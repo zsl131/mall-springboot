@@ -36,7 +36,11 @@ public class TemplateMessageTools {
         for(int i=0;i<keys.size();i++) {
             key_array[i] = keys.get(i);
         }
-        sendMessage(dto.getTemplateName(), dto.getToUser(), dto.getUrl(), dto.getFirst(), key_array);
+        if(dto.getToUser()!=null && !"".equals(dto.getToUser())) { //发给单个的
+            sendMessage(dto.getTemplateName(), dto.getToUser(), dto.getUrl(), dto.getFirst(), key_array);
+        } else if(dto.getUsers()!=null && dto.getUsers().size()>0) { //发给多个的
+            sendMessage(dto.getTemplateName(), dto.getUsers(), dto.getUrl(), dto.getFirst(), key_array);
+        }
     }
 
     public void sendMessage(String templateName, List<String> toUsers, String url, String first, String... keyValues) {
