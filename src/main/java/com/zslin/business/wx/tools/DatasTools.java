@@ -2,16 +2,15 @@ package com.zslin.business.wx.tools;
 
 import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.tools.BindCodeTools;
+import com.zslin.business.tools.SendTemplateMessageTools;
 import com.zslin.business.wx.annotations.HasScore;
 import com.zslin.business.wx.annotations.HasTemplateMessage;
 import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
 import com.zslin.business.wx.dao.IFeedbackDao;
 import com.zslin.business.wx.dao.IWxAccountDao;
-import com.zslin.business.wx.dto.SendMessageDto;
 import com.zslin.business.wx.model.Feedback;
 import com.zslin.business.wx.model.WxAccount;
 import com.zslin.core.common.NormalTools;
-import com.zslin.core.rabbit.RabbitMQConfig;
 import com.zslin.core.tools.ConfigTools;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +63,9 @@ public class DatasTools {
     @Autowired
     private BindCodeTools bindCodeTools;
 
+    @Autowired
+    private SendTemplateMessageTools sendTemplateMessageTools;
+
     /** 当用户取消关注时 */
     public void onUnsubscribe(String openid) {
         wxAccountDao.updateStatus(openid, "0");
@@ -76,7 +78,7 @@ public class DatasTools {
      * @param content 具体内容
      * @return
      */
-    @TemplateMessageAnnotation(name = "在线反馈", keys = "反馈日期-反馈用户-反馈内容")
+    @TemplateMessageAnnotation(name = "业务咨询通知", keys = "咨询姓名-联系方式-咨询日期-咨询类型-咨询详情")
     public String onEventText(String openid, String builderName, String content) {
         if(content==null || "".equals(content.trim()) || "?".equals(content.trim())
                 || "？".equals(content.trim()) || "1".equals(content.trim())
@@ -102,14 +104,19 @@ public class DatasTools {
             feedbackDao.save(f);
 
 //            List<String> adminOpenids = accountService.findOpenid(AccountTools.ADMIN);
-            List<String> adminOpenids = wxAccountTools.getOpenid(wxAccountTools.ADMIN);
-//            StringBuffer sb = new StringBuffer();
-//            sb.append("反馈用户：").append(f.getNickname()).append(" \\n")
-//                    .append("反馈内容：").append(content);
-//            eventTools.eventRemind(adminOpenids, "在线反馈", "收到在线反馈信息", NormalTools.curDate("yyyy-MM-dd HH:mm"), sb.toString(), "/wx/feedback/list");
-//            templateMessageTools.sendMessageByThread("在线反馈", adminOpenids, "/wx/feedback/list", "您有一条新的反馈信息！", "反馈日期="+NormalTools.curDate("yyyy-MM-dd HH:mm"), "反馈用户="+f.getNickname(), "反馈内容="+content);
-            SendMessageDto smd = new SendMessageDto("在线反馈", adminOpenids, "", "您有一条新的反馈信息！", "反馈日期="+NormalTools.getNow("yyyy-MM-dd HH:mm"), "反馈用户="+f.getNickname(), "反馈内容="+content);
-            rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, smd);
+//            List<String> adminOpenids = wxAccountTools.getOpenid(wxAccountTools.ADMIN);
+            /*SendMessageDto smd = new SendMessageDto("在线反馈", adminOpenids, "", "您有一条新的反馈信息！", "反馈日期="+NormalTools.getNow("yyyy-MM-dd HH:mm"), "反馈用户="+f.getNickname(), "反馈内容="+content);
+            rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, smd);*/
+
+            //咨询姓名-联系方式-咨询日期-咨询类型-咨询详情
+            sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "业务咨询通知", "", "收到新留言",
+                    TemplateMessageTools.field("咨询姓名", a.getNickname()),
+                    TemplateMessageTools.field("联系方式", "-"),
+                    TemplateMessageTools.field("咨询日期", NormalTools.curDatetime()),
+                    TemplateMessageTools.field("咨询类型", "公众号留言"),
+                    TemplateMessageTools.field("咨询详情", content),
+                    TemplateMessageTools.field("请及时登陆后台查阅处理"));
+
             return "";
         }
     }
