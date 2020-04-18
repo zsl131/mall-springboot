@@ -11,9 +11,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.ClassUtils;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
+import java.nio.charset.Charset;
 
 @Component
 public class ApiTools implements ApplicationContextAware {
@@ -29,14 +30,19 @@ public class ApiTools implements ApplicationContextAware {
         return applicationContext;
     }
 
-    public ApiDto buildApiDto(HttpServletRequest request, String apiCode) throws NoSuchMethodException, UnsupportedEncodingException {
+    public ApiDto buildApiDto(String methodType, HttpServletRequest request, String apiCode) throws NoSuchMethodException, UnsupportedEncodingException {
         String serviceName = apiCode.split("\\.")[0];
         String actionName = apiCode.split("\\.")[1];
 //        Object obj = factory.getBean(serviceName);
         Object obj = getApplicationContext().getBean(serviceName);
         Method method ;
         boolean hasParams = false;
-        String params = request.getParameter("params");
+        String params = null;
+        if("get".equalsIgnoreCase(methodType)) { //如果是GET请求
+            params = request.getParameter("params");
+        } else if("post".equalsIgnoreCase(methodType)) { //如果是POST
+            params = getPostParams(request);
+        }
         if(params==null || "".equals(params.trim())) {
             method = obj.getClass().getMethod(actionName);
         } else {
@@ -58,5 +64,45 @@ public class ApiTools implements ApplicationContextAware {
         String ip = request.getRemoteAddr();
 
         return new ApiDto(specificMethod, obj, hasParams, params, ip);
+    }
+
+    /**
+     * 如果是POST请求，则获取body内容做为参数
+     * @param request
+     * @return
+     */
+    private String getPostParams(HttpServletRequest request) {
+        StringBuilder sb = new StringBuilder();
+        InputStream inputStream = null;
+        BufferedReader reader = null;
+        try {
+            inputStream = request.getInputStream();
+            reader = new BufferedReader(
+                    new InputStreamReader(inputStream, Charset.forName("UTF-8")));
+
+            char[] bodyCharBuffer = new char[1024];
+            int len = 0;
+            while ((len = reader.read(bodyCharBuffer)) != -1) {
+                sb.append(new String(bodyCharBuffer, 0, len));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return sb.toString();
     }
 }

@@ -40,6 +40,18 @@ public class Product implements Serializable {
 	private String content;
 
 	/**
+	* 用于再次编辑的图文内容
+	*/
+	@Lob
+	private String rawContent;
+
+	/**
+	* Json格式的图文内容
+	*/
+	@Lob
+	private String jsonContent;
+
+	/**
 	* 浏览次数
 	*/
 	private Integer readCount=0;

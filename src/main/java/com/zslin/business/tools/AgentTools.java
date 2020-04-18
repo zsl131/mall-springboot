@@ -64,13 +64,13 @@ public class AgentTools {
 
         String msgTitle = "很遗憾，审核不通过！";
         if("1".equals(status)) { //只有审核通过才进行等级调整
-            msgTitle = "恭喜，审核通过！";
+            msgTitle = "恭喜您，审核通过！";
         }
 
         sendTemplateMessageTools.send(agent.getOpenid(), "申请审核通知", "", msgTitle,
                 TemplateMessageTools.field("申请人", agent.getName()),
                 TemplateMessageTools.field("申请内容", "1".equals(status)?"通过":"驳回"),
-                TemplateMessageTools.field("1".equals(status)?msgTitle:"原因："+reason));
+                TemplateMessageTools.field("1".equals(status)?msgTitle+(al==null?"":"等级为："+al.getName()):"原因："+reason));
     }
 
     private void addLevelRecord(Agent agent, AgentLevel al, String reason) {

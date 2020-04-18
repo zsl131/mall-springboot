@@ -90,7 +90,7 @@ public class JsonTools {
             Integer res = Integer.parseInt(result);
             return res;
         } catch (Exception e) {
-            e.printStackTrace();
+            //e.printStackTrace();
             return null;
         }
     }

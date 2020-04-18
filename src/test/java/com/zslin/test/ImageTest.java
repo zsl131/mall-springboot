@@ -26,7 +26,7 @@ public class ImageTest {
     private ShareImageTools shareImageTools;
 
     @Test
-    public void test04() {
+    public void test04() throws Exception {
         String proTitle = "绥江半边红李子";
         String price = "￥ 88";
         String nickname = "好友想攀登的胖子";
@@ -34,7 +34,8 @@ public class ImageTest {
         String fontName = "微软雅黑";
         String proImgUrl = "https://zz-specialty.zslin.com/Product_a2d5d791-55a8-472f-80c6-e49bdcf7c964.jpg";
         String headUrl = "https://zz-specialty.zslin.com/oIguM5UvbfNglnWYj7W7_aBkS-3w.jpg";
-        shareImageTools.createImage(proTitle, price, nickname, remark, proImgUrl, headUrl, "", "123");
+        BufferedImage bi = shareImageTools.createImage(proTitle, price, nickname, remark, proImgUrl, headUrl, "", "123");
+        ImageIO.write(bi, "jpg", new File("D:/temp/test/share1.jpg"));
     }
 
     @Test

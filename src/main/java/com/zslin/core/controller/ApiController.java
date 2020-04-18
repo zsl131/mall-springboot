@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,9 +30,17 @@ public class ApiController {
     @Autowired
     private ApiTools apiTools;
 
+    @PostMapping(value = "get")
+    public JsonResult post(HttpServletRequest request, HttpServletResponse response) {
+        return handle(request, "post");
+    }
+
     @GetMapping(value = "get")
     public JsonResult get(HttpServletRequest request, HttpServletResponse response) {
+        return handle(request, "get");
+    }
 
+    public JsonResult handle(HttpServletRequest request, String methodType) {
         String token = request.getHeader("authToken"); //身份认证token
         Long authTime = null;
         try {
@@ -47,10 +56,10 @@ public class ApiController {
 
         try {
 
-            ApiDto apiDto = apiTools.buildApiDto(request, apiCode);
+            ApiDto apiDto = apiTools.buildApiDto(methodType, request, apiCode);
 
             //输出的日志，方便查看
-            log.info("接口调用，apiCode: {}, params: {}", apiCode, apiDto.getParams());
+            //log.info("接口调用，apiCode: {}, params: {}", apiCode, apiDto.getParams());
 
             JsonResult result;
 
@@ -58,10 +67,10 @@ public class ApiController {
             //System.out.println("---------->needAuth:::"+needAuth);
             boolean hasAuth = true;
             if(needAuth==null || needAuth.need()) { //需要权限验证
-                log.info(apiCode+"，需要权限验证");
+                //log.info(apiCode+"，需要权限验证");
                 hasAuth = authCheckTools.hasAuth(token, authTime);
             } else {
-                log.info(apiCode+"， 不需要权限验证");
+                //log.info(apiCode+"， 不需要权限验证");
             }
 
             if(hasAuth) {

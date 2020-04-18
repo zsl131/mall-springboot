@@ -144,6 +144,7 @@ public class ProductService {
             obj.setPcateId(o.getPcateId());
             obj.setPcateName(o.getPcateName());
             obj.setContent(o.getContent());
+            obj.setRawContent(o.getRawContent());
             obj.setFund(o.getFund());
             obj.setSurplusCount(o.getSurplusCount());
             obj.setOrderNo(o.getOrderNo());
