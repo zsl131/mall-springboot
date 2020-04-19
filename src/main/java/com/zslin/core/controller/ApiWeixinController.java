@@ -42,6 +42,7 @@ public class ApiWeixinController {
     }
 
     public JsonResult handle(HttpServletRequest request, String methodType) {
+        //System.out.println("----------methodType:: "+methodType);
         //String token = request.getHeader("authToken"); //身份认证token
         String openid = request.getHeader("openid"); //微信端传入的Openid
         //String nickname = Base64Utils.unPassword(request.getHeader("nickname")); //昵称
@@ -58,7 +59,8 @@ public class ApiWeixinController {
             return JsonResult.getInstance().fail("api_code为空");
         }
         try {
-            ApiDto apiDto = apiTools.buildApiDto(methodType, request, apiCode);
+            ApiDto apiDto = apiTools.buildApiDto("app", request, apiCode);
+            log.info(apiDto.toString());
             JsonResult result;
 
             //输出的日志，方便查看

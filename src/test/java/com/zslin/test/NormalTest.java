@@ -114,6 +114,13 @@ public class NormalTest implements ApplicationContextAware {
     private ICustomCommissionRecordDao customCommissionRecordDao;
 
     @Test
+    public void test35() {
+        String url = "https://msq-file.zslin.com/Product_Exception_3c0f192d-e825-4941-8a0b-ed4511a6686c.jpg";
+        String key = url.substring(url.lastIndexOf("/")+1);
+        System.out.println(key);
+    }
+
+    @Test
     public void test34() {
         for(int i=0;i<50;i++) {
             CustomCommissionRecord ccr = new CustomCommissionRecord();

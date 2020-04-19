@@ -9,4 +9,6 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
  */
 public interface IOrdersAfterSaleDao extends BaseRepository<OrdersAfterSale, Integer>, JpaSpecificationExecutor<OrdersAfterSale> {
 
+    /** 通过订单产品ID获取对象 */
+    OrdersAfterSale findByOrderProId(Integer orderProId);
 }

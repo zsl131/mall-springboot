@@ -42,6 +42,8 @@ public class ApiTools implements ApplicationContextAware {
             params = request.getParameter("params");
         } else if("post".equalsIgnoreCase(methodType)) { //如果是POST
             params = getPostParams(request);
+        } else if("app".equalsIgnoreCase(methodType)) { //如果是移动端的请求，则不用管get和post，都是一样的
+            params = request.getParameter("params");
         }
         if(params==null || "".equals(params.trim())) {
             method = obj.getClass().getMethod(actionName);
@@ -72,6 +74,7 @@ public class ApiTools implements ApplicationContextAware {
      * @return
      */
     private String getPostParams(HttpServletRequest request) {
+
         StringBuilder sb = new StringBuilder();
         InputStream inputStream = null;
         BufferedReader reader = null;

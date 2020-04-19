@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 物流接口配置
  * @author 钟述林
- * @data generate on: 2020-04-17
+ * @data generate on: 2020-04-19
  */
 @Data
 @Entity

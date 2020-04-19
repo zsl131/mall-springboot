@@ -252,17 +252,25 @@ public class OrdersHandlerTools {
         if(agent.getLeaderId()!=null && agent.getLeaderId()>0) {leaderAgent = agentDao.findOne(agent.getLeaderId());} //获取上级代理
         for(OrdersProductDto proDto:proDtoList) {
             OrdersRateDto rateDto = rateTools.getRate(level.getId(), proDto.getSpecs().getId()); //佣金DTO对象
-            result.add(buildRecord(agent, level, custom, rateDto.getThisAmount(), ordersKey, ordersNo, proDto));
-            if(leaderAgent!=null) { //如果有上级代理，也添加进去
-                result.add(buildRecord(leaderAgent, level, custom, rateDto.getLeaderAmount(), ordersKey, ordersNo, proDto));
+            result.add(buildRecord(agent, agent, level, custom, rateDto.getThisAmount(), ordersKey, ordersNo, proDto));
+            //TODO 如果有上级代理且上级是 “金牌代理【id为3】”，也添加进去
+            if(leaderAgent!=null && leaderAgent.getLevelId()==3) {
+                result.add(buildRecord(agent, leaderAgent, level, custom, rateDto.getLeaderAmount(), ordersKey, ordersNo, proDto));
             }
         }
         return result;
     }
 
-    private CustomCommissionRecord buildRecord(Agent agent, AgentLevel level, WxCustomDto custom, Float money,
+    private CustomCommissionRecord buildRecord(Agent saler, Agent agent, AgentLevel level, WxCustomDto custom, Float money,
                                                String ordersKey, String ordersNo, OrdersProductDto proDto) {
         CustomCommissionRecord ccr = new CustomCommissionRecord();
+
+        //设置具体的销售人员信息
+        ccr.setSalerId(saler.getId());
+        ccr.setSalerName(saler.getName());
+        ccr.setSalerOpenid(saler.getOpenid());
+        ccr.setSalerPhone(saler.getPhone());
+
         ccr.setAgentId(agent.getId());
         ccr.setAgentLevelId(level.getId());
         ccr.setAgentLevelName(level.getName());

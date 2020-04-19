@@ -61,8 +61,9 @@ public class MiniCustomCommissionRecordService {
 
         QueryListDto qld = QueryTools.buildQueryListDto(params);
         Page<CustomCommissionRecord> res = customCommissionRecordDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
-                new SpecificationOperator("agentId", "eq", agentId),
-                (status!=null&&!"".equals(status))?new SpecificationOperator("status", "eq", status, "and"):null),
+                new SpecificationOperator("agentId", "eq", agentId, "and"), //代理
+                new SpecificationOperator("money", "gt", 0, "and"), //金额要大于0
+                (status!=null&&!"".equals(status))?new SpecificationOperator("status", "eq", status, "and"):null), //对应状态
                 SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
 
         return JsonResult.getInstance().set("size", (int) res.getTotalElements())

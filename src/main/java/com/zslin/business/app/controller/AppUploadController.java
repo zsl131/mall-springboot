@@ -1,6 +1,7 @@
 package com.zslin.business.app.controller;
 
 import com.zslin.business.dao.ICustomerDao;
+import com.zslin.business.dao.IOrdersProductDao;
 import com.zslin.business.mini.dao.IImageWallDao;
 import com.zslin.business.mini.model.ImageWall;
 import com.zslin.business.model.Customer;
@@ -47,6 +48,9 @@ public class AppUploadController {
     @Autowired
     private ICustomerDao customerDao;
 
+    @Autowired
+    private IOrdersProductDao ordersProductDao;
+
     /**
      * 文件上传的通用方法
      * @param files
@@ -56,6 +60,61 @@ public class AppUploadController {
     @RequestMapping(value = "normal")
     public UploadResult normalUpload(@RequestParam("files") MultipartFile[] files, Integer customId) {
         UploadResult result = upload(files, customId);
+        return result;
+    }
+
+    /**
+     * 上传产品售后信息的照片
+     * @param files
+     * @return
+     */
+    @RequestMapping(value = "productException")
+    public UploadResult productException(@RequestParam("files") MultipartFile[] files) {
+        UploadResult result = new UploadResult(0);
+        if(files!=null) {
+            for(MultipartFile file : files) {
+                BufferedOutputStream bw = null;
+                try {
+                    //System.out.println("---->"+extra);
+                    //log.info("上传参数：{}。", customId);
+//                    UploadParam param = UploadParamsTools.buildParams(extra); //参数DTO对象
+
+                    String fileName = file.getOriginalFilename();
+                    String fileType = NormalTools.getFileType(fileName); //文件类型
+
+                    String type = "";//1-图片；2-视频；
+                    if(MyFileTools.isImageFile(fileName)) {type = "1";}
+                    else if(MyFileTools.isVideoFile(fileName)) {type = "2"; }
+
+                    //上传到七牛
+                    String key = "Product_Exception_"+UUID.randomUUID().toString() + fileType.toLowerCase();
+                    //System.out.println("------>"+key);
+//                        m.setUrl(qiniuConfigTools.getQiniuConfig().getUrl() + "/" + key);
+                    if("1".equals(type)) { //图片
+                        File outFile = new File(configTools.getFilePath("/app/productException") + File.separator + "temp" + File.separator + UUID.randomUUID().toString() + fileType);
+                        FileUtils.copyInputStreamToFile(file.getInputStream(), outFile);
+
+                        Thumbnails.of(outFile).size(1000, 1000).toFile(outFile);
+
+                        qiniuTools.upload(FileUtils.openInputStream(outFile), key);
+                        outFile.delete(); //传到七牛就删除本地
+
+                        result.add(qiniuConfigTools.getQiniuConfig().getUrl()+key);
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } finally {
+                    try {
+                        if (bw != null) {
+                            bw.close();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
         return result;
     }
 

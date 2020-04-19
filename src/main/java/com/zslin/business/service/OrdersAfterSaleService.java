@@ -1,27 +1,23 @@
 package com.zslin.business.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.dao.IOrdersAfterSaleDao;
+import com.zslin.business.model.OrdersAfterSale;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
-import com.zslin.business.dao.IOrdersAfterSaleDao;
+import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
-import com.zslin.business.model.OrdersAfterSale;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.QueryTools;
-import com.zslin.core.validate.ValidationDto;
-import com.zslin.core.validate.ValidationTools;
-import com.zslin.core.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by 钟述林 on 2019-12-18.
@@ -33,6 +29,25 @@ public class OrdersAfterSaleService {
 
     @Autowired
     private IOrdersAfterSaleDao ordersAfterSaleDao;
+
+    @Transactional
+    public JsonResult handleExp(String params) {
+        try {
+            Integer id = JsonTools.getId(params);
+            OrdersAfterSale oas = ordersAfterSaleDao.findOne(id);
+            oas.setStatus("1");
+            oas.setEndLong(System.currentTimeMillis());
+            oas.setEndTime(NormalTools.curDatetime());
+            oas.setEndDay(NormalTools.curDate());
+
+            ordersAfterSaleDao.save(oas);
+
+            return JsonResult.success("操作成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return JsonResult.error(e.getMessage());
+        }
+    }
 
     @AdminAuth(name = "订单售后列表", orderNum = 1)
     @ExplainOperation(name = "订单售后列表", notes = "订单售后列表", params= {
