@@ -94,6 +94,7 @@ public class WxMenuTools {
             sb.append(",\"key\":\"").append(menu.getOptKey()).append("\"");
         } else if("miniprogram".equalsIgnoreCase(type)) {
             sb.append(",\"appid\":\"").append(menu.getAppid()).append("\"");
+            sb.append(",\"url\":\"").append(menu.getPagePath()).append("\"");
             sb.append(",\"pagepath\":\"").append(menu.getPagePath()).append("\"");
         }
         return sb.toString();

@@ -32,10 +32,11 @@ public class WxMediaTools {
     private String buildJson(String type, Integer offset, Integer count) {
         StringBuffer sb = new StringBuffer();
         sb.append("{");
-        sb.append("\"type\":\""+type+"\"")
-                .append("\"offset\":"+offset)
+        sb.append("\"type\":\""+type+"\",")
+                .append("\"offset\":"+offset+",")
                 .append("\"count\":"+count);
         sb.append("}");
+        System.out.println(sb.toString());
         return sb.toString();
     }
 }
