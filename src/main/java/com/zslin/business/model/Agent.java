@@ -5,7 +5,6 @@ import lombok.Data;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import javax.validation.constraints.NotBlank;
 
 
 /**
@@ -26,7 +25,6 @@ public class Agent implements Serializable {
 	/**
 	* 姓名
 	*/
-	@NotBlank(message="姓名不能为空")
 	private String name;
 
 	/**
@@ -43,13 +41,11 @@ public class Agent implements Serializable {
 	/**
 	* 联系电话
 	*/
-	@NotBlank(message="联系电话不能为空")
 	private String phone;
 
 	/**
 	* 身份证号
 	*/
-	@NotBlank(message="身份证号不能为空")
 	private String identity;
 
 	/**

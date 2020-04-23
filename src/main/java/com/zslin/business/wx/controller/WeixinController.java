@@ -40,9 +40,10 @@ public class WeixinController {
     /** 获取素材 */
     @GetMapping(value = "media")
     public @ResponseBody
-    String media(Integer offset, Integer count) {
+    String media(String type, Integer offset, Integer count) {
         offset = offset==null?0:offset; count = count==null?20:count;
-        String res = wxMediaTools.queryMedias(offset, count);
+        type = (type==null||"".equals(type))?"news":type;
+        String res = wxMediaTools.queryMedias(type, offset, count);
         return res;
     }
 

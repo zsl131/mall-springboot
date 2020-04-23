@@ -123,7 +123,8 @@ public class NormalTest implements ApplicationContextAware {
 
     @Test
     public void test37() {
-        wxMediaTools.queryMedias();
+        String str = wxMediaTools.queryMedias(0, 20);
+        System.out.println(str);
     }
 
     @Test

@@ -15,23 +15,26 @@ public class WxMediaTools {
     @Autowired
     private WxAccessTokenTools wxAccessTokenTools;
 
-    public String queryMedias(Integer offset, Integer count) {
-        String url = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token="+wxAccessTokenTools.getAccessToken();
-        JSONObject jsonObj = WeixinUtil.httpRequest(url, "POST", buildJson(offset, count));
-        //System.out.println(jsonObj);
-        return jsonObj.toJSONString();
-        /*String code = JsonTools.getJsonParam(jsonObj.toString(), "errcode");
-        if(!"0".equals(code)) {
-            throw new BusinessException(code, JsonTools.getJsonParam(jsonObj.toJSONString(), "errmsg"));
-        }*/
+    public String queryMedias() {
+        return queryMedias("news", 0, 20);
     }
 
-    private String buildJson(Integer offset, Integer count) {
+    public String queryMedias( Integer offset, Integer count) {
+        return queryMedias("news", offset, count);
+    }
+
+    public String queryMedias(String type, Integer offset, Integer count) {
+        String url = "https://api.weixin.qq.com/cgi-bin/material/batchget_material?access_token="+wxAccessTokenTools.getAccessToken();
+        JSONObject jsonObj = WeixinUtil.httpRequest(url, "POST", buildJson(type, offset, count));
+        return jsonObj.toJSONString();
+    }
+
+    private String buildJson(String type, Integer offset, Integer count) {
         StringBuffer sb = new StringBuffer();
         sb.append("{");
-        sb.append("\"type\":news")
-                .append("\"offset\":0")
-                .append("\"count\":20");
+        sb.append("\"type\":\""+type+"\"")
+                .append("\"offset\":"+offset)
+                .append("\"count\":"+count);
         sb.append("}");
         return sb.toString();
     }

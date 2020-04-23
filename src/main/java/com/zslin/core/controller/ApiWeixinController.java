@@ -60,7 +60,7 @@ public class ApiWeixinController {
         }
         try {
             ApiDto apiDto = apiTools.buildApiDto("app", request, apiCode);
-            log.info(apiDto.toString());
+            //log.info(apiDto.toString());
             JsonResult result;
 
             //输出的日志，方便查看
