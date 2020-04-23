@@ -9,6 +9,7 @@ import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
+import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.exception.BusinessException;
@@ -73,6 +74,14 @@ public class ProductService {
             if(vd.isHasError()) { //如果有验证异常
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
             }
+
+            obj.setCreateDay(NormalTools.curDate());
+            obj.setCreateTime(NormalTools.curDatetime());
+            obj.setCreateLong(System.currentTimeMillis());
+            obj.setUpdateDay(NormalTools.curDate());
+            obj.setUpdateTime(NormalTools.curDatetime());
+            obj.setUpdateLong(System.currentTimeMillis());
+
             productDao.save(obj);
             return JsonResult.succ(obj);
         } catch (Exception e) {
@@ -148,6 +157,11 @@ public class ProductService {
             obj.setFund(o.getFund());
             obj.setSurplusCount(o.getSurplusCount());
             obj.setOrderNo(o.getOrderNo());
+
+            obj.setUpdateDay(NormalTools.curDate());
+            obj.setUpdateTime(NormalTools.curDatetime());
+            obj.setUpdateLong(System.currentTimeMillis());
+
             productDao.save(obj);
             onUpdateProduct(obj);
             return JsonResult.getInstance().set("obj", obj);

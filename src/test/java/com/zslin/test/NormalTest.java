@@ -10,6 +10,8 @@ import com.zslin.business.mini.tools.*;
 import com.zslin.business.model.*;
 import com.zslin.business.wx.dto.TemplateMessageDto;
 import com.zslin.business.wx.tools.TemplateMessageAnnotationTools;
+import com.zslin.business.wx.tools.WxMediaTools;
+import com.zslin.business.wx.tools.WxMenuTools;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
@@ -112,6 +114,23 @@ public class NormalTest implements ApplicationContextAware {
 
     @Autowired
     private ICustomCommissionRecordDao customCommissionRecordDao;
+
+    @Autowired
+    private WxMenuTools wxMenuTools;
+
+    @Autowired
+    private WxMediaTools wxMediaTools;
+
+    @Test
+    public void test37() {
+        wxMediaTools.queryMedias();
+    }
+
+    @Test
+    public void test36() {
+        String str = wxMenuTools.createMenuJson();
+        System.out.println(str);
+    }
 
     @Test
     public void test35() {

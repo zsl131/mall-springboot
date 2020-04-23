@@ -1,14 +1,12 @@
 package com.zslin.business.wx.controller;
 
-import com.zslin.business.wx.tools.DatasTools;
-import com.zslin.business.wx.tools.EventTools;
-import com.zslin.business.wx.tools.RepeatTools;
-import com.zslin.business.wx.tools.SignTools;
+import com.zslin.business.wx.tools.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -35,6 +33,18 @@ public class WeixinController {
 
     @Autowired
     private DatasTools datasTools;
+
+    @Autowired
+    private WxMediaTools wxMediaTools;
+
+    /** 获取素材 */
+    @GetMapping(value = "media")
+    public @ResponseBody
+    String media(Integer offset, Integer count) {
+        offset = offset==null?0:offset; count = count==null?20:count;
+        String res = wxMediaTools.queryMedias(offset, count);
+        return res;
+    }
 
     @GetMapping(value = "root")
     public void root(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response) {

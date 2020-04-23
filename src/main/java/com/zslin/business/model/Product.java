@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 /**
  * 产品信息
  * @author 钟述林
- * @data generate on: 2020-04-19
+ * @data generate on: 2020-04-23
  */
 @Data
 @Entity
@@ -193,5 +193,17 @@ public class Product implements Serializable {
 	* @remark 会在订单详情处显示推荐产品
 	*/
 	private String isRecommend="0";
+
+	private String createDay;
+
+	private String createTime;
+
+	private Long createLong;
+
+	private String updateDay;
+
+	private String updateTime;
+
+	private Long updateLong;
 
 }
