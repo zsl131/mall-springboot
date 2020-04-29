@@ -8,6 +8,11 @@ import com.zslin.business.mini.dto.MsgDto;
 import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.tools.*;
 import com.zslin.business.model.*;
+import com.zslin.business.settlement.dao.IRewardDao;
+import com.zslin.business.settlement.dto.AgentRewardDto;
+import com.zslin.business.settlement.dto.RankingDto;
+import com.zslin.business.settlement.tools.RankingTools;
+import com.zslin.business.settlement.tools.RewardTools;
 import com.zslin.business.wx.dto.TemplateMessageDto;
 import com.zslin.business.wx.tools.TemplateMessageAnnotationTools;
 import com.zslin.business.wx.tools.WxMediaTools;
@@ -16,6 +21,8 @@ import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.express.ExpressResultDto;
+import com.zslin.core.repository.SimplePageBuilder;
+import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.service.TestService;
 import com.zslin.core.tasker.BeanCheckTools;
 import com.zslin.core.tools.*;
@@ -29,6 +36,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.BridgeMethodResolver;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.util.ClassUtils;
@@ -121,6 +131,62 @@ public class NormalTest implements ApplicationContextAware {
     @Autowired
     private WxMediaTools wxMediaTools;
 
+    @Autowired
+    private RankingTools rankingTools;
+
+    @Autowired
+    private RewardTools rewardTools;
+
+    @Autowired
+    private IRewardDao rewardDao;
+
+    @Test
+    public void test44() {
+//        customCommissionRecordDao
+    }
+
+    @Test
+    public void test43() {
+        AgentRewardDto dto = rewardDao.queryDto("oIguM5UvbfNglnWYj7W7_aBkS-2a");
+        System.out.println(dto);
+    }
+
+    @Test
+    public void test42() {
+        rewardTools.buildReward("202004");
+    }
+
+    @Test
+    public void test41() {
+        String pattern = "yyyyMM";
+        System.out.println(NormalTools.getMonth(pattern));
+        System.out.println(NormalTools.getMonth(pattern, 0));
+        System.out.println(NormalTools.getMonth(pattern, -1));
+        System.out.println(NormalTools.getMonth(pattern, 5));
+    }
+
+    @Test
+    public void test40() {
+        rankingTools.buildRanking("202004");
+    }
+
+    @Test
+    public void test39() {
+        Sort sort = SimpleSortBuilder.generateSort("totalMoney_d", "totalCount_d");
+        Pageable page = SimplePageBuilder.generate(0, 2, sort);
+        Page<RankingDto> list = customCommissionRecordDao.queryRanking("202004", page);
+        System.out.println("page::"+list.getTotalPages()+", total: "+list.getTotalElements());
+        for(RankingDto dto : list.getContent()) {
+            System.out.println(dto);
+        }
+    }
+
+    @Test
+    public void test38() {
+        AgentLevel al = agentLevelDao.queryMinLevel();
+        System.out.println(al);
+    }
+
     @Test
     public void test37() {
         String str = wxMediaTools.queryMedias(0, 20);
@@ -142,18 +208,21 @@ public class NormalTest implements ApplicationContextAware {
 
     @Test
     public void test34() {
-        for(int i=0;i<50;i++) {
-            CustomCommissionRecord ccr = new CustomCommissionRecord();
-            ccr.setAgentId(1);
-            ccr.setStatus(getStatus());
-            ccr.setMoney(getMoney());
-            ccr.setCustomNickname("顾客【"+i+"】");
-            ccr.setCreateTime(NormalTools.curDatetime());
-            ccr.setCreateLong(System.currentTimeMillis());
-            ccr.setCreateDay(NormalTools.curDate());
-            ccr.setProTitle("其中一项产品"+i);
-            ccr.setSpecsName("规格"+i);
-            customCommissionRecordDao.save(ccr);
+        for(int j=5;j<15;j++) {
+            for (int i = 0; i < 150; i++) {
+                CustomCommissionRecord ccr = new CustomCommissionRecord();
+                ccr.setAgentId(j);
+                ccr.setStatus(getStatus());
+                ccr.setMoney(getMoney());
+                ccr.setCustomNickname("顾客【" + j+"_"+i + "】");
+                ccr.setCreateTime(NormalTools.curDatetime());
+                ccr.setCreateMonth(NormalTools.getNow("yyyyMM"));
+                ccr.setCreateLong(System.currentTimeMillis());
+                ccr.setCreateDay(NormalTools.curDate());
+                ccr.setProTitle("其中一项产品" + i);
+                ccr.setSpecsName("规格" + i);
+                customCommissionRecordDao.save(ccr);
+            }
         }
     }
 

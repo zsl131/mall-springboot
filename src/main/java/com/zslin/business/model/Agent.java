@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理
  * @author 钟述林
- * @data generate on: 2020-04-23
+ * @data generate on: 2020-04-29
  */
 @Data
 @Entity
@@ -162,5 +162,17 @@ public class Agent implements Serializable {
 	* 当前等级名称
 	*/
 	private String levelName;
+
+	private String createDay;
+
+	private String createTime;
+
+	private Long createLong;
+
+	private String updateDay;
+
+	private String updateTime;
+
+	private Long updateLong;
 
 }

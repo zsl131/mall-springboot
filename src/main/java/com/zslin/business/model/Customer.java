@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 客户
  * @author 钟述林
- * @data generate on: 2020-04-23
+ * @data generate on: 2020-04-29
  */
 @Data
 @Entity
@@ -98,5 +98,20 @@ public class Customer implements Serializable {
 	* @remark 0-未标记；1-已标记
 	*/
 	private String bindWx="0";
+
+	/**
+	* 上级CustomId
+	*/
+	private Integer leaderId;
+
+	/**
+	* 上级CustomNickname
+	*/
+	private String leaderNickname;
+
+	/**
+	* 上级CustomOpenid
+	*/
+	private String leaderOpenid;
 
 }

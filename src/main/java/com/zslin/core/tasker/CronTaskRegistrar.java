@@ -27,10 +27,10 @@ public class CronTaskRegistrar implements DisposableBean {
     }
 
     public void show() {
-        System.out.println("----------size: "+ this.scheduledTasks.size());
+        //System.out.println("----------size: "+ this.scheduledTasks.size());
         Set<String> set = this.scheduledTasks.keySet();
         for(String s : set) {
-            System.out.println("--------->" + s);
+            //System.out.println("--------->" + s);
             System.out.println(this.scheduledTasks.remove(s));
         }
     }

@@ -253,8 +253,8 @@ public class OrdersHandlerTools {
         for(OrdersProductDto proDto:proDtoList) {
             OrdersRateDto rateDto = rateTools.getRate(level.getId(), proDto.getSpecs().getId()); //佣金DTO对象
             result.add(buildRecord(agent, agent, level, custom, rateDto.getThisAmount(), ordersKey, ordersNo, proDto));
-            //TODO 如果有上级代理且上级是 “金牌代理【id为3】”，也添加进去
-            if(leaderAgent!=null && leaderAgent.getLevelId()==3) {
+            //TODO 如果有上级代理且上级是 “金牌代理【id为3】”，并且自己不是金牌代理，也添加进去
+            if(leaderAgent!=null && leaderAgent.getLevelId()==3 && agent.getLevelId()!=3) {
                 result.add(buildRecord(agent, leaderAgent, level, custom, rateDto.getLeaderAmount(), ordersKey, ordersNo, proDto));
             }
         }
@@ -271,6 +271,10 @@ public class OrdersHandlerTools {
         ccr.setSalerOpenid(saler.getOpenid());
         ccr.setSalerPhone(saler.getPhone());
 
+        if(saler.getId().equals(agent.getId())) {
+            ccr.setHaveType("0"); //说明是自己推广
+        } else {ccr.setHaveType("1");} //说明是下级代理推广
+
         ccr.setAgentId(agent.getId());
         ccr.setAgentLevelId(level.getId());
         ccr.setAgentLevelName(level.getName());
@@ -279,6 +283,7 @@ public class OrdersHandlerTools {
         ccr.setAgentPhone(agent.getPhone());
         ccr.setAgentUnionid(agent.getUnionid());
         ccr.setCreateDay(NormalTools.curDate());
+        ccr.setCreateMonth(NormalTools.getNow("yyyyMM"));
         ccr.setCreateLong(System.currentTimeMillis());
         ccr.setCreateTime(NormalTools.curDatetime());
         ccr.setCustomId(agent.getCustomId());

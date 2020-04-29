@@ -1,21 +1,19 @@
 package com.zslin.business.tools;
 
-import com.zslin.business.dao.IAgentApplyVerifyDao;
-import com.zslin.business.dao.IAgentLevelRecordDao;
-import com.zslin.business.model.Agent;
-import com.zslin.business.model.AgentApplyVerify;
-import com.zslin.business.model.AgentLevel;
-import com.zslin.business.model.AgentLevelRecord;
+import com.zslin.business.dao.*;
+import com.zslin.business.model.*;
 import com.zslin.business.wx.annotations.HasTemplateMessage;
 import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
 import com.zslin.business.wx.tools.TemplateMessageTools;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.LoginUserDto;
+import com.zslin.core.dto.WxCustomDto;
 import com.zslin.core.tools.JsonTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
-@Component
+@Component("agentTools")
 @HasTemplateMessage
 public class AgentTools {
 
@@ -27,6 +25,73 @@ public class AgentTools {
 
     @Autowired
     private SendTemplateMessageTools sendTemplateMessageTools;
+
+    @Autowired
+    private IAgentDao agentDao;
+
+    @Autowired
+    private ICustomerDao customerDao;
+
+    @Autowired
+    private IAgentLevelDao agentLevelDao;
+
+    /** 在MiniAuthService中初始化用户信息时调用 */
+    public Agent initAgent(Customer customer) {
+        WxCustomDto customDto = new WxCustomDto();
+        customDto.setHeadImgUrl(customer.getHeadImgUrl());
+        customDto.setUnionid(customer.getUnionid());
+        customDto.setOpenid(customer.getOpenid());
+        customDto.setNickname(customer.getNickname());
+        customDto.setCustomId(customer.getId());
+        return initAgent(customDto, customer.getLeaderId());
+    }
+
+    /** 初始化代理信息 */
+    @Transactional
+    public synchronized Agent initAgent(WxCustomDto customDto, Integer leaderId) {
+        try {
+            Agent agent = agentDao.findByOpenid(customDto.getOpenid());
+            if(agent==null) {
+                agent = new Agent();
+                if(leaderId!=null && leaderId>0) { //如果分享者ID不为空
+                    Customer leader = customerDao.findOne(leaderId);
+                    if(leader!=null) { //如果存在上级
+                        agent.setLeaderOpenid(leader.getOpenid());
+                        agent.setLeaderPhone(leader.getPhone());
+                        agent.setLeaderName(leader.getName()==null?leader.getNickname():leader.getName());
+                        agent.setLeaderId(leaderId);
+                    }
+                }
+                agent.setStatus("1"); //默认设置为1
+                agent.setSubCount(0); //下级人数
+                agent.setRelationCount(0); //代理等级调整次数
+                agent.setOpenid(customDto.getOpenid());
+                agent.setCustomId(customDto.getCustomId());
+                agent.setNickname(customDto.getNickname());
+                agent.setUnionid(customDto.getUnionid());
+
+                AgentLevel al = agentLevelDao.queryMinLevel();
+                if(al!=null) {
+                    agent.setLevelName(al.getName());
+                    agent.setLevelId(al.getId());
+                }
+                agent.setCreateDay(NormalTools.curDate());
+                agent.setCreateTime(NormalTools.curDatetime());
+                agent.setCreateLong(System.currentTimeMillis());
+                agent.setUpdateDay(NormalTools.curDate());
+                agent.setUpdateTime(NormalTools.curDatetime());
+                agent.setUpdateLong(System.currentTimeMillis());
+                agentDao.save(agent);
+
+                //建立代理与客户之间的关系
+                customerDao.updateName("", "", agent.getId(), agent.getOpenid());
+                return agent;
+            } else {return agent;}
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     @TemplateMessageAnnotation(name = "申请审核通知", keys = "申请人-申请内容")
     public void verify(String params, Agent agent, AgentLevel al) {

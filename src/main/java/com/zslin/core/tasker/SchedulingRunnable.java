@@ -60,8 +60,8 @@ public class SchedulingRunnable implements Runnable {
         }
 
         long times = System.currentTimeMillis() - startTime;
-        log.info("定时任务执行结束 - name:{}, bean：{}，方法：{}，参数：{}，耗时：{} 毫秒", taskDesc, beanName, methodName, params, times);
-        System.out.println("----------------------------------------------------------------");
+       // log.info("定时任务执行结束 - name:{}, bean：{}，方法：{}，参数：{}，耗时：{} 毫秒", taskDesc, beanName, methodName, params, times);
+        //System.out.println("----------------------------------------------------------------");
 
         processTask(task, flag);
     }

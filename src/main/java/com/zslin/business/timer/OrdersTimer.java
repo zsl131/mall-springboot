@@ -17,7 +17,7 @@ import java.util.List;
 /**
  * 订单定时功能
  */
-@Component
+@Component("ordersTimer")
 @HasTemplateMessage
 public class OrdersTimer {
 
@@ -66,7 +66,7 @@ public class OrdersTimer {
      * 关闭长时间未付款的订单
      */
     public void closeTimeoutOrders() {
-        Long timeout = System.currentTimeMillis() - 48 * 3600 * 1000; //当前时间减去24小时
+        Long timeout = System.currentTimeMillis() - 48 * 3600 * 1000; //当前时间减去48小时
         List<Orders> allList = ordersDao.findTimeoutOrders(timeout);
         for(Orders orders : allList) {
             handleTimeoutOrders(orders);

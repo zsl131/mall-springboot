@@ -13,4 +13,9 @@ public interface IAgentLevelDao extends BaseRepository<AgentLevel, Integer>, Jpa
     /** 通过代理ID获取代理等级对象 */
     @Query("SELECT l FROM AgentLevel l, AgentLevelRelation r WHERE l.id=r.levelId AND r.agentId=?1")
     AgentLevel findByAgentId(Integer agentId);
+
+    @Query("SELECT al FROM AgentLevel al WHERE al.level=(SELECT MIN(a.level) FROM AgentLevel a )")
+    AgentLevel queryMinLevel();
+
+    AgentLevel findByLevel(Integer level);
 }

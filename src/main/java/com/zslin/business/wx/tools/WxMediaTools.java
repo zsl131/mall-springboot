@@ -36,7 +36,7 @@ public class WxMediaTools {
                 .append("\"offset\":"+offset+",")
                 .append("\"count\":"+count);
         sb.append("}");
-        System.out.println(sb.toString());
+        //System.out.println(sb.toString());
         return sb.toString();
     }
 }

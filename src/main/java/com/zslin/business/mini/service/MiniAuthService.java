@@ -1,5 +1,7 @@
 package com.zslin.business.mini.service;
 
+import com.qiniu.util.Json;
+import com.zslin.business.dao.IAgentDao;
 import com.zslin.business.dao.ICustomerDao;
 import com.zslin.business.mini.dao.IMiniConfigDao;
 import com.zslin.business.mini.dao.ISessionKeyDao;
@@ -43,6 +45,9 @@ public class MiniAuthService {
     @Autowired
     private ISessionKeyDao sessionKeyDao;
 
+    @Autowired
+    private IAgentDao agentDao;
+
     @ExplainOperation(name = "获取微信用户信息", params = {
             @ExplainParam(value = "code", name = "loginCode", require = true, example = "通过uni.login获取"),
             @ExplainParam(value = "encryptedData", name = "encryptedData", require = true, example = "通过uni.getUserInfo获取"),
@@ -56,6 +61,7 @@ public class MiniAuthService {
         String code = JsonTools.getJsonParam(params, "code");
         String enc = JsonTools.getJsonParam(params, "encryptedData"); //
         String iv = JsonTools.getJsonParam(params, "iv");
+
         if(NormalTools.isNullOr(code, enc, iv)) {
             throw new BusinessException(BusinessException.Code.PARAM_NULL, "code、encryptedData、iv三者均不能为空");
         }
@@ -84,6 +90,11 @@ public class MiniAuthService {
         }).run();
         if(openid!=null && !"".equals(openid)) {
             //System.out.println(str);
+
+            Integer leaderId = JsonTools.getParamInteger(params, "leaderId");
+            String leaderNickname = JsonTools.getJsonParam(params, "leaderNickname");
+            String leaderOpenid = JsonTools.getJsonParam(params, "leaderOpenid");
+
             Customer customer = new Customer();
             customer.setHeadImgUrl(dto.getAvatarUrl());
             customer.setNickname(dto.getNickName());
@@ -91,6 +102,9 @@ public class MiniAuthService {
             customer.setSex(dto.getGender()==1?"1":"2");
             customer.setStatus("1");
             customer.setUnionid(dto.getUnionId());
+            customer.setLeaderId(leaderId);
+            customer.setLeaderNickname(leaderNickname);
+            customer.setLeaderOpenid(leaderOpenid);
             //rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, customer);
 
             return JsonResult.success("获取成功").set("custom", handlerCustomer(customer));
@@ -138,6 +152,7 @@ public class MiniAuthService {
                 //log.info(res);
             }
             if(phone!=null && !"".equals(phone.trim())) { //如果有手机号码，则保存
+                agentDao.updatePhone(phone, customDto.getCustomId()); //保存代理的手机号码
                 customerDao.updatePhone(phone, customDto.getCustomId());
             }
             return JsonResult.success().set("phone", phone);
@@ -191,6 +206,9 @@ public class MiniAuthService {
             res = old;
         }
         rabbitNormalTools.updateData("couponTools", "handlerFirstFollowCoupon", res);
+
+        ///初始化用户对应的代理信息
+        rabbitNormalTools.updateData("agentTools", "initAgent", customer);
         return res;
     }
 }

@@ -16,10 +16,13 @@ public class AgentCommissionDto {
 
     private String status;
 
+    private String haveType;
+
     private String name;
 
-    public AgentCommissionDto(Integer agentId, String status, Double money, Long totalCount) {
+    public AgentCommissionDto(Integer agentId, String haveType, String status, Double money, Long totalCount) {
         this.agentId = agentId;
+        this.haveType = haveType;
         this.status = status;
         this.money = money==null?0d:money;
         this.totalCount = totalCount==null?0L:totalCount;

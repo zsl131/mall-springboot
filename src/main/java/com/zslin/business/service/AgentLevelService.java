@@ -72,6 +72,9 @@ public class AgentLevelService {
             if(vd.isHasError()) { //如果有验证异常
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
             }
+            if(agentLevelDao.findByLevel(obj.getLevel())!=null) {
+                return JsonResult.getInstance().failFlag(BusinessException.Code.HAS_EXISTS, "等级【"+obj.getLevel()+"】已存在", vd.getErrors());
+            }
             agentLevelDao.save(obj);
 
             agentRateTools.initDefault(); //处理默认提成标准
@@ -97,6 +100,12 @@ public class AgentLevelService {
             if(vd.isHasError()) { //如果有验证异常
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
             }
+
+            AgentLevel al = agentLevelDao.findByLevel(o.getLevel());
+            if(al!=null && al.getId()!=o.getId()) {
+                return JsonResult.getInstance().failFlag(BusinessException.Code.HAS_EXISTS, "等级【"+o.getLevel()+"】已存在", vd.getErrors());
+            }
+
             AgentLevel obj = agentLevelDao.findOne(o.getId());
             MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay");
             agentLevelDao.save(obj);

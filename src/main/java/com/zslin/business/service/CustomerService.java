@@ -1,5 +1,6 @@
 package com.zslin.business.service;
 
+import com.zslin.business.dao.IAgentDao;
 import com.zslin.business.dao.ICustomerDao;
 import com.zslin.business.model.Customer;
 import com.zslin.core.annotations.AdminAuth;
@@ -30,23 +31,26 @@ public class CustomerService {
     @Autowired
     private ICustomerDao customerDao;
 
-    @AdminAuth(name = "客户列表", orderNum = 1)
-    @ExplainOperation(name = "客户列表", notes = "客户列表", params= {
-             @ExplainParam(value = "page", name = "页码，从0开始，默认0", require = false, type = "int", example = "0"),
-             @ExplainParam(value = "size", name = "每页条数，默认15答", require = false, type = "int", example = "15"),
-             @ExplainParam(value = "sort", name = "排序，id_desc表示根据id降序", require = false, type = "String", example = "id_desc"),
-             @ExplainParam(value = "conditions", name = "筛选条件，id_eq:5表示id=5", require = false, type = "String", example = "id_eq:5")
-     }, back = {
-             @ExplainReturn(field = "size", type = "int", notes = "客户数量"),
-             @ExplainReturn(field = "datas", type = "Object", notes = "客户数组对象")
-     })
-     public JsonResult list(String params) {
-         QueryListDto qld = QueryTools.buildQueryListDto(params);
-         Page<Customer> res = customerDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList()),
-                 SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
+    @Autowired
+    private IAgentDao agentDao;
 
-         return JsonResult.getInstance().set("size", (int) res.getTotalElements()).set("datas", res.getContent());
-     }
+    @AdminAuth(name = "客户列表", orderNum = 1)
+    @ExplainOperation(name = "客户列表", notes = "客户列表", params = {
+            @ExplainParam(value = "page", name = "页码，从0开始，默认0", require = false, type = "int", example = "0"),
+            @ExplainParam(value = "size", name = "每页条数，默认15答", require = false, type = "int", example = "15"),
+            @ExplainParam(value = "sort", name = "排序，id_desc表示根据id降序", require = false, type = "String", example = "id_desc"),
+            @ExplainParam(value = "conditions", name = "筛选条件，id_eq:5表示id=5", require = false, type = "String", example = "id_eq:5")
+    }, back = {
+            @ExplainReturn(field = "size", type = "int", notes = "客户数量"),
+            @ExplainReturn(field = "datas", type = "Object", notes = "客户数组对象")
+    })
+    public JsonResult list(String params) {
+        QueryListDto qld = QueryTools.buildQueryListDto(params);
+        Page<Customer> res = customerDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList()),
+                SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
+
+        return JsonResult.getInstance().set("size", (int) res.getTotalElements()).set("datas", res.getContent());
+    }
 
     @AdminAuth(name = "获取客户", orderNum = 5)
     @ExplainOperation(name = "获取客户信息", notes = "通过ID获取客户信息", params = {
@@ -66,13 +70,17 @@ public class CustomerService {
         }
     }
 
-    /** 绑定手机号码 */
+    /**
+     * 绑定手机号码
+     */
     @NeedAuth(openid = true)
     public JsonResult bindPhone(String params) {
         try {
             String phone = JsonTools.getJsonParam(params, "phone");
             WxCustomDto customDto = JsonTools.getCustom(params);
-            customerDao.updatePhone(phone, customDto.getCustomId());
+
+            agentDao.updatePhone(phone, customDto.getCustomId()); //修改代理手机号码
+            customerDao.updatePhone(phone, customDto.getCustomId()); //修改客户手机号码
             return JsonResult.success("绑定成功");
         } catch (Exception e) {
             return JsonResult.error(e.getMessage());

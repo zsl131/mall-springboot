@@ -33,5 +33,7 @@ kaoqin.properties
 
 # office的临时文件
 ~$*
+# 这个文件需要忽略，属于重要文件
+model.xlsx
 
 # application-*.properties

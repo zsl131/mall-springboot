@@ -2,6 +2,8 @@ package com.zslin.core.common;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.text.DecimalFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -28,6 +30,19 @@ public class NormalTools {
         DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
         String res = df.format(LocalDateTime.now());
         return res;
+    }
+
+    public static String getMonth(String pattern) {
+        return getMonth(pattern, 0);
+    }
+
+    public static String getMonth(String pattern, int plus) {
+        LocalDate ld = LocalDate.now();
+        if(plus!=0) {
+            ld = ld.plusMonths(plus);
+        }
+        DateTimeFormatter df = DateTimeFormatter.ofPattern(pattern);
+        return df.format(ld);
     }
 
     public static Date getDate(String dateStr, String pattern) {
@@ -95,5 +110,16 @@ public class NormalTools {
             if(isNull(val)) {res = true; break;}
         }
         return res;
+    }
+
+    /**
+     * 保留2位小数
+     * @param value 需要转换的数值
+     * @return
+     */
+    public static Float retain2Decimal(Double value) {
+        if(value==null) {return 0f;}
+        DecimalFormat df = new DecimalFormat("#.00");
+        return Float.parseFloat(df.format(value));
     }
 }

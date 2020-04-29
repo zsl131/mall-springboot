@@ -8,6 +8,12 @@ import com.zslin.business.mini.tools.MiniOrdersTools;
 import com.zslin.business.model.Agent;
 import com.zslin.business.model.CashOut;
 import com.zslin.business.model.CustomCommissionRecord;
+import com.zslin.business.tools.AgentTools;
+import com.zslin.business.tools.SendTemplateMessageTools;
+import com.zslin.business.wx.annotations.HasTemplateMessage;
+import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
+import com.zslin.business.wx.tools.TemplateMessageTools;
+import com.zslin.business.wx.tools.WxAccountTools;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
@@ -29,6 +35,7 @@ import java.util.List;
  * 小程序处理提成记录
  */
 @Service
+@HasTemplateMessage
 public class MiniCustomCommissionRecordService {
 
     @Autowired
@@ -43,12 +50,25 @@ public class MiniCustomCommissionRecordService {
     @Autowired
     private ICashOutDao cashOutDao;
 
+    @Autowired
+    private AgentTools agentTools;
+
+    @Autowired
+    private SendTemplateMessageTools sendTemplateMessageTools;
+
     @NeedAuth(openid = true)
     public JsonResult listOwn(String params) {
         WxCustomDto customDto = JsonTools.getCustom(params);
-        Integer agentId = agentDao.queryAgentId(customDto.getCustomId());
+
+        Integer sharedId = JsonTools.getParamInteger(params, "shareId");
+
+        //初始化代理，有则返回，无则新增
+        Agent agent = agentTools.initAgent(customDto, sharedId);
+
+//        Integer agentId = agentDao.queryAgentId(customDto.getCustomId());
+        Integer agentId = agent.getId();
         List<AgentCommissionDto> dtoList = miniOrdersTools.buildAgentCommission(agentId);
-        return JsonResult.success().set("commissionList", dtoList);
+        return JsonResult.success().set("commissionList", dtoList).set("agent", agent);
     }
 
     /** 获取明细 */
@@ -72,6 +92,7 @@ public class MiniCustomCommissionRecordService {
 
     /** 当用户发起提现 */
     @NeedAuth(openid = true)
+    @TemplateMessageAnnotation(name = "提现申请通知", keys = "申请人-创建时间-申请金额")
     public JsonResult onCashOut(String params) {
         WxCustomDto customDto = JsonTools.getCustom(params);
         String batchNo = RandomTools.genTimeNo(3, 5).toUpperCase(); //批次号
@@ -96,6 +117,16 @@ public class MiniCustomCommissionRecordService {
             cashOutDao.save(co); //保存记录
 
             customCommissionRecordDao.updateBatchNo(batchNo, "3", "2", agent.getId());
+
+            String name = (agent.getName()==null||"".equals(agent.getName()))?agent.getNickname():agent.getName();
+            //申请人-创建时间-申请金额
+            sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "提现申请通知", "", name+" 发起了提现申请",
+                    TemplateMessageTools.field("申请人", name),
+                    TemplateMessageTools.field("创建时间", NormalTools.curDatetime()),
+                    TemplateMessageTools.field("申请金额", co.getMoney()+""),
+
+                    TemplateMessageTools.field(agent.getPhone()));
+
             return JsonResult.success("提现申请成功，等待审核").set("flag", "1");
         } else {
             return JsonResult.success("提现失败，存在未完成的提现业务").set("flag", "0");
