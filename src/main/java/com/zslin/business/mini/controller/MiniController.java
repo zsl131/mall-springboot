@@ -1,6 +1,8 @@
 package com.zslin.business.mini.controller;
 
-import com.zslin.business.wx.tools.*;
+import com.zslin.business.mini.utils.MiniEventTools;
+import com.zslin.business.mini.utils.MiniSignTools;
+import com.zslin.business.wx.tools.RepeatTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +14,10 @@ import org.w3c.dom.Node;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 /**
  * Created by zsl on 2018/7/20.
@@ -23,26 +27,21 @@ import java.io.PrintWriter;
 public class MiniController {
 
     @Autowired
-    private SignTools signTools;
+    private MiniSignTools miniSignTools;
 
     @Autowired
-    private EventTools eventTools;
+    private MiniEventTools miniEventTools;
 
     @Autowired
     private RepeatTools repeatTools;
 
-    @Autowired
-    private DatasTools datasTools;
-
-    @Autowired
-    private WxMediaTools wxMediaTools;
 
     @GetMapping(value = "root")
     public @ResponseBody String root(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response) {
         System.out.println("===========MiniController echostr===========>"+echostr);
         try {
             // 通过检验signature对请求进行校验，若校验成功则原样返回echostr，表示接入成功，否则接入失败
-            if (signTools.checkSignature(signature, timestamp, nonce)) {
+            if (miniSignTools.checkSignature(signature, timestamp, nonce)) {
                 System.out.println("------------MiniController  check success---------");
                 return echostr;
             }
@@ -54,13 +53,25 @@ public class MiniController {
 
     @PostMapping(value = "root")
     public @ResponseBody String root(HttpServletRequest request, HttpServletResponse response) {
-        response.setContentType("text/xml");
+        response.setContentType("text/json");
         response.setCharacterEncoding("UTF-8");
 
         try {
             request.setCharacterEncoding("UTF-8");
 
-            Element root = eventTools.getMessageEle(request);
+            InputStream in =  request.getInputStream();
+            InputStreamReader inputStreamReader = new InputStreamReader(in, "utf-8");
+            BufferedReader bufferedReader = new BufferedReader(
+                    inputStreamReader);
+            StringBuffer buffer = new StringBuffer();
+            String str = null;
+            while ((str = bufferedReader.readLine()) != null) {
+                buffer.append(str);
+            }
+
+            System.out.println("--------->content::"+buffer.toString());
+
+            Element root = miniEventTools.getMessageEle(request);
 
             Node fromUser = root.getElementsByTagName("FromUserName").item(0);
             Node createTime = root.getElementsByTagName("CreateTime").item(0);
