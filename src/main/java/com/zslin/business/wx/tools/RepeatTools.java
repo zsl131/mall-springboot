@@ -15,6 +15,15 @@ public class RepeatTools {
 
     public boolean hasRepeat(String openid, String time) {
         String name = openid+"-"+time;
+        return hasRepeat(name);
+    }
+
+    public boolean hasRepeat(String msgId, String openid, String time) {
+        String name = (msgId==null || "".equals(msgId))?(openid+"-"+time):msgId;
+        return hasRepeat(name);
+    }
+
+    public boolean hasRepeat(String name) {
         boolean res = cacheTools.exists(name);
         if(!res) {
             cacheTools.putKey(name, 1, 15);
