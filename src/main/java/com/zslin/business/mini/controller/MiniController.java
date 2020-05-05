@@ -37,43 +37,27 @@ public class MiniController {
     @Autowired
     private WxMediaTools wxMediaTools;
 
-    /** 获取素材 */
-    @GetMapping(value = "media")
-    public @ResponseBody
-    String media(String type, Integer offset, Integer count) {
-        offset = offset==null?0:offset; count = count==null?20:count;
-        type = (type==null||"".equals(type))?"news":type;
-        String res = wxMediaTools.queryMedias(type, offset, count);
-        return res;
-    }
-
     @GetMapping(value = "root")
-    public void root(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response) {
+    public @ResponseBody String root(String signature, String timestamp, String nonce, String echostr, HttpServletResponse response) {
+        System.out.println("===========MiniController echostr===========>"+echostr);
         try {
-
-//            System.out.println("signature:"+signature+",timestamp:"+timestamp+",nonce:"+nonce+",echostr:"+echostr);
-
-            PrintWriter out = response.getWriter();
             // 通过检验signature对请求进行校验，若校验成功则原样返回echostr，表示接入成功，否则接入失败
             if (signTools.checkSignature(signature, timestamp, nonce)) {
-                out.print(echostr);
+                System.out.println("------------MiniController  check success---------");
+                return echostr;
             }
-            out.close();
-
-        } catch(IOException e) {
+        } catch(Exception e) {
             e.printStackTrace();
         }
+        return echostr;
     }
 
     @PostMapping(value = "root")
     public @ResponseBody String root(HttpServletRequest request, HttpServletResponse response) {
         response.setContentType("text/xml");
         response.setCharacterEncoding("UTF-8");
-        PrintWriter out = null;
-        String docSend = "";
 
         try {
-            out = response.getWriter();
             request.setCharacterEncoding("UTF-8");
 
             Element root = eventTools.getMessageEle(request);
@@ -93,9 +77,6 @@ public class MiniController {
             String msgTypeStr = msgType.getTextContent(); //事件类型
 
             if(repeatTools.hasRepeat(msgIdStr, fromOpenid, cTime)) { //如果重复
-                out.print(docSend);
-                out.flush();
-                out.close();
                 return "success";
             } else {
                 try { System.out.println("content: "+ content.getTextContent()); } catch (Exception e) { e.printStackTrace(); }
