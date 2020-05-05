@@ -14,6 +14,7 @@ import com.zslin.core.dto.RateDto;
 import com.zslin.core.dto.WxCustomDto;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
+import com.zslin.core.repository.SpecificationOperator;
 import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.QueryTools;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +48,8 @@ public class MiniAgentLevelSpecsRateService {
         List<AgentLevel> levelList = agentLevelDao.findAll();
 
         QueryListDto qld = QueryTools.buildQueryListDto(params);
-        Page<Product> res = productDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList()),
+        Page<Product> res = productDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
+                new SpecificationOperator("status", "eq", "1")),
                 SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
 
         //System.out.println(res.getContent());
