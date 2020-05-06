@@ -1,19 +1,9 @@
 package com.zslin.business.mini.utils;
 
-import com.alibaba.fastjson.JSONObject;
 import com.qq.weixin.mp.aes.WXBizMsgCrypt;
 import com.zslin.business.mini.model.MiniConfig;
 import com.zslin.business.mini.tools.AccessTokenTools;
 import com.zslin.business.mini.tools.MiniConfigTools;
-import com.zslin.business.wx.dto.EventRemarkDto;
-import com.zslin.business.wx.dto.TempParamDto;
-import com.zslin.business.wx.dto.TemplateParamDto;
-import com.zslin.business.wx.model.WxConfig;
-import com.zslin.business.wx.tools.SignTools;
-import com.zslin.business.wx.tools.WeixinUtil;
-import com.zslin.business.wx.tools.WxAccessTokenTools;
-import com.zslin.business.wx.tools.WxConfigTools;
-import com.zslin.core.tools.JsonTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.w3c.dom.Document;
@@ -28,8 +18,6 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 接收消息的事件处理工具类
@@ -62,16 +50,16 @@ public class MiniEventTools {
 	public Element getMessageEle(HttpServletRequest request) {
 //		System.out.println("====config:"+wxConfigTools);
 		MiniConfig config = miniConfigTools.getMiniConfig();
-		System.out.println("====config:"+config);
+		//System.out.println("====config:"+config);
 		Element root = null;
 		try {
 			String signature = request.getParameter("signature"); //微信加密签名
 			String timestamp = request.getParameter("timestamp"); //时间戳
 			String nonce = request.getParameter("nonce"); //随机数
 
-			System.out.println("signature--->"+signature);
-			System.out.println("timestamp--->"+timestamp);
-			System.out.println("nonce--->"+nonce);
+//			System.out.println("signature--->"+signature);
+//			System.out.println("timestamp--->"+timestamp);
+//			System.out.println("nonce--->"+nonce);
 
 			boolean check = miniSignTools.checkSignature(signature, timestamp, nonce);
 			if(!check) {return null;} //如果验证不通过
@@ -103,10 +91,10 @@ public class MiniEventTools {
 				
 				String format = "<xml><ToUserName><![CDATA[toUser]]></ToUserName><Encrypt><![CDATA[%1$s]]></Encrypt></xml>";
 				String fromXML = String.format(format, encrypt);
-				System.out.println("formXML --> "+fromXML);
+				//System.out.println("formXML --> "+fromXML);
 				try {
 					resultStr = pc.decryptMsg(signature, timestamp, nonce, fromXML);
-					System.out.println("resultStr --> "+resultStr);
+					//System.out.println("resultStr --> "+resultStr);
 				} catch (Exception e) {
 				e.printStackTrace();
 				}

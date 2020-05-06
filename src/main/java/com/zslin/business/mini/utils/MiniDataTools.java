@@ -1,6 +1,7 @@
 package com.zslin.business.mini.utils;
 
 import com.zslin.business.dao.ICustomerDao;
+import com.zslin.business.mini.dao.ICustomMessageDao;
 import com.zslin.business.mini.model.CustomMessage;
 import com.zslin.business.model.Customer;
 import com.zslin.business.tools.SendTemplateMessageTools;
@@ -38,6 +39,9 @@ public class MiniDataTools {
 
     @Autowired
     private ICustomerDao customerDao;
+
+    @Autowired
+    private ICustomMessageDao customMessageDao;
 
     /**
      * 添加文本内容
@@ -84,6 +88,7 @@ public class MiniDataTools {
             msg.setHeadImgUrl(customer.getHeadImgUrl());
         }
 
+        customMessageDao.save(msg);
         sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "业务咨询通知", "", "收到新客服消息",
                 TemplateMessageTools.field("咨询姓名", msg.getNickname()),
                 TemplateMessageTools.field("联系方式", "-"),
