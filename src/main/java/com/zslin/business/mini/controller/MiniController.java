@@ -14,10 +14,7 @@ import org.w3c.dom.Node;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 
 /**
  * Created by zsl on 2018/7/20.
@@ -58,18 +55,6 @@ public class MiniController {
 
         try {
             request.setCharacterEncoding("UTF-8");
-
-            InputStream in =  request.getInputStream();
-            InputStreamReader inputStreamReader = new InputStreamReader(in, "utf-8");
-            BufferedReader bufferedReader = new BufferedReader(
-                    inputStreamReader);
-            StringBuffer buffer = new StringBuffer();
-            String str = null;
-            while ((str = bufferedReader.readLine()) != null) {
-                buffer.append(str);
-            }
-
-            System.out.println("--------->content::"+buffer.toString());
 
             Element root = miniEventTools.getMessageEle(request);
 

@@ -62,12 +62,16 @@ public class MiniEventTools {
 	public Element getMessageEle(HttpServletRequest request) {
 //		System.out.println("====config:"+wxConfigTools);
 		MiniConfig config = miniConfigTools.getMiniConfig();
-//		System.out.println("====config:"+config);
+		System.out.println("====config:"+config);
 		Element root = null;
 		try {
 			String signature = request.getParameter("signature"); //微信加密签名
 			String timestamp = request.getParameter("timestamp"); //时间戳
 			String nonce = request.getParameter("nonce"); //随机数
+
+			System.out.println("signature--->"+signature);
+			System.out.println("timestamp--->"+timestamp);
+			System.out.println("nonce--->"+nonce);
 
 			boolean check = miniSignTools.checkSignature(signature, timestamp, nonce);
 			if(!check) {return null;} //如果验证不通过
@@ -99,8 +103,10 @@ public class MiniEventTools {
 				
 				String format = "<xml><ToUserName><![CDATA[toUser]]></ToUserName><Encrypt><![CDATA[%1$s]]></Encrypt></xml>";
 				String fromXML = String.format(format, encrypt);
+				System.out.println("formXML --> "+fromXML);
 				try {
 					resultStr = pc.decryptMsg(signature, timestamp, nonce, fromXML);
+					System.out.println("resultStr --> "+resultStr);
 				} catch (Exception e) {
 				e.printStackTrace();
 				}
