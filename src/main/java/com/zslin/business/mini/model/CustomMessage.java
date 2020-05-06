@@ -1,4 +1,4 @@
-package com.zslin.business.wx.model;
+package com.zslin.business.mini.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -8,41 +8,35 @@ import java.io.Serializable;
 
 
 /**
- * 微信小程序关联
+ * 客服消息
  * @author 钟述林
  * @data generate on: 2020-05-06
  */
 @Data
 @Entity
-@Table(name = "wx_wx_mini")
+@Table(name = "mini_custom_message")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class WxMini implements Serializable {
+public class CustomMessage implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
+	private String openid;
+
 	private String nickname;
 
 	/**
-	* 小程序用户ID
+	* text;image
 	*/
-	private Integer customId;
+	private String msgType;
 
-	/**
-	* 微信用户ID
-	*/
-	private Integer accountId;
+	private String msgId;
 
-	/**
-	* 微信用户Openid
-	*/
-	private String wxOpenid;
+	@Lob
+	private String content;
 
-	/**
-	* 小程序用户Openid
-	*/
-	private String miniOpenid;
+	private String headImgUrl;
 
 	private String createDay;
 
@@ -50,4 +44,9 @@ public class WxMini implements Serializable {
 
 	private Long createLong;
 
+	private String picUrl;
+
+	private String mediaId;
+
+	private String createTimeMini;
 }
