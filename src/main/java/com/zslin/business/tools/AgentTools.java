@@ -9,6 +9,7 @@ import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.LoginUserDto;
 import com.zslin.core.dto.WxCustomDto;
 import com.zslin.core.tools.JsonTools;
+import com.zslin.core.tools.RandomTools;
 import com.zslin.core.tools.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -38,6 +39,18 @@ public class AgentTools {
     @Autowired
     private IAgentLevelDao agentLevelDao;
 
+    private String buildCode(String openid, Integer id) {
+        try {
+            //每一次生成都不一样，把后面时间取消则每次生成都一样
+            String md5 = SecurityUtil.md5(openid, id+"-"+NormalTools.curDatetime());
+            String code = md5.substring(0, 6).toUpperCase(); //取前10位作为邀请码,转换成大写
+            return code;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return RandomTools.randomString(6).toUpperCase();
+        }
+    }
+
     /**
      * 生成自己的邀请码
      * @param customId Customer的ID
@@ -51,8 +64,10 @@ public class AgentTools {
             } else {
                 try {
                     //每一次生成都不一样，把后面时间取消则每次生成都一样
-                    String md5 = SecurityUtil.md5(agent.getOpenid(), agent.getId()+"-"+NormalTools.curDatetime());
-                    String code = md5.substring(0, 6).toUpperCase(); //取前10位作为邀请码,转换成大写
+                    /*String md5 = SecurityUtil.md5(agent.getOpenid(), agent.getId()+"-"+NormalTools.curDatetime());
+                    String code = md5.substring(0, 6).toUpperCase(); //取前10位作为邀请码,转换成大写*/
+                    String code = buildCode(agent.getOpenid(), agent.getId());
+                    while (agentDao.findByOwnCode(code)!=null) {code = buildCode(agent.getOpenid(), agent.getId());}
                     agent.setOwnCode(code);
                     agentDao.save(agent);
                     return code;
