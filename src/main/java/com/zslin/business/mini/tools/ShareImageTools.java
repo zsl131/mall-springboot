@@ -22,55 +22,61 @@ public class ShareImageTools {
     public BufferedImage createImage(String proTitle, String price, String nickname, String remark,
                             String proImgUrl, String headUrl, String page, String scene) {
         try {
+            int proHeight = 460; //+280
+            //产品图片
+            BufferedImage proImg = zoomImage(new URL(proImgUrl).openStream(), 800);
+            proHeight = proImg.getHeight()>460?460:proImg.getHeight();
+
             String fontName = "微软雅黑";
-            BufferedImage bi = new BufferedImage(800, 740, BufferedImage.TYPE_INT_BGR);
+            BufferedImage bi = new BufferedImage(800, proHeight+280, BufferedImage.TYPE_INT_BGR);
 
             Graphics g = bi.getGraphics();
             g.setColor(new Color(255,255,255));
-            g.fillRect(0,0,bi.getWidth(),460); //设置上部份背景色
+            g.fillRect(0,0,bi.getWidth(),proHeight); //设置上部份背景色
 
-            //产品图片
-            BufferedImage proImg = zoomImage(new URL(proImgUrl).openStream(), 800);
+
+            System.out.println("--------->"+proImg.getHeight());
+
             g.drawImage(proImg, 0,0,null);
 
 
             g.setColor(new Color(233,233,233));
-            g.fillRect(0,460,bi.getWidth(),280); //设置下部份背景色
+            g.fillRect(0,proHeight,bi.getWidth(),280); //设置下部份背景色
             //g.dispose();
 
 
             //小程序码
             BufferedImage qr = zoomImage(qrTools.getQrB(page, scene), 190);
-//            BufferedImage qr = qrTools.getQrB(page, scene);
-            g.drawImage(qr, 580,530,null);
+//            BufferedImage qr = qrTools.getQrB(page, scene); 530-460=70
+            g.drawImage(qr, 580,proHeight+70,null);
 
             //满山晴字样
             BufferedImage imgIcon = ImageIO.read(new ClassPathResource("logo-msq.png").getInputStream());
-            g.drawImage(imgIcon, 30,480,null);
+            g.drawImage(imgIcon, 30,proHeight+20,null);
 
             //头像
             BufferedImage srcImg = ImageIO.read(new URL(headUrl)); //读取图片
             BufferedImage newImage=new BufferedImage(90, 90,BufferedImage.TYPE_INT_RGB);
             newImage.createGraphics().drawImage(srcImg.getScaledInstance(90, 90, Image.SCALE_SMOOTH), 0, 0, null);
 
-            g.drawImage(newImage, 30,630,null);
+            g.drawImage(newImage, 30,proHeight+170,null); //630-460=170
 
             Font font = new Font(fontName, Font.PLAIN, 34);
             g.setColor(new Color(39,39,39));
             g.setFont(font);
-            g.drawString(proTitle, 150, 515); //写字是从下往上的占高度
+            g.drawString(proTitle, 150, proHeight+55); //写字是从下往上的占高度 //515-460=55
 
             g.setColor(new Color(255, 0, 0));
             g.setFont(new Font(fontName, Font.PLAIN, 50));
-            g.drawString(price, 40, 590);
+            g.drawString(price, 40, proHeight+130); //590-460=130
 
             g.setColor(new Color(100,100,100));
             g.setFont(font);
-            g.drawString(nickname, 135, 670);
+            g.drawString(nickname, 135, proHeight+210); //670-460=210
 
             g.setColor(new Color(126,126,126));
             g.setFont(new Font(fontName, Font.PLAIN, 26));
-            g.drawString(remark, 135, 710);
+            g.drawString(remark, 135, proHeight+250); //710-460=250
 
             g.dispose();
 

@@ -10,6 +10,7 @@ import com.zslin.business.dao.IAgentPaperDao;
 import com.zslin.business.model.Agent;
 import com.zslin.business.model.AgentApplyVerify;
 import com.zslin.business.model.AgentPaper;
+import com.zslin.business.tools.AgentTools;
 import com.zslin.business.tools.MediumTools;
 import com.zslin.business.tools.SendTemplateMessageTools;
 import com.zslin.business.wx.annotations.HasTemplateMessage;
@@ -17,12 +18,18 @@ import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
 import com.zslin.business.wx.tools.TemplateMessageTools;
 import com.zslin.business.wx.tools.WxAccountTools;
 import com.zslin.core.annotations.NeedAuth;
+import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
+import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.dto.WxCustomDto;
 import com.zslin.core.exception.BusinessException;
+import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
+import com.zslin.core.repository.SpecificationOperator;
 import com.zslin.core.tools.JsonTools;
+import com.zslin.core.tools.QueryTools;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +56,65 @@ public class MiniAgentService {
 
     @Autowired
     private SendTemplateMessageTools sendTemplateMessageTools;
+
+    @Autowired
+    private AgentTools agentTools;
+
+    /**
+     * 获取下级代理
+     * @param params
+     * @return
+     */
+    public JsonResult listSub(String params) {
+        QueryListDto qld = QueryTools.buildQueryListDto(params);
+        WxCustomDto customDto = JsonTools.getCustom(params);
+        Page<Agent> res = agentDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
+                new SpecificationOperator("leaderOpenid", "eq", customDto.getOpenid())),
+                SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
+
+        return JsonResult.getInstance().set("size", (int) res.getTotalElements()).set("data", res.getContent());
+    }
+
+    /**
+     * 生成邀请码
+     * @param params
+     * @return
+     */
+    public JsonResult buildCode(String params) {
+        WxCustomDto customDto = JsonTools.getCustom(params);
+        String code = agentTools.buildOwnCode(customDto.getCustomId());
+        return JsonResult.success().set("code", code);
+    }
+
+    /**
+     * 绑定邀请码
+     * @param params
+     * @return
+     */
+    public JsonResult bindCode(String params) {
+        WxCustomDto customDto = JsonTools.getCustom(params);
+        String code = JsonTools.getJsonParam(params, "code");
+        Agent leader = agentDao.findByOwnCode(code);
+        if(leader==null) {
+            return JsonResult.success("邀请码不存在").set("flag", "0");
+        }
+        Agent agent = agentDao.findByCustomId(customDto.getCustomId());
+        if(agent.getLeaderCode()!=null && !"".equals(agent.getLeaderCode().trim())) {
+            String name = (leader.getName()==null||"".equals(leader.getName()))?leader.getNickname():leader.getName();
+            return JsonResult.success("你的上级是【"+name+"】").set("flag", "0");
+        }
+        agent.setLeaderId(leader.getId());
+        agent.setLeaderName(leader.getName());
+        agent.setLeaderPhone(leader.getPhone());
+        agent.setLeaderOpenid(leader.getOpenid());
+        agent.setLeaderCode(leader.getOwnCode());
+        agent.setLeaderDate(NormalTools.curDate());
+        agent.setLeaderTime(NormalTools.curDatetime());
+        agent.setLeaderLong(System.currentTimeMillis());
+        agent.setStatus("1");
+        agentDao.save(agent);
+        return JsonResult.success("设置成功").set("flag", "1");
+    }
 
     /**
      * 申请被驳回时重新提交

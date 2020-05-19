@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 销售排名
  * @author 钟述林
- * @data generate on: 2020-05-06
+ * @data generate on: 2020-05-18
  */
 @Data
 @Entity

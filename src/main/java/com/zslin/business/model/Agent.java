@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理
  * @author 钟述林
- * @data generate on: 2020-05-06
+ * @data generate on: 2020-05-18
  */
 @Data
 @Entity
@@ -128,6 +128,15 @@ public class Agent implements Serializable {
 	private String leaderPhone;
 
 	/**
+	* 设置上级的日期
+	*/
+	private String leaderDate;
+
+	private String leaderTime;
+
+	private Long leaderLong;
+
+	/**
 	* 证件数量
 	* @remark 对应AgentPaper
 	*/
@@ -174,5 +183,15 @@ public class Agent implements Serializable {
 	private String updateTime;
 
 	private Long updateLong;
+
+	/**
+	* 个人邀请码
+	*/
+	private String ownCode;
+
+	/**
+	* 上级邀请码
+	*/
+	private String leaderCode;
 
 }

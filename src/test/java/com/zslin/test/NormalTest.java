@@ -141,8 +141,11 @@ public class NormalTest implements ApplicationContextAware {
     private IRewardDao rewardDao;
 
     @Test
-    public void test44() {
-//        customCommissionRecordDao
+    public void test44() throws Exception {
+        String openid = "oIguM5UvbfNglnWYj7W7_aBkS-2a";
+        String id = "123";
+        String md5 = SecurityUtil.md5(openid, id);
+        System.out.println(md5);
     }
 
     @Test

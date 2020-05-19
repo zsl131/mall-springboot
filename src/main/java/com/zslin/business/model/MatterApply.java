@@ -1,4 +1,4 @@
-package com.zslin.business.mini.model;
+package com.zslin.business.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -8,46 +8,56 @@ import java.io.Serializable;
 
 
 /**
- * 客服消息
+ * 物料申请
  * @author 钟述林
  * @data generate on: 2020-05-18
  */
 @Data
 @Entity
-@Table(name = "mini_custom_message")
+@Table(name = "business_matter_apply")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CustomMessage implements Serializable {
+public class MatterApply implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
-	private String openid;
-
 	private String nickname;
 
-	/**
-	* text;image
-	*/
-	private String msgType;
-
-	private String msgId;
-
-	@Lob
-	private String content;
+	private String openid;
 
 	private String headImgUrl;
+
+	private Integer customId;
+
+	private String phone;
+
+	/**
+	* 店铺名称
+	*/
+	private String shopName;
+
+	/**
+	* 邮箱
+	*/
+	private String email;
+
+	/**
+	* 说明
+	*/
+	@Lob
+	private String remark;
+
+	/**
+	* 状态
+	* @remark 0-申请；1-已发邮箱
+	*/
+	private String status;
 
 	private String createDay;
 
 	private String createTime;
 
 	private Long createLong;
-
-	private String picUrl;
-
-	private String mediaId;
-
-	private String createTimeMini;
 
 }

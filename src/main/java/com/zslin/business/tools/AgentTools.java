@@ -9,9 +9,12 @@ import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.LoginUserDto;
 import com.zslin.core.dto.WxCustomDto;
 import com.zslin.core.tools.JsonTools;
+import com.zslin.core.tools.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.security.NoSuchAlgorithmException;
 
 @Component("agentTools")
 @HasTemplateMessage
@@ -34,6 +37,31 @@ public class AgentTools {
 
     @Autowired
     private IAgentLevelDao agentLevelDao;
+
+    /**
+     * 生成自己的邀请码
+     * @param customId Customer的ID
+     * @return
+     */
+    public String buildOwnCode(Integer customId) {
+        Agent agent = agentDao.findByCustomId(customId);
+        if(agent!=null) {
+            if(agent.getOwnCode()!=null && !"".equals(agent.getOwnCode().trim())) {
+                return agent.getOwnCode();
+            } else {
+                try {
+                    //每一次生成都不一样，把后面时间取消则每次生成都一样
+                    String md5 = SecurityUtil.md5(agent.getOpenid(), agent.getId()+"-"+NormalTools.curDatetime());
+                    String code = md5.substring(0, 6).toUpperCase(); //取前10位作为邀请码,转换成大写
+                    agent.setOwnCode(code);
+                    agentDao.save(agent);
+                    return code;
+                } catch (Exception e) {
+                }
+            }
+        }
+        return null;
+    }
 
     /** 在MiniAuthService中初始化用户信息时调用 */
     public Agent initAgent(Customer customer) {
@@ -62,7 +90,7 @@ public class AgentTools {
                         agent.setLeaderId(leaderId);
                     }
                 }
-                agent.setStatus("1"); //默认设置为1
+                agent.setStatus("0"); //默认设置为0
                 agent.setSubCount(0); //下级人数
                 agent.setRelationCount(0); //代理等级调整次数
                 agent.setOpenid(customDto.getOpenid());

@@ -32,7 +32,7 @@ public class ImageTest {
         String nickname = "好友想攀登的胖子";
         String remark = "请君移驾品鉴";
         String fontName = "微软雅黑";
-        String proImgUrl = "https://zz-specialty.zslin.com/Product_a2d5d791-55a8-472f-80c6-e49bdcf7c964.jpg";
+        String proImgUrl = "https://msq-file.zslin.com/Product_2412d68b-ef0a-4e37-857c-15c669c7b415.jpg";
         String headUrl = "https://zz-specialty.zslin.com/oIguM5UvbfNglnWYj7W7_aBkS-3w.jpg";
         BufferedImage bi = shareImageTools.createImage(proTitle, price, nickname, remark, proImgUrl, headUrl, "", "123");
         ImageIO.write(bi, "jpg", new File("D:/temp/test/share1.jpg"));

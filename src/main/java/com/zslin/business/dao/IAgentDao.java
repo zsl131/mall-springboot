@@ -41,6 +41,8 @@ public interface IAgentDao extends BaseRepository<Agent, Integer>, JpaSpecificat
 
     Agent findByOpenid(String openid);
 
+    Agent findByCustomId(Integer customId);
+
     /** 通过顾客ID获取代理ID */
     @Query("SELECT a.id FROM Agent a WHERE a.customId=?1")
     Integer queryAgentId(Integer customId);
@@ -49,4 +51,7 @@ public interface IAgentDao extends BaseRepository<Agent, Integer>, JpaSpecificat
     @Modifying
     @Transactional
     void updatePhone(String phone, Integer customId);
+
+    /** 通过Code获取对象 */
+    Agent findByOwnCode(String code);
 }
