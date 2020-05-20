@@ -141,6 +141,18 @@ public class NormalTest implements ApplicationContextAware {
     private IRewardDao rewardDao;
 
     @Test
+    public void test45() {
+        int i = 0;
+        while(i++<10000) {
+            System.out.print(RandomTools.genCodeNew()+"      ");
+            if(i%50==0) {
+
+                System.out.println("-----------------");
+            }
+        }
+    }
+
+    @Test
     public void test44() throws Exception {
         String openid = "oIguM5UvbfNglnWYj7W7_aBkS-2a";
         String id = "123";

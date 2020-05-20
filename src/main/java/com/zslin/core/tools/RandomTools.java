@@ -45,6 +45,12 @@ public class RandomTools {
 		}
 		return String.valueOf(val);
 	}
+
+	/** 新版生成6位随机数 */
+	public static String genCodeNew() {
+		int code = (int)((Math.random()*9+1)*100000);
+		return code+"";
+	}
 	
 	/** 生成随机4位数 */
 	public static String genCode4() {
