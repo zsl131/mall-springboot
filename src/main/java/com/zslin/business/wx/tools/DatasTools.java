@@ -80,6 +80,7 @@ public class DatasTools {
      */
     @TemplateMessageAnnotation(name = "业务咨询通知", keys = "咨询姓名-联系方式-咨询日期-咨询类型-咨询详情")
     public String onEventText(String openid, String builderName, String content) {
+        content = NormalTools.rebuildUTF8MB4(content); //转换
         if(content==null || "".equals(content.trim()) || "?".equals(content.trim())
                 || "？".equals(content.trim()) || "1".equals(content.trim())
                 || "help".equals(content.toLowerCase().trim())) { //帮助

@@ -15,6 +15,19 @@ import java.util.Date;
 @Slf4j
 public class NormalTools {
 
+    /**
+     * 转换mb４字条串
+     * @param con
+     * @return
+     */
+    public static String rebuildUTF8MB4(String con) {
+        try {
+            con = con.replaceAll("[^\\u0000-\\uFFFF]", ""); //替换utf8mb4字条
+        } catch (Exception e) {
+        }
+        return con;
+    }
+
     public static boolean isNumeric(String s) {
         if (s != null && !"".equals(s.trim()))
 //            return s.matches("^[0-9]*$");

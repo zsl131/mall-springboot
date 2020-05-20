@@ -84,7 +84,7 @@ public class WeixinController {
             Node content = root.getElementsByTagName("Content").item(0);
             Node event = root.getElementsByTagName("Event").item(0);
             Node eventKey = root.getElementsByTagName("EventKey").item(0);
-            Node msgId = root.getElementsByTagName("MsgId").item(0);
+//            Node msgId = root.getElementsByTagName("MsgId").item(0);
             String builderName = root.getElementsByTagName("ToUserName").item(0).getTextContent(); //开发者微信号
 
             String fromOpenid = fromUser.getTextContent(); //用户的openid

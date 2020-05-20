@@ -97,7 +97,7 @@ public class MiniAuthService {
 
             Customer customer = new Customer();
             customer.setHeadImgUrl(dto.getAvatarUrl());
-            customer.setNickname(dto.getNickName());
+            customer.setNickname(NormalTools.rebuildUTF8MB4(dto.getNickName()));
             customer.setOpenid(openid);
             customer.setSex(dto.getGender()==1?"1":"2");
             customer.setStatus("1");

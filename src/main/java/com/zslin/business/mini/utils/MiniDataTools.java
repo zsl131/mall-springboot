@@ -62,7 +62,7 @@ public class MiniDataTools {
         String fromOpenid = fromUser.getTextContent(); //用户的openid
         String cTime = createTime.getTextContent(); //创建时间
         String msgTypeStr = msgType.getTextContent(); //事件类型
-        String conStr = content==null?"":content.getTextContent(); //内容
+        String conStr = content==null?"":NormalTools.rebuildUTF8MB4(content.getTextContent()); //内容
 
         CustomMessage msg = new CustomMessage();
         msg.setCreateLong(System.currentTimeMillis());
