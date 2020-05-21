@@ -57,13 +57,17 @@ public class PayTools {
 
         String nonceStr = RandomTools.randomString(32);
         String body = BODY_PRE+"-"+orders.getTotalCount()+" 件产品"; //支付名称
+        Float money = orders.getTotalMoney();
+        if(orders.getDiscountMoney()!=null && orders.getDiscountMoney()>0) {
+            money = orders.getTotalMoney() - orders.getDiscountMoney();
+        }
         String sign = PayUtils.buildSign(appId, config.getMchid(), body, apiKey, nonceStr);
         data.put("appid", appId);
         data.put("mch_id", config.getMchid());
         data.put("nonce_str", nonceStr);
         data.put("body", body);
         data.put("out_trade_no",ordersNo);
-        data.put("total_fee", buildTotalMoney(orders.getTotalMoney()));
+        data.put("total_fee", buildTotalMoney(money));
         data.put("spbill_create_ip", ip);
         data.put("notify_url", config.getPayNotifyUrl()); //支付结果通知地址
         data.put("trade_type","JSAPI"); //交易类型，小程序填：JSAPI
