@@ -111,6 +111,7 @@ public class MiniAgentService {
         agent.setLeaderDate(NormalTools.curDate());
         agent.setLeaderTime(NormalTools.curDatetime());
         agent.setLeaderLong(System.currentTimeMillis());
+        agent.setName((agent.getName()==null||"".equals(agent.getName()))?agent.getNickname():agent.getName());
         agent.setStatus("1");
         agentDao.save(agent);
         return JsonResult.success("设置成功").set("flag", "1");

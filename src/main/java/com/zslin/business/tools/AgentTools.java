@@ -116,6 +116,7 @@ public class AgentTools {
                 agent.setCustomId(customDto.getCustomId());
                 agent.setNickname(customDto.getNickname());
                 agent.setUnionid(customDto.getUnionid());
+                agent.setName(customDto.getNickname());
 
                 AgentLevel al = agentLevelDao.queryMinLevel();
                 if(al!=null) {
