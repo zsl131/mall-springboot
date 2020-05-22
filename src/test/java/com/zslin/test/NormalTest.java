@@ -2,6 +2,7 @@ package com.zslin.test;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.rabbitmq.tools.json.JSONUtil;
 import com.zslin.business.dao.*;
 import com.zslin.business.mini.dto.AgentCommissionDto;
 import com.zslin.business.mini.dto.MsgDto;
@@ -139,6 +140,21 @@ public class NormalTest implements ApplicationContextAware {
 
     @Autowired
     private IRewardDao rewardDao;
+
+    private String createTextMsgCon(String toUser, String content) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("{\"touser\":\"").append(toUser).append("\",")
+                .append("\"msgtype\":\"text\",\"text\":")
+                .append("{\"content\":\"").append(content).append("\"}}");
+        System.out.println("----PushMessageTools.createTextMsgCon---"+sb.toString());
+        return sb.toString();
+    }
+
+    @Test
+    public void test46() {
+        String con = createTextMsgCon("123", "456");
+        System.out.println(con);
+    }
 
     @Test
     public void test45() {

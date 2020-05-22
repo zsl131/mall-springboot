@@ -20,11 +20,12 @@ public class PushMessageTools {
     private AccessTokenTools  accessTokenTools;
 
     public void sendTextMsg(String toUser, String text) {
-        String accessToken = accessTokenTools.getAccessToken();
+//        String accessToken = accessTokenTools.getAccessToken();
 
         String json = createTextMsgCon(toUser, text);
         String url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token="+accessTokenTools.getAccessToken();
         JSONObject jsonObj = WeixinUtil.httpRequest(url, "POST", json);
+        System.out.println("===PushMessageTools.sendTextMsg==="+jsonObj.toJSONString());
         //String code = JsonTools.getJsonParam(jsonObj.toString(), "errcode");
     }
 
@@ -33,7 +34,7 @@ public class PushMessageTools {
         sb.append("{\"touser\":\"").append(toUser).append("\",")
                 .append("\"msgtype\":\"text\",\"text\":")
                 .append("{\"content\":\"").append(content).append("\"}}");
-        System.out.println("----PushMessageTools.createTextMsgCon---");
+        System.out.println("----PushMessageTools.createTextMsgCon---"+sb.toString());
         return sb.toString();
     }
 
