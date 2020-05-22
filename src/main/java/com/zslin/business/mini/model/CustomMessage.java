@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 客服消息
  * @author 钟述林
- * @data generate on: 2020-05-18
+ * @data generate on: 2020-05-22
  */
 @Data
 @Entity
@@ -49,5 +49,13 @@ public class CustomMessage implements Serializable {
 	private String mediaId;
 
 	private String createTimeMini;
+
+	private String replyDay;
+
+	private String replyTime;
+
+	private Long replyLong;
+
+	private String reply;
 
 }

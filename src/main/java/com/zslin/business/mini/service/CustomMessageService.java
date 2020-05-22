@@ -2,12 +2,14 @@ package com.zslin.business.mini.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.mini.tools.PushMessageTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
 import com.zslin.business.mini.dao.ICustomMessageDao;
+import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.business.mini.model.CustomMessage;
@@ -34,6 +36,9 @@ public class CustomMessageService {
 
     @Autowired
     private ICustomMessageDao customMessageDao;
+
+    @Autowired
+    private PushMessageTools pushMessageTools;
 
     @AdminAuth(name = "客服消息列表", orderNum = 1)
     @ExplainOperation(name = "客服消息列表", notes = "客服消息列表", params= {
@@ -70,5 +75,20 @@ public class CustomMessageService {
         }
     }
 
+    /** 回复 */
+    public JsonResult reply(String params) {
+        Integer id = JsonTools.getId(params);
+        String reply = JsonTools.getJsonParam(params, "reply");
+        CustomMessage cm = customMessageDao.findOne(id);
 
+        cm.setReply(reply);
+        cm.setReplyDay(NormalTools.curDate());
+        cm.setReplyTime(NormalTools.curDatetime());
+        cm.setReplyLong(System.currentTimeMillis());
+
+        customMessageDao.save(cm);
+
+        pushMessageTools.sendTextMsg(cm.getOpenid(), reply); //回复
+        return null;
+    }
 }
