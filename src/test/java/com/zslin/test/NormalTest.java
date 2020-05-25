@@ -152,8 +152,9 @@ public class NormalTest implements ApplicationContextAware {
 
     @Test
     public void test46() {
-        String con = createTextMsgCon("123", "456");
-        System.out.println(con);
+//        String con = createTextMsgCon("oIguM5UvbfNglnWYj7W7_aBkS-3w", "456");
+//        System.out.println(con);
+        pushMessageTools.sendTextMsg("oIguM5UvbfNglnWYj7W7_aBkS-3w", "456");
     }
 
     @Test

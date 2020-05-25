@@ -69,7 +69,7 @@ public class BindCodeTools {
                     return "已经绑定，不用重复操作";
                 }
             } else {
-                return "验证码【"+code+"】不存在或忆过期";
+                return "验证码【"+code+"】不存在或已过期";
             }
         } catch (Exception e) {
             e.printStackTrace();
