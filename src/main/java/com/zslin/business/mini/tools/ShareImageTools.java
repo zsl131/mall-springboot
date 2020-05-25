@@ -40,7 +40,7 @@ public class ShareImageTools {
             g.drawImage(proImg, 0,0,null);
 
 
-            g.setColor(new Color(233,233,233));
+            g.setColor(new Color(255,255,255));
             g.fillRect(0,proHeight,bi.getWidth(),280); //设置下部份背景色
             //g.dispose();
 
