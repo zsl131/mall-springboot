@@ -29,6 +29,8 @@ hs_err_pid*
 wx.properties
 sms.properties
 kaoqin.properties
+# 这个涉及数据库信息，不上传
+application-*.properties
 *.bat
 
 # office的临时文件
