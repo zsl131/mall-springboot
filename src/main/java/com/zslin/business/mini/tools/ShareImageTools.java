@@ -35,7 +35,7 @@ public class ShareImageTools {
             g.fillRect(0,0,bi.getWidth(),proHeight); //设置上部份背景色
 
 
-            System.out.println("--------->"+proImg.getHeight());
+            //System.out.println("--------->"+proImg.getHeight());
 
             g.drawImage(proImg, 0,0,null);
 
