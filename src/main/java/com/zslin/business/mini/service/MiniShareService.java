@@ -71,7 +71,7 @@ public class MiniShareService {
         String proImg = buildProImg(id);
         if(proImg==null) {proImg = pro.getHeadImgUrl();}
         BufferedImage bi = shareImageTools.createImage(pro.getTitle(), "￥ "+pro.getPrice(), "好友"+customDto.getNickname(),
-                "请君移驾品鉴", proImg, customDto.getHeadImgUrl(), page, scene);
+                "山里有味，满山晴浓", proImg, customDto.getHeadImgUrl(), page, scene);
         if(bi==null) { //说明生成失败
             return JsonResult.success("生成失败").set("flag", "0").set("url", "");
         } else {
