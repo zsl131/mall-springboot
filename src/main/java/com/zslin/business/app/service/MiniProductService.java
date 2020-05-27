@@ -21,6 +21,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -58,6 +59,10 @@ public class MiniProductService {
             Sort sort = SimpleSortBuilder.generateSort("orderNo");
             List<ProductSpecs> specsList = productSpecsDao.findByProId(id, sort);
             List<Medium> mediumList = mediumDao.findByObjClassNameAndObjId("Product", id, sort);
+            List<Medium> mediumList2 = new ArrayList<>();
+            for(Medium m : mediumList) {
+                if(m.getOrderNo()<=5) {mediumList2.add(m);} //前5个为产品详情面顶部轮播图
+            }
             PriceDto priceDto = PriceTools.buildPriceDto(specsList);
 
             WxCustomDto custom = JsonTools.getCustom(params);
@@ -68,7 +73,7 @@ public class MiniProductService {
             plusCount(id); //增加点击量
 
             return JsonResult.success("获取成功").set("product", product).set("specsList", specsList)
-                    .set("mediumList", mediumList).set("price", priceDto).set("favorite", pfr).set("basketCount", basketCount==null?0:basketCount);
+                    .set("mediumList", mediumList2).set("price", priceDto).set("favorite", pfr).set("basketCount", basketCount==null?0:basketCount);
         } catch (Exception e) {
             e.printStackTrace();
             return JsonResult.error("获取出错", e.getMessage());
