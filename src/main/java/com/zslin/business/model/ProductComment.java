@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 产品评论
  * @author 钟述林
- * @data generate on: 2020-05-22
+ * @data generate on: 2020-06-01
  */
 @Data
 @Entity
@@ -47,6 +47,8 @@ public class ProductComment implements Serializable {
 	private String openid;
 
 	private String unionid;
+
+	private Integer customId;
 
 	/**
 	* 评论者昵称

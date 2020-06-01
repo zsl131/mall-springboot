@@ -8,6 +8,7 @@ import com.zslin.business.mini.dao.ISessionKeyDao;
 import com.zslin.business.mini.dto.NewCustomDto;
 import com.zslin.business.mini.model.MiniConfig;
 import com.zslin.business.mini.model.SessionKey;
+import com.zslin.business.mini.tools.CustomerTools;
 import com.zslin.business.mini.tools.MiniUtils;
 import com.zslin.business.model.Customer;
 import com.zslin.core.api.Explain;
@@ -28,6 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.UUID;
+
 @Service
 @Slf4j
 @Explain(name = "小程序授权管理", notes = "获取小程序用户信息")
@@ -47,6 +50,49 @@ public class MiniAuthService {
 
     @Autowired
     private IAgentDao agentDao;
+
+    @Autowired
+    private CustomerTools customerTools;
+
+    /** 重新更新昵称和头像 */
+    public JsonResult reloadUser(String params) {
+        String code = JsonTools.getJsonParam(params, "code");
+        String enc = JsonTools.getJsonParam(params, "encryptedData"); //
+        String iv = JsonTools.getJsonParam(params, "iv");
+
+        if(NormalTools.isNullOr(code, enc, iv)) {
+            throw new BusinessException(BusinessException.Code.PARAM_NULL, "code、encryptedData、iv三者均不能为空");
+        }
+
+        MiniConfig config = miniConfigDao.loadOne();
+        if(config==null || NormalTools.isNullOr(config.getAppid(), config.getAppSecret())) {
+            throw new BusinessException(BusinessException.Code.CONFIG_NULL, "小程序未配置或Appid、AppSecret为空");
+        }
+
+        RestTemplate template = new RestTemplate();
+        String url = "https://api.weixin.qq.com/sns/jscode2session?appid="+config.getAppid()
+                +"&secret="+config.getAppSecret()+"&js_code="+code+"&grant_type=authorization_code";
+        String str = template.getForObject(url, String.class);
+//        System.out.println("====================================");
+//        log.info(str);
+        String openid = JsonTools.getJsonParam(str, "openid");
+        String sessionKey = JsonTools.getJsonParam(str, "session_key");
+        NewCustomDto dto = MiniUtils.decryptionUserInfo(enc, sessionKey, iv);
+        Customer customer = customerDao.findByOpenid(openid);
+
+        Integer customId = customer.getId();
+        String nickname = NormalTools.rebuildUTF8MB4(dto.getNickName());
+        String headimg = dto.getAvatarUrl();
+        if(headimg!=null && !"".equals(headimg)) { //如果有头像
+            headimg = qiniuTools.uploadCustomerHeadImg(headimg, "head-"+customId+"-"+(UUID.randomUUID().toString())+".jpg");
+        }
+        //更新信息
+        rabbitNormalTools.updateData("customerTools", "updateUserInfo", nickname, headimg, customer.getId());
+//        customer.setNickname();
+        customer.setNickname(nickname);
+        customer.setHeadImgUrl(headimg);
+        return JsonResult.success("微信同步成功").set("customer", customer);
+    }
 
     @ExplainOperation(name = "获取微信用户信息", params = {
             @ExplainParam(value = "code", name = "loginCode", require = true, example = "通过uni.login获取"),
@@ -105,6 +151,8 @@ public class MiniAuthService {
             customer.setLeaderId(leaderId);
             customer.setLeaderNickname(leaderNickname);
             customer.setLeaderOpenid(leaderOpenid);
+
+
             //rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, customer);
 
             return JsonResult.success("获取成功").set("custom", handlerCustomer(customer));
@@ -180,11 +228,13 @@ public class MiniAuthService {
     @Autowired
     private QiniuTools qiniuTools;
     /** 处理小程序获取用户授权信息 */
-    private Customer handlerCustomer(Customer customer) {
+    private synchronized Customer handlerCustomer(Customer customer) {
         Customer old = customerDao.findByOpenid(customer.getOpenid());
         String headimg = customer.getHeadImgUrl();
         if(customer.getHeadImgUrl()!=null && !"".equals(customer.getHeadImgUrl())) { //如果有头像
-            headimg = qiniuTools.uploadCustomerHeadImg(headimg, customer.getOpenid()+".jpg");
+            headimg = qiniuTools.uploadCustomerHeadImg(headimg, "head-"+customer.getOpenid()+".jpg");
+//            headimg = qiniuTools.uploadCustomerHeadImg(headimg, "head-"+(UUID.randomUUID().toString())+".jpg");
+
         }
         customer.setHeadImgUrl(headimg);
         Customer res = null;
@@ -195,6 +245,13 @@ public class MiniAuthService {
             customer.setFollowDay(NormalTools.curDate());
             customer.setFollowTime(NormalTools.curDatetime());
             customer.setFollowLong(System.currentTimeMillis());
+
+            //设置推荐者信息
+            customer.setInviterId(customer.getLeaderId());
+            customer.setInviterNickname(customer.getLeaderNickname());
+            customer.setInviterOpenid(customer.getLeaderOpenid());
+            //设置推荐者信息
+
             customerDao.save(customer);
             res = customer;
         } else {

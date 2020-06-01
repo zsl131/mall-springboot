@@ -66,6 +66,9 @@ public class OrdersHandlerTools {
     @Autowired
     private SendTemplateMessageTools sendTemplateMessageTools;
 
+    @Autowired
+    private ICustomerDao customerDao;
+
     @Transactional
     @TemplateMessageAnnotation(name = "订单创建成功通知", keys = "订单号-商品数量-商品金额")
     public void addOrders(WxCustomDto custom, SubmitOrdersDto ordersDto) {
@@ -127,6 +130,20 @@ public class OrdersHandlerTools {
             order.setAgentUnionid(agent.getUnionid());
             order.setAgentId(agent.getId());
             order.setHasAgent("1"); //设置为有代理
+        } else { //如果没有代理信息，则使用默认的代理信息
+            try {
+                Customer c = customerDao.findByOpenid(custom.getOpenid());
+                String inviterOpenid = c.getInviterOpenid();
+                if(inviterOpenid!=null && !"".equals(inviterOpenid)) {
+                    order.setAgentName(c.getInviterNickname());
+                    order.setAgentOpenid(inviterOpenid);
+    //                order.setAgentPhone(c.getIn);
+    //                order.setAgentUnionid(agent.getUnionid());
+                    order.setAgentId(c.getInviterId());
+                    order.setDefaultAgent("1"); //使用默认的信息
+                }
+            } catch (Exception e) {
+            }
         }
         order.setCreateDay(NormalTools.curDate());
         order.setCreateTime(NormalTools.curDatetime());

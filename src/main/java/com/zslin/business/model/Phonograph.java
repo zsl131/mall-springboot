@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 留声机
  * @author 钟述林
- * @data generate on: 2020-05-22
+ * @data generate on: 2020-06-01
  */
 @Data
 @Entity
@@ -60,6 +60,8 @@ public class Phonograph implements Serializable {
 	* 留声人openid
 	*/
 	private String openid;
+
+	private Integer customId;
 
 	/**
 	* 留声人nickname

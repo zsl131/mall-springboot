@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单
  * @author 钟述林
- * @data generate on: 2020-05-22
+ * @data generate on: 2020-06-01
  */
 @Data
 @Entity
@@ -167,6 +167,12 @@ public class Orders implements Serializable {
 	* 代理电话
 	*/
 	private String agentPhone;
+
+	/**
+	* 是否默认代理
+	* @remark 没有推荐者则使用默认的代理
+	*/
+	private String defaultAgent="0";
 
 	/**
 	* 佣金总额

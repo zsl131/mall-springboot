@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 客服消息
  * @author 钟述林
- * @data generate on: 2020-05-22
+ * @data generate on: 2020-06-01
  */
 @Data
 @Entity
@@ -23,6 +23,8 @@ public class CustomMessage implements Serializable {
     private Integer id;
 	
 	private String openid;
+
+	private Integer customId;
 
 	private String nickname;
 

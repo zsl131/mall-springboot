@@ -52,7 +52,9 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @SpringBootTest
 @RunWith(SpringRunner.class)
@@ -140,6 +142,30 @@ public class NormalTest implements ApplicationContextAware {
 
     @Autowired
     private IRewardDao rewardDao;
+
+    public org.json.JSONObject getUserInfo(String openid) {
+        Map<String, Object> params = new HashMap<String, Object>();
+        try {
+            params.put("access_token", accessTokenTools.getAccessToken());
+            params.put("openid", openid);
+            params.put("lang", "zh_CN");
+
+            String result = InternetTools.doGet("https://api.weixin.qq.com/cgi-bin/user/info", params);
+
+            org.json.JSONObject jsonObj = new org.json.JSONObject(result);
+            return jsonObj;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Test
+    public void test47() {
+        String openid = "oIguM5UvbfNglnWYj7W7_aBkS-3w";
+        org.json.JSONObject jsonObj = getUserInfo(openid);
+        System.out.println(jsonObj.toString());
+    }
 
     private String createTextMsgCon(String toUser, String content) {
         StringBuffer sb = new StringBuffer();

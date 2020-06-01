@@ -22,4 +22,9 @@ public interface IProductFavoriteRecordDao extends BaseRepository<ProductFavorit
 
     @Query("SELECT p.id FROM ProductFavoriteRecord p WHERE p.customId=?1")
     List<Integer> findIdsByCustomId(Integer customId);
+
+    @Query("UPDATE ProductFavoriteRecord p SET p.nickname=?1 WHERE p.customId=?2")
+    @Modifying
+    @Transactional
+    void updateNickname(String nickname, Integer customId);
 }

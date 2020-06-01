@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 客户
  * @author 钟述林
- * @data generate on: 2020-05-22
+ * @data generate on: 2020-06-01
  */
 @Data
 @Entity
@@ -113,5 +113,21 @@ public class Customer implements Serializable {
 	* 上级CustomOpenid
 	*/
 	private String leaderOpenid;
+
+	/**
+	* 邀请者ID
+	* @remark 邀请者CustomerId
+	*/
+	private Integer inviterId;
+
+	/**
+	* 邀请者Openid
+	*/
+	private String inviterOpenid;
+
+	/**
+	* 邀请者昵称
+	*/
+	private String inviterNickname;
 
 }
