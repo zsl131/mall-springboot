@@ -269,10 +269,10 @@ public class OrdersHandlerTools {
         if(agent.getLeaderId()!=null && agent.getLeaderId()>0) {leaderAgent = agentDao.findOne(agent.getLeaderId());} //获取上级代理
         for(OrdersProductDto proDto:proDtoList) {
             OrdersRateDto rateDto = rateTools.getRate(level.getId(), proDto.getSpecs().getId()); //佣金DTO对象
-            result.add(buildRecord(agent, agent, level, custom, rateDto.getThisAmount(), ordersKey, ordersNo, proDto));
+            result.add(buildRecord(agent, agent, level, custom, rateDto.getThisAmount()*proDto.getAmount(), ordersKey, ordersNo, proDto));
             //TODO 如果有上级代理且上级是 “金牌代理【id为3】”，并且自己不是金牌代理，也添加进去
             if(leaderAgent!=null && leaderAgent.getLevelId()==3 && agent.getLevelId()!=3) {
-                result.add(buildRecord(agent, leaderAgent, level, custom, rateDto.getLeaderAmount(), ordersKey, ordersNo, proDto));
+                result.add(buildRecord(agent, leaderAgent, level, custom, rateDto.getLeaderAmount()*proDto.getAmount(), ordersKey, ordersNo, proDto));
             }
         }
         return result;
@@ -314,6 +314,7 @@ public class OrdersHandlerTools {
         ccr.setProTitle(proDto.getProduct().getTitle());
         ccr.setSpecsId(proDto.getSpecs().getId());
         ccr.setSpecsName(proDto.getSpecs().getName());
+        ccr.setSpecsCount(proDto.getAmount());
         ccr.setStatus("0"); //默认为0，用户刚下单
         return ccr;
     }

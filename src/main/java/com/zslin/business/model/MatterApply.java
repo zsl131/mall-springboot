@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 物料申请
  * @author 钟述林
- * @data generate on: 2020-06-01
+ * @data generate on: 2020-06-02
  */
 @Data
 @Entity
