@@ -1,6 +1,5 @@
 package com.zslin.business.mini.service;
 
-import com.qiniu.util.Json;
 import com.zslin.business.dao.IAgentDao;
 import com.zslin.business.dao.ICustomerDao;
 import com.zslin.business.mini.dao.IMiniConfigDao;
@@ -22,7 +21,6 @@ import com.zslin.core.exception.BusinessException;
 import com.zslin.core.qiniu.tools.QiniuTools;
 import com.zslin.core.rabbit.RabbitNormalTools;
 import com.zslin.core.tools.JsonTools;
-import com.zslin.core.tools.MyBeanUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -133,7 +131,7 @@ public class MiniAuthService {
             public void run() {
                 addOrUpdateSessionKey(0, openid, sessionKey, code);
             }
-        }).run();
+        }).start();
         if(openid!=null && !"".equals(openid)) {
             //System.out.println(str);
 
@@ -255,10 +253,24 @@ public class MiniAuthService {
             customerDao.save(customer);
             res = customer;
         } else {
-            MyBeanUtils.copyProperties(customer, old, "id", "phone", "name", "agentId", "firstFollowDay", "firstFollowTime", "firstFollowLong");
+           // MyBeanUtils.copyProperties(customer, old, "id", "phone", "name", "agentId", "firstFollowDay", "firstFollowTime", "firstFollowLong");
             old.setFollowDay(NormalTools.curDate());
             old.setFollowTime(NormalTools.curDatetime());
             old.setFollowLong(System.currentTimeMillis());
+            old.setHeadImgUrl(customer.getHeadImgUrl());
+            old.setNickname(customer.getNickname());
+            if(old.getInviterId()==null || old.getInviterId()<=0) {
+                //设置推荐者信息
+                old.setInviterId(customer.getLeaderId());
+                old.setInviterNickname(customer.getLeaderNickname());
+                old.setInviterOpenid(customer.getLeaderOpenid());
+            }
+            if(old.getLeaderId()==null || old.getLeaderId()<=0) {
+                old.setLeaderOpenid(customer.getLeaderOpenid());
+                old.setLeaderNickname(customer.getLeaderNickname());
+                old.setLeaderId(customer.getLeaderId());
+            }
+            old.setSex(customer.getSex());
             customerDao.save(old);
             res = old;
         }
