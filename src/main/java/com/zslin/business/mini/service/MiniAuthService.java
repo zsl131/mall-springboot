@@ -134,6 +134,10 @@ public class MiniAuthService {
         }).start();
         if(openid!=null && !"".equals(openid)) {
             //System.out.println(str);
+System.out.println("----------------MiniAuthService--------------");
+            System.out.println(params);
+System.out.println("----------------MiniAuthService--------------");
+
 
             Integer leaderId = JsonTools.getParamInteger(params, "leaderId");
             String leaderNickname = JsonTools.getJsonParam(params, "leaderNickname");
