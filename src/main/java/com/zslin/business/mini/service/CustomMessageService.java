@@ -89,6 +89,6 @@ public class CustomMessageService {
         customMessageDao.save(cm);
 
         pushMessageTools.sendTextMsg(cm.getOpenid(), reply); //回复
-        return null;
+        return JsonResult.success("回复成功");
     }
 }
