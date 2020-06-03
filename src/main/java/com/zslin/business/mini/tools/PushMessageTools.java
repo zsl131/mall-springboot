@@ -4,6 +4,7 @@ import com.zslin.business.mini.dto.CustomMessageDto;
 import com.zslin.business.mini.dto.MsgDto;
 import com.zslin.business.mini.dto.PushMsgDto;
 import com.zslin.business.mini.dto.SingleDataDto;
+import com.zslin.core.common.NormalTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -25,8 +26,9 @@ public class PushMessageTools {
 
 //        String json = createTextMsgCon(toUser, text);
 //        String json = "";
-        String url = "https://api.weixin.qq.com/cgi-bin/menu/create?access_token="+accessTokenTools.getAccessToken();
+        String url = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token="+accessTokenTools.getAccessToken();
         ResponseEntity<String> entity = template.postForEntity(url, buildTextMsgCon(toUser, text), String.class);
+        System.out.println(NormalTools.curDatetime() +"-----PushMessageTools-----");
         System.out.println(entity.getBody());
         /*JSONObject jsonObj = WeixinUtil.httpRequest(url, "POST", json);
         System.out.println("===PushMessageTools.sendTextMsg==="+jsonObj.toJSONString());*/
