@@ -54,4 +54,8 @@ public interface IAgentDao extends BaseRepository<Agent, Integer>, JpaSpecificat
 
     /** 通过Code获取对象 */
     Agent findByOwnCode(String code);
+
+    /** 获取正常代理 */
+    @Query("FROM Agent a WHERE a.openid=?1 AND a.status='1' ")
+    Agent findOkByOpenid(String openid);
 }

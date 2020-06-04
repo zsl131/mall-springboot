@@ -143,28 +143,13 @@ public class NormalTest implements ApplicationContextAware {
     @Autowired
     private IRewardDao rewardDao;
 
-    public org.json.JSONObject getUserInfo(String openid) {
-        Map<String, Object> params = new HashMap<String, Object>();
-        try {
-            params.put("access_token", accessTokenTools.getAccessToken());
-            params.put("openid", openid);
-            params.put("lang", "zh_CN");
-
-            String result = InternetTools.doGet("https://api.weixin.qq.com/cgi-bin/user/info", params);
-
-            org.json.JSONObject jsonObj = new org.json.JSONObject(result);
-            return jsonObj;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+    @Autowired
+    private IAgentDao agentDao;
 
     @Test
     public void test47() {
-        String openid = "oIguM5UvbfNglnWYj7W7_aBkS-3w";
-        org.json.JSONObject jsonObj = getUserInfo(openid);
-        System.out.println(jsonObj.toString());
+        Agent a = agentDao.findOkByOpenid("123");
+        System.out.println(a);
     }
 
     private String createTextMsgCon(String toUser, String content) {

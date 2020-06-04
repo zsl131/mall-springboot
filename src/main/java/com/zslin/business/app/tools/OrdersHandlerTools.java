@@ -85,6 +85,7 @@ public class OrdersHandlerTools {
         if(ordersDto.getAddressId()!=null && ordersDto.getAddressId()>0) {address = customAddressDao.findOne(ordersDto.getAddressId());}
 //        if(ordersDto.getAgentId()!=null && ordersDto.getAgentId()>0) {agent = agentDao.findOne(ordersDto.getAgentId());} //由于前端获取的是Customer，所以不能通过agentId获取对象
         if(ordersDto.getAgentOpenid()!=null && !"".equals(ordersDto.getAgentOpenid())) {agent = agentDao.findByOpenid(ordersDto.getAgentOpenid());} //通过Openid获取对象
+        if(agent==null) {agent = agentDao.findOkByOpenid(custom.getOpenid());} //如果没有其他代理，则获取自身代理
         if(agent!=null && agent.getLevelId()!=null && agent.getLevelId()>0) {level = agentLevelDao.findOne(agent.getLevelId());}
 
         String ordersKey = ordersDto.getOrdersKey();
