@@ -64,18 +64,22 @@ public class MiniShoppingBasketService {
      */
     public JsonResult updateAmount(String params) {
         JsonResult result = JsonResult.success("操作成功");
-        Integer id = JsonTools.getId(params);
-        Integer surplusCount = shoppingBasketDao.querySpecsAmount(id); //产品库存
-        surplusCount = surplusCount==null?0:surplusCount;
-        Integer amount = JsonTools.getParamInteger(params, "amount");
-        if(amount>surplusCount) {
-            result.set("isOut", true); //超过库存
-            amount = surplusCount;
-        } else {
-            result.set("isOut", false);
+        try {
+            Integer id = JsonTools.getId(params);
+            Integer surplusCount = shoppingBasketDao.querySpecsAmount(id); //产品库存
+            surplusCount = surplusCount==null?0:surplusCount;
+            Integer amount = JsonTools.getParamInteger(params, "amount");
+            if(amount>surplusCount) {
+                result.set("isOut", true); //超过库存
+                amount = surplusCount;
+            } else {
+                result.set("isOut", false);
+            }
+            shoppingBasketDao.updateAmount(amount, id);
+            result.set("amount", amount);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        shoppingBasketDao.updateAmount(amount, id);
-        result.set("amount", amount);
         return result;
     }
 
