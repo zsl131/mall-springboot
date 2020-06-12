@@ -69,7 +69,8 @@ public class MiniAgentService {
         QueryListDto qld = QueryTools.buildQueryListDto(params);
         WxCustomDto customDto = JsonTools.getCustom(params);
         Page<Agent> res = agentDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
-                new SpecificationOperator("leaderOpenid", "eq", customDto.getOpenid())),
+                new SpecificationOperator("leaderOpenid", "eq", customDto.getOpenid()),
+                new SpecificationOperator("status", "eq", "1")),
                 SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
 
         return JsonResult.getInstance().set("size", (int) res.getTotalElements()).set("data", res.getContent());

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
@@ -64,7 +65,14 @@ public class ShareImageTools {
             g.drawImage(imgIcon, 30,conStartY+20,null);
 
             //头像
-            BufferedImage srcImg = ImageIO.read(new URL(headUrl)); //读取图片
+            BufferedImage srcImg = null;//ImageIO.read(new URL(headUrl)); //读取图片
+            try {
+                srcImg = ImageIO.read(new URL(headUrl)); //读取图片
+            } catch (Exception e) {
+                //默认图片
+                srcImg = ImageIO.read(new URL("http://qiniu.qswkx.com/logo-144.jpg")); //读取图片
+            }
+
             BufferedImage newImage=new BufferedImage(90, 90,BufferedImage.TYPE_INT_RGB);
             newImage.createGraphics().drawImage(srcImg.getScaledInstance(90, 90, Image.SCALE_SMOOTH), 0, 0, null);
 

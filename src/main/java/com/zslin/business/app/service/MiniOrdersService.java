@@ -102,6 +102,24 @@ public class MiniOrdersService {
         return JsonResult.success("确认成功").set("flag", "0");
     }
 
+    /** 删除订单 */
+    @NeedAuth(openid = true)
+    public JsonResult removeOrders(String params) {
+        WxCustomDto customDto = JsonTools.getCustom(params);
+        String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
+        Orders orders = ordersDao.findByOrdersNoAndCustomId(ordersNo, customDto.getCustomId());
+        String status = orders.getStatus();
+        if("0".equals(status) || "-1".equals(status)) {
+            //删除订单
+//            ordersDao.updateStatus("-10", ordersNo, customDto.getCustomId());
+            orders.setStatus("-10");
+            ordersDao.save(orders);
+            return JsonResult.success("订单删除成功");
+        } else {
+            return JsonResult.success("此订单不可删除");
+        }
+    }
+
     /** 催单 */
     @NeedAuth(openid = true)
     @TemplateMessageAnnotation(name = "催单通知", keys = "订单号-下单时间-收货人-收货人联系方式-收货人地址")
@@ -220,6 +238,7 @@ public class MiniOrdersService {
         QueryListDto qld = QueryTools.buildQueryListDto(params);
         Page<Orders> res = ordersDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
                 new SpecificationOperator("customId", "eq", customDto.getCustomId()),
+                new SpecificationOperator("status", "ne", "-10"),//不显示已删除的订单
                 (status!=null&&!"".equals(status))?new SpecificationOperator("status", "eq", status, "and"):null),
                 SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
 
