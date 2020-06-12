@@ -372,9 +372,9 @@ public class OrdersHandlerTools {
     private String buildAddressCon(CustomAddress address) {
         StringBuffer sb = new StringBuffer();
         sb.append(address.getName()).append(",")
-                .append(address.getProvinceName())
-                .append(address.getCityName())
-                .append(address.getCountyName())
+                .append(address.getProvinceName()==null?"":address.getProvinceName())
+                .append(address.getCityName()==null?"":address.getCityName())
+                .append(address.getCountyName()==null?"":address.getCountyName())
                 .append(address.getStreet()).append(",")
                 .append(address.getPhone());
         return sb.toString();

@@ -41,6 +41,6 @@ public interface IShoppingBasketDao extends BaseRepository<ShoppingBasket, Integ
     List<ShoppingBasket> findByIds(Integer [] ids);
 
     /** 获取对应规格库存 */
-    @Query("SELECT s.amount FROM ProductSpecs s, ShoppingBasket b WHERE s.proId=b.proId AND b.id=?1")
+    @Query("SELECT s.amount FROM ProductSpecs s, ShoppingBasket b WHERE s.proId=b.proId AND s.id=b.specsId AND b.id=?1")
     Integer querySpecsAmount(Integer basketId);
 }

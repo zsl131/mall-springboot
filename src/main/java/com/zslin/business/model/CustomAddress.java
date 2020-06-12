@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 /**
  * 客户收货地址
  * @author 钟述林
- * @data generate on: 2020-06-02
+ * @data generate on: 2020-06-12
  */
 @Data
 @Entity
@@ -35,7 +35,6 @@ public class CustomAddress implements Serializable {
 	/**
 	* 省级代码
 	*/
-	@NotBlank(message="省份不能为空")
 	private String provinceCode;
 
 	/**
@@ -46,7 +45,6 @@ public class CustomAddress implements Serializable {
 	/**
 	* 市级代码
 	*/
-	@NotBlank(message="市不能为空")
 	private String cityCode;
 
 	/**
@@ -57,7 +55,6 @@ public class CustomAddress implements Serializable {
 	/**
 	* 县级代码
 	*/
-	@NotBlank(message="县区不能为空")
 	private String countyCode;
 
 	/**

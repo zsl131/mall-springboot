@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 购物车
  * @author 钟述林
- * @data generate on: 2020-06-02
+ * @data generate on: 2020-06-12
  */
 @Data
 @Entity

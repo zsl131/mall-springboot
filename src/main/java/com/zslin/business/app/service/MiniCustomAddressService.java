@@ -39,6 +39,7 @@ public class MiniCustomAddressService {
         try {
             WxCustomDto custom = JsonTools.getCustom(params);
             CustomAddress address = JSONObject.toJavaObject(JSON.parseObject(params), CustomAddress.class);
+            System.out.println(address);
             ValidationDto vd = ValidationTools.buildValidate(address);
             if(vd.isHasError()) { //如果有验证异常
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
