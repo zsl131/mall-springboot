@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理等级变化记录
  * @author 钟述林
- * @data generate on: 2020-06-12
+ * @data generate on: 2020-06-25
  */
 @Data
 @Entity

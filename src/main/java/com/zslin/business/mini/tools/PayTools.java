@@ -56,7 +56,11 @@ public class PayTools {
         String apiKey = config.getApiKey();
 
         String nonceStr = RandomTools.randomString(32);
-        String body = BODY_PRE+"-"+orders.getTotalCount()+" 件产品"; //支付名称
+        String body;
+        String proTitles = orders.getProTitles();
+        if(proTitles==null || "".equals(proTitles.trim())) {
+            body = BODY_PRE+"-"+orders.getSpecsCount()+" 件产品"; //支付名称
+        } else {body = proTitles;}
         Float money = orders.getTotalMoney();
         if(orders.getDiscountMoney()!=null && orders.getDiscountMoney()>0) {
             money = orders.getTotalMoney() - orders.getDiscountMoney();

@@ -138,11 +138,11 @@ public class OrdersExpressService {
         ordersDao.save(orders);
 
         //快递公司-快递单号-商品信息-商品数量
-        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "商品发货通知", "", "您购买的商品已发货啦~",
+        sendTemplateMessageTools.send(orders.getOpenid(), "商品发货通知", "", "您购买的商品已发货啦~",
                 TemplateMessageTools.field("快递公司", express.getExpName()),
                 TemplateMessageTools.field("快递单号", express.getExpNo()),
                 TemplateMessageTools.field("商品信息", "-"),
-                TemplateMessageTools.field("商品数量", orders.getTotalCount()+" 件"),
+                TemplateMessageTools.field("商品数量", orders.getSpecsCount()+" 件"),
 
                 TemplateMessageTools.field("您可以在“满山晴”小程序中查看物流信息"));
 

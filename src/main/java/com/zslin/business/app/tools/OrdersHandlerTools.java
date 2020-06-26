@@ -94,10 +94,12 @@ public class OrdersHandlerTools {
         List<OrdersProductDto> productDtoList = generateProducts(ordersDto.getProductData());
         List<CustomCommissionRecord> commissionRecordList = buildCommission(agent, custom, level, productDtoList, ordersKey, ordersNo);
 
+        String proTitles = buildProTitles(productDtoList);
+
         OrdersHandlerDto countDto = buildHandlerDto(productDtoList, commissionRecordList);
 
 //        System.out.println(ordersDto);
-        Orders orders = addOrders(ordersKey, ordersNo, custom, address, agent, coupon, countDto, ordersDto.getRemark());
+        Orders orders = addOrders(ordersKey, ordersNo, custom, address, agent, coupon, countDto, ordersDto.getRemark(), proTitles);
         //订单生成后要处理用户优惠券
         buildCoupon(orders, coupon);
         //保存佣金，
@@ -108,20 +110,21 @@ public class OrdersHandlerTools {
         //保存订单产品
         saveOrderProducts(orders, agent, level, custom, productDtoList);
 
-        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单创建成功通知", "", "有顾客下单单了",
+        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单创建成功通知", "", "有顾客下单了",
                 TemplateMessageTools.field("订单号", ordersNo),
-                TemplateMessageTools.field("商品数量", orders.getTotalCount()+" 件"),
-                TemplateMessageTools.field("商品金额", orders.getTotalMoney()+" 元"),
+                TemplateMessageTools.field("商品件数", orders.getSpecsCount()+" 件"),
+                TemplateMessageTools.field("商品金额", (orders.getTotalMoney()-orders.getDiscountMoney())+" 元"),
 
                 TemplateMessageTools.field("可以前往后台管理系统查看"));
     }
 
     private Orders addOrders(String ordersKey, String ordersNo, WxCustomDto custom, CustomAddress address,
-                           Agent agent, CustomCoupon coupon, OrdersHandlerDto countDto, String remark) {
+                           Agent agent, CustomCoupon coupon, OrdersHandlerDto countDto, String remark, String proTitles) {
         Orders order = new Orders();
         order.setAddressCon(buildAddressCon(address));
         order.setAddressId(address.getId());
         order.setRemark(remark);
+        order.setProTitles(proTitles);
         order.setHasAgent("0"); //默认为没有代理
 
         if(agent!=null) { //如果有代理信息，则设置
@@ -377,6 +380,24 @@ public class OrdersHandlerTools {
                 .append(address.getCountyName()==null?"":address.getCountyName())
                 .append(address.getStreet()).append(",")
                 .append(address.getPhone());
+        return sb.toString();
+    }
+
+    /**
+     * 生成产品标题集合，多标题用｜分隔
+     * @param productDtoList
+     * @return
+     */
+    private String buildProTitles(List<OrdersProductDto> productDtoList) {
+        StringBuffer sb = new StringBuffer();
+        int index = 0;
+        for(OrdersProductDto opd : productDtoList) {
+            index ++;
+            sb.append(opd.getProduct().getTitle());
+            if(index<productDtoList.size()) {
+                sb.append("｜");
+            }
+        }
         return sb.toString();
     }
 

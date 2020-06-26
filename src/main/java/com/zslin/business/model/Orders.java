@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单
  * @author 钟述林
- * @data generate on: 2020-06-12
+ * @data generate on: 2020-06-25
  */
 @Data
 @Entity
@@ -50,6 +50,11 @@ public class Orders implements Serializable {
 	* 订单内总产品数量
 	*/
 	private Integer totalCount;
+
+	/**
+	* 已发货数量
+	*/
+	private Integer sendCount=0;
 
 	/**
 	* 订单总金额
@@ -128,7 +133,7 @@ public class Orders implements Serializable {
 
 	/**
 	* 订单状态
-	* @remark  -2:售后；-1：关闭；0-未付款；1-已付款，未发货；2-已发货；3-未点评；4-已完成
+	* @remark  -10:删除；-2:售后；-1：关闭；0-未付款；1-已付款，未发货；2-已发货；3-未点评；4-已完成
 	*/
 	private String status;
 
@@ -220,5 +225,11 @@ public class Orders implements Serializable {
 	private String sendTime;
 
 	private Long sendLong;
+
+	/**
+	* 订单中的产品标题，便于搜索
+	*/
+	@Lob
+	private String proTitles;
 
 }

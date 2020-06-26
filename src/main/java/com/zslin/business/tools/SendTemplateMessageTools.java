@@ -40,7 +40,9 @@ public class SendTemplateMessageTools {
             SendMessageDto smd = new SendMessageDto(tempName, wxOpenid, url, title, fields);
             rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, smd);
         }*/
-        send2Wx(wxOpenid, tempName, url, title, fields);
+        if(wxOpenid!=null && !"".equals(wxOpenid)) {
+            send2Wx(wxOpenid, tempName, url, title, fields);
+        }
     }
 
     /**
