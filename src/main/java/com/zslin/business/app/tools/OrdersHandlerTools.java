@@ -110,10 +110,13 @@ public class OrdersHandlerTools {
         //保存订单产品
         saveOrderProducts(orders, agent, level, custom, productDtoList);
 
+        Float discountMoney = orders.getDiscountMoney();
+        discountMoney = (discountMoney == null) ? 0 : discountMoney;
+
         sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单创建成功通知", "", "有顾客下单了",
                 TemplateMessageTools.field("订单号", ordersNo),
                 TemplateMessageTools.field("商品件数", orders.getSpecsCount()+" 件"),
-                TemplateMessageTools.field("商品金额", (orders.getTotalMoney()-orders.getDiscountMoney())+" 元"),
+                TemplateMessageTools.field("商品金额", (orders.getTotalMoney()-discountMoney)+" 元"),
 
                 TemplateMessageTools.field("可以前往后台管理系统查看"));
     }
