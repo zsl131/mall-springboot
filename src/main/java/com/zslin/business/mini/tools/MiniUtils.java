@@ -3,6 +3,7 @@ package com.zslin.business.mini.tools;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.mini.dto.NewCustomDto;
+import com.zslin.business.model.Orders;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
 
@@ -17,6 +18,22 @@ import java.util.Arrays;
  * 小程序常用工具类
  */
 public class MiniUtils {
+
+    /**
+     * 生成代理信息
+     * @param orders
+     * @return
+     */
+    public static String buildAgent(Orders orders) {
+        try {
+            StringBuffer res = new StringBuffer();
+            res.append(orders.getAgentName()==null?"无代理":orders.getAgentName())
+                    .append("推荐").append(orders.getNickname());
+            return res.toString();
+        } catch (Exception e) {
+            return "";
+        }
+    }
 
     /**
      * 小程序解密用户数据

@@ -52,7 +52,7 @@ public class MiniIndexService {
         List<AppModule> moduleList = appModuleDao.findAll(QueryTools.getInstance().buildSearch(new SpecificationOperator("status", "eq", "1")), sort);
         List<AppNotice> noticeList = appNoticeDao.findAll(QueryTools.getInstance().buildSearch(new SpecificationOperator("status", "eq", "1")));
         Page<Product> productList = productDao.findAll(QueryTools.getInstance().buildSearch(new SpecificationOperator("status", "eq", "1", "and")),
-                SimplePageBuilder.generate(0, 6, SimpleSortBuilder.generateSort("isRecommend_d", "id_d")));
+                SimplePageBuilder.generate(0, 6, SimpleSortBuilder.generateSort("isRecommend_d", "orderNo_a", "id_d")));
 
         result.set("carouseList", carouselList).set("moduleList", moduleList).
                 set("noticeList", noticeList).set("productList", productList.getContent());

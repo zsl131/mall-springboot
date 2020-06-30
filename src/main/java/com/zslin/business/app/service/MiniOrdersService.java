@@ -7,6 +7,7 @@ import com.zslin.business.app.dto.SubmitOrdersDto;
 import com.zslin.business.app.tools.OrdersHandlerTools;
 import com.zslin.business.dao.*;
 import com.zslin.business.mini.dto.PaySubmitDto;
+import com.zslin.business.mini.tools.MiniUtils;
 import com.zslin.business.mini.tools.PayTools;
 import com.zslin.business.model.*;
 import com.zslin.business.tools.SendTemplateMessageTools;
@@ -175,13 +176,16 @@ public class MiniOrdersService {
 //                ordersDao.updateStatus("1", ordersNo, customDto.getCustomId()); //修改订单状态
                 customCommissionRecordDao.updateStatus("1", ordersNo); //修改提成状态
 
-                sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单付款成功通知", "", "有订单付款了",
+                Float discountMoney = orders.getDiscountMoney();
+                discountMoney = (discountMoney == null) ? 0 : discountMoney;
+
+                sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单付款成功通知", "", orders.getProTitles(),
                         TemplateMessageTools.field("订单号", orders.getOrdersNo()),
                         TemplateMessageTools.field("支付时间", orders.getPayTime()),
-                        TemplateMessageTools.field("支付金额", orders.getTotalMoney()+""),
+                        TemplateMessageTools.field("支付金额", (orders.getTotalMoney() - discountMoney)+ " 元"),
                         TemplateMessageTools.field("支付方式", "在线支付"),
 
-                        TemplateMessageTools.field("请核对信息后尽快处理~~"));
+                        TemplateMessageTools.field("请核对信息后尽快处理["+ MiniUtils.buildAgent(orders)+"]"));
             }
             return JsonResult.success("操作成功").set("flag", "1");
         } catch (Exception e) {
@@ -269,18 +273,20 @@ public class MiniOrdersService {
             } else { //如果是直接购买
                 Integer specsId = Integer.parseInt(ids);
                 ProductSpecs specs = productSpecsDao.findOne(specsId);
-                Product pro = productDao.findOne(specs.getProId());
-                List<ProductSpecsDto> dtoList = buildDtoList(custom.getOpenid(), specs, pro);
-
                 specsList = new ArrayList<>();
-                specsList.add(specs);
                 proIds = new Integer[]{specs.getProId()};
-
-                totalMoney = specs.getPrice();
+                if(specs.getAmount()>0) {
+                    Product pro = productDao.findOne(specs.getProId());
+                    List<ProductSpecsDto> dtoList = buildDtoList(custom.getOpenid(), specs, pro);
+                    specsList.add(specs);
+                    totalMoney = specs.getPrice();
 
                 /*
                 List<Product> proList = productDao.findByIds(proIds);*/
-                result.set("productList", dtoList);
+                    result.set("productList", dtoList);
+                } else {
+                    result.set("productList", new ArrayList<>());
+                }
             }
 
             CustomAddress address = null;

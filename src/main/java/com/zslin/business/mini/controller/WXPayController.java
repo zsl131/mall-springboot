@@ -5,6 +5,7 @@ import com.zslin.business.dao.ICustomCommissionRecordDao;
 import com.zslin.business.dao.IOrdersDao;
 import com.zslin.business.mini.model.MiniConfig;
 import com.zslin.business.mini.tools.MiniConfigTools;
+import com.zslin.business.mini.tools.MiniUtils;
 import com.zslin.business.mini.tools.PayNotifyTools;
 import com.zslin.business.model.Orders;
 import com.zslin.business.tools.SendTemplateMessageTools;
@@ -76,13 +77,16 @@ public class WXPayController {
                         ordersDao.save(orders);
                         customCommissionRecordDao.updateStatus("1", ordersNo);
 
-                        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单付款成功通知", "", "有订单付款了",
+                        Float discountMoney = orders.getDiscountMoney();
+                        discountMoney = (discountMoney == null) ? 0 : discountMoney;
+
+                        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单付款成功通知", "", orders.getProTitles(),
                                 TemplateMessageTools.field("订单号", orders.getOrdersNo()),
                                 TemplateMessageTools.field("支付时间", orders.getPayTime()),
-                                TemplateMessageTools.field("支付金额", orders.getTotalMoney()+""),
+                                TemplateMessageTools.field("支付金额", (orders.getTotalMoney() - discountMoney)+ " 元"),
                                 TemplateMessageTools.field("支付方式", "在线支付"),
 
-                                TemplateMessageTools.field("请核对信息后尽快处理~~"));
+                                TemplateMessageTools.field("请核对信息后尽快处理["+ MiniUtils.buildAgent(orders)+"]"));
                     }
                 }
 

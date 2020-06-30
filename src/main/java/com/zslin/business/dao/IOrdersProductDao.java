@@ -12,4 +12,6 @@ import java.util.List;
 public interface IOrdersProductDao extends BaseRepository<OrdersProduct, Integer>, JpaSpecificationExecutor<OrdersProduct> {
 
     List<OrdersProduct> findByOrdersId(Integer ordersId);
+
+    List<OrdersProduct> findByOrdersNo(String ordersNo);
 }

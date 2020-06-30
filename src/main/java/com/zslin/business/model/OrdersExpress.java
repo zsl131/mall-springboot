@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单物流
  * @author 钟述林
- * @data generate on: 2020-06-25
+ * @data generate on: 2020-06-30
  */
 @Data
 @Entity
@@ -51,6 +51,16 @@ public class OrdersExpress implements Serializable {
 	* 物流公司名称
 	*/
 	private String expName;
+
+	/**
+	* 对应订单产品ID
+	*/
+	private Integer ordersProId;
+
+	/**
+	* 对应订单产品标题
+	*/
+	private String ordersProTitle;
 
 	/**
 	* 物流信息内容

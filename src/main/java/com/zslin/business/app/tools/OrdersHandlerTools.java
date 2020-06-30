@@ -6,6 +6,7 @@ import com.zslin.business.app.dto.orders.OrdersProductDto;
 import com.zslin.business.app.dto.orders.OrdersRateDto;
 import com.zslin.business.dao.*;
 import com.zslin.business.dto.OrdersShowDto;
+import com.zslin.business.mini.tools.MiniUtils;
 import com.zslin.business.model.*;
 import com.zslin.business.tools.SendTemplateMessageTools;
 import com.zslin.business.wx.annotations.HasTemplateMessage;
@@ -113,12 +114,12 @@ public class OrdersHandlerTools {
         Float discountMoney = orders.getDiscountMoney();
         discountMoney = (discountMoney == null) ? 0 : discountMoney;
 
-        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单创建成功通知", "", "有顾客下单了",
+        sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单创建成功通知", "", proTitles,
                 TemplateMessageTools.field("订单号", ordersNo),
                 TemplateMessageTools.field("商品件数", orders.getSpecsCount()+" 件"),
                 TemplateMessageTools.field("商品金额", (orders.getTotalMoney()-discountMoney)+" 元"),
 
-                TemplateMessageTools.field("可以前往后台管理系统查看"));
+                TemplateMessageTools.field("可以前往后台管理系统查看["+ MiniUtils.buildAgent(orders)+"]"));
     }
 
     private Orders addOrders(String ordersKey, String ordersNo, WxCustomDto custom, CustomAddress address,
