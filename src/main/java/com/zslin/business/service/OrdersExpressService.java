@@ -118,6 +118,7 @@ public class OrdersExpressService {
         OrdersExpress express = null;
         int size = 0;
         for(String no:expNoArray) {
+            if(no==null || "".equals(no)) {continue;}
             if(no!=null && ("自提".equals(no) || "送货上门".equals(no) || ordersExpressDao.findByExpNo(no).size()<=0)) {
                 express = new OrdersExpress();
                 express.setCustomId(orders.getCustomId());
@@ -160,21 +161,23 @@ public class OrdersExpressService {
         ordersExpressDao.save(express); //保存*/
 
 //        ordersDao.updateStatus("2", ordersNo, orders.getCustomId()); //修改状态为已发货
-        orders.setStatus("2");//修改状态为已发货
-        orders.setSendDay(NormalTools.curDate());
-        orders.setSendTime(NormalTools.curDatetime());
-        orders.setSendLong(System.currentTimeMillis());
-        orders.setSendCount(orders.getSendCount()+size);
-        ordersDao.save(orders);
+        if(size>0) {
+            orders.setStatus("2");//修改状态为已发货
+            orders.setSendDay(NormalTools.curDate());
+            orders.setSendTime(NormalTools.curDatetime());
+            orders.setSendLong(System.currentTimeMillis());
+            orders.setSendCount(orders.getSendCount() + size);
+            ordersDao.save(orders);
 
-        //快递公司-快递单号-商品信息-商品数量
-        sendTemplateMessageTools.send(orders.getOpenid(), "商品发货通知", "", "您购买的商品已发货啦~",
-                TemplateMessageTools.field("快递公司", express==null?"无":express.getExpName()),
-                TemplateMessageTools.field("快递单号", express==null?"无":express.getExpNo()),
-                TemplateMessageTools.field("商品信息", "-"),
-                TemplateMessageTools.field("商品数量", expNoArray.length+" 件"),
+            //快递公司-快递单号-商品信息-商品数量
+            sendTemplateMessageTools.send(orders.getOpenid(), "商品发货通知", "", "您购买的商品已发货啦~",
+                    TemplateMessageTools.field("快递公司", express == null ? "无" : express.getExpName()),
+                    TemplateMessageTools.field("快递单号", express == null ? "无" : express.getExpNo()),
+                    TemplateMessageTools.field("商品信息", "-"),
+                    TemplateMessageTools.field("商品数量", expNoArray.length + " 件"),
 
-                TemplateMessageTools.field("您可以在“满山晴”小程序中查看物流信息"));
+                    TemplateMessageTools.field("您可以在“满山晴”小程序中查看物流信息"));
+        }
 
         return JsonResult.success("保存成功");
     }
