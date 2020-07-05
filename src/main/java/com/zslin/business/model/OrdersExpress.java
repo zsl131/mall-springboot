@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单物流
  * @author 钟述林
- * @data generate on: 2020-06-30
+ * @data generate on: 2020-07-05
  */
 @Data
 @Entity
@@ -83,5 +83,11 @@ public class OrdersExpress implements Serializable {
 	* @remark 方便控制重复查询
 	*/
 	private Long updateLong;
+
+	private String createDay;
+
+	private String createTime;
+
+	private Long createLong;
 
 }

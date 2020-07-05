@@ -3,10 +3,7 @@ package com.zslin.business.app.service;
 import com.zslin.business.app.dto.PriceDto;
 import com.zslin.business.app.tools.PriceTools;
 import com.zslin.business.dao.*;
-import com.zslin.business.model.Medium;
-import com.zslin.business.model.Product;
-import com.zslin.business.model.ProductFavoriteRecord;
-import com.zslin.business.model.ProductSpecs;
+import com.zslin.business.model.*;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.dto.WxCustomDto;
@@ -48,6 +45,9 @@ public class MiniProductService {
     @Autowired
     private IShoppingBasketDao shoppingBasketDao;
 
+    @Autowired
+    private ICouponDao couponDao;
+
     public JsonResult loadOne(String params) {
         try {
 //            String ip = JsonTools.getIP(params);
@@ -72,8 +72,12 @@ public class MiniProductService {
             Integer basketCount = shoppingBasketDao.queryCount(custom.getOpenid());
             plusCount(id); //增加点击量
 
+            /*//优惠券
+            List<Coupon> couponList = couponDao.findByProId(id);*/
+
             return JsonResult.success("获取成功").set("product", product).set("specsList", specsList)
-                    .set("mediumList", mediumList2).set("price", priceDto).set("favorite", pfr).set("basketCount", basketCount==null?0:basketCount);
+                    .set("mediumList", mediumList2).set("price", priceDto).set("favorite", pfr)
+                    .set("basketCount", basketCount==null?0:basketCount);
         } catch (Exception e) {
             e.printStackTrace();
             return JsonResult.error("获取出错", e.getMessage());

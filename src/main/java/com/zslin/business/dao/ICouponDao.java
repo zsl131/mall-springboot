@@ -17,4 +17,6 @@ public interface ICouponDao extends BaseRepository<Coupon, Integer>, JpaSpecific
 
     @Query("SELECT c FROM Coupon c, CouponRule r WHERE c.id=r.couponId AND r.ruleSn=?1")
     Coupon findByRuleSn(String ruleSn);
+
+    List<Coupon> findByProId(Integer proId);
 }

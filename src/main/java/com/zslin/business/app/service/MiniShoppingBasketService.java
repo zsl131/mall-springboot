@@ -4,7 +4,9 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.dao.IProductDao;
+import com.zslin.business.dao.IProductSpecsDao;
 import com.zslin.business.dao.IShoppingBasketDao;
+import com.zslin.business.model.ProductSpecs;
 import com.zslin.business.model.ShoppingBasket;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
@@ -17,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -27,6 +30,9 @@ public class MiniShoppingBasketService {
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    private IProductSpecsDao productSpecsDao;
 
     /**
      * 添加到购物车
@@ -54,7 +60,16 @@ public class MiniShoppingBasketService {
         WxCustomDto custom = JsonTools.getCustom(params);
         Sort sort = SimpleSortBuilder.generateSort("id_d");
         List<ShoppingBasket> list = shoppingBasketDao.findByOpenid(custom.getOpenid(), sort);
-        return JsonResult.success().set("basketList", list);
+        List<ProductSpecs> specsList = querySpecs(list);
+        return JsonResult.success().set("basketList", list).set("specsList", specsList);
+    }
+
+    private List<ProductSpecs> querySpecs(List<ShoppingBasket> basketList) {
+        List<Integer> specsIds = new ArrayList<>();
+        for(ShoppingBasket basket : basketList) {
+            if(!specsIds.contains(basket.getSpecsId())) {specsIds.add(basket.getSpecsId());}
+        }
+        return productSpecsDao.findByIds(specsIds.toArray(new Integer[]{}));
     }
 
     /**

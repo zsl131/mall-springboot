@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理佣金明细
  * @author 钟述林
- * @data generate on: 2020-06-30
+ * @data generate on: 2020-07-05
  */
 @Data
 @Entity
@@ -94,7 +94,7 @@ public class CustomCommissionRecord implements Serializable {
 
 	/**
 	* 状态
-	* @remark  -1：用户取消；0-用户下单；1-用户付款，但不在提现期；2-在提现期；3-纳入结算清单；4-结算到账；5-结算失败
+	* @remark  -2：售后；-1：用户取消；0-用户下单；1-用户付款，但不在提现期；2-在提现期；3-纳入结算清单；4-结算到账；5-结算失败
 	*/
 	private String status;
 

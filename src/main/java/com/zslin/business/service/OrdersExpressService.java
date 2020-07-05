@@ -91,6 +91,16 @@ public class OrdersExpressService {
 
     /** 获取已经存在的订单物流 */
     public JsonResult onExpress(String params) {
+        //String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
+        Integer proId = JsonTools.getParamInteger(params, "proId");
+        List<OrdersExpress> expressList = ordersExpressDao.findByOrdersProId(proId);
+        List<ExpressCompany> companyList = expressCompanyDao.findAll();
+
+        return JsonResult.success().set("expressList", expressList)
+                .set("companyList", companyList).set("product", ordersProductDao.findOne(proId));
+    }
+
+    /*public JsonResult onExpress(String params) {
         String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
         List<OrdersExpress> expressList = ordersExpressDao.findByOrdersNo(ordersNo);
         List<ExpressCompany> companyList = expressCompanyDao.findAll();
@@ -98,24 +108,37 @@ public class OrdersExpressService {
 
         return JsonResult.success().set("expressList", expressList)
                 .set("companyList", companyList).set("productList", productList);
+    }*/
+
+    /** 查看物流信息 */
+    public JsonResult showExpress(String params) {
+        Integer proId = JsonTools.getParamInteger(params, "proId");
+        List<OrdersExpress> expressList = ordersExpressDao.findByOrdersProId(proId);
+        return JsonResult.success("获取成功").set("expressList", expressList);
     }
 
     /** 为订单发货 */
     @TemplateMessageAnnotation(name = "商品发货通知", keys = "快递公司-快递单号-商品信息-商品数量")
     public JsonResult express(String params) {
+        System.out.println(params);
         String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
         Orders orders = ordersDao.findByOrdersNo(ordersNo);
 
-        String addressCon = JsonTools.getJsonParam(params, "addressCon"); //收货地址
+//        String addressCon = JsonTools.getJsonParam(params, "addressCon"); //收货地址
+        String addressCon = orders.getAddressCon();
         Integer expId = JsonTools.getParamInteger(params, "expId"); //物流公司ID
 //        String expName = JsonTools.getJsonParam(params, "expName"); //物流公司名称
         String expNo = JsonTools.getJsonParam(params, "expNo"); //物流单号
         Integer ordersProId = JsonTools.getParamInteger(params, "proId"); //订单产品对象ID
 
+        //订单产品
+        OrdersProduct ordersProduct = ordersProductDao.findOne(ordersProId);
+
         String expName = expressCompanyDao.findOne(expId).getName(); //物流公司名称
 
         String [] expNoArray = handleExpress(expNo);
         OrdersExpress express = null;
+        StringBuffer expressNos = new StringBuffer();
         int size = 0;
         for(String no:expNoArray) {
             if(no==null || "".equals(no)) {continue;}
@@ -130,13 +153,22 @@ public class OrdersExpressService {
                 express.setUpdateLong(System.currentTimeMillis());
                 express.setUpdateTime(NormalTools.curDatetime());
 
+                express.setOrdersProTitle(ordersProduct.getProTitle());
+                express.setOrdersProId(ordersProId);
+
                 express.setExpId(expId);
                 express.setExpName(expName);
                 express.setExpNo(buildNo(no, addressCon, expName));
-                express.setOrdersProId(ordersProId);
+                express.setCreateDay(NormalTools.curDate());
+                express.setCreateTime(NormalTools.curDatetime());
+                express.setCreateLong(System.currentTimeMillis());
 
                 ordersExpressDao.save(express); //保存
                 size ++;
+                try {
+                    if(!expressNos.toString().contains(no)) {expressNos.append(no).append(",");}
+                } catch (Exception e) {
+                }
             }
         }
 
@@ -169,11 +201,15 @@ public class OrdersExpressService {
             orders.setSendCount(orders.getSendCount() + size);
             ordersDao.save(orders);
 
+            //修改订单产品的状态为已发货
+            ordersProduct.setStatus("2");
+            ordersProductDao.save(ordersProduct);
+
             //快递公司-快递单号-商品信息-商品数量
             sendTemplateMessageTools.send(orders.getOpenid(), "商品发货通知", "", "您购买的商品已发货啦~",
                     TemplateMessageTools.field("快递公司", express == null ? "无" : express.getExpName()),
-                    TemplateMessageTools.field("快递单号", express == null ? "无" : express.getExpNo()),
-                    TemplateMessageTools.field("商品信息", "-"),
+                    TemplateMessageTools.field("快递单号", expressNos == null ? "无" : expressNos.toString()),
+                    TemplateMessageTools.field("商品信息", ordersProduct.getProTitle()),
                     TemplateMessageTools.field("商品数量", expNoArray.length + " 件"),
 
                     TemplateMessageTools.field("您可以在“满山晴”小程序中查看物流信息"));

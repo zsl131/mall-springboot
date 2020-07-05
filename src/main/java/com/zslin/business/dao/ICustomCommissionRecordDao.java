@@ -25,6 +25,8 @@ public interface ICustomCommissionRecordDao extends BaseRepository<CustomCommiss
     @Transactional
     void updateStatus(String status, String ordersNo);
 
+    List<CustomCommissionRecord> findByOrdersNoAndProId(String ordersNo, Integer proId);
+
     //Integer agentId, String haveType, String status, Float money, Integer totalCount
     @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.cashOutBatchNo IS NULL ")
     AgentCommissionDto queryCountDto(String status, Integer agentId);

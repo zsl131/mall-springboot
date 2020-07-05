@@ -3,6 +3,7 @@ package com.zslin.business.mini.controller;
 import com.github.wxpay.sdk.WXPayUtil;
 import com.zslin.business.dao.ICustomCommissionRecordDao;
 import com.zslin.business.dao.IOrdersDao;
+import com.zslin.business.dao.IOrdersProductDao;
 import com.zslin.business.mini.model.MiniConfig;
 import com.zslin.business.mini.tools.MiniConfigTools;
 import com.zslin.business.mini.tools.MiniUtils;
@@ -41,6 +42,9 @@ public class WXPayController {
     private IOrdersDao ordersDao;
 
     @Autowired
+    private IOrdersProductDao ordersProductDao;
+
+    @Autowired
     private ICustomCommissionRecordDao customCommissionRecordDao;
 
     @Autowired
@@ -76,6 +80,7 @@ public class WXPayController {
                         orders.setStatus("1");
                         ordersDao.save(orders);
                         customCommissionRecordDao.updateStatus("1", ordersNo);
+                        ordersProductDao.updateStatus("1", ordersNo); //修改订单产品状态
 
                         Float discountMoney = orders.getDiscountMoney();
                         discountMoney = (discountMoney == null) ? 0 : discountMoney;

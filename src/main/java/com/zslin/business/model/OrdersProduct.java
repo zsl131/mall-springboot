@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单产品
  * @author 钟述林
- * @data generate on: 2020-06-30
+ * @data generate on: 2020-07-05
  */
 @Data
 @Entity
@@ -135,5 +135,16 @@ public class OrdersProduct implements Serializable {
 	* @remark 当saleMode为2时，此值有效
 	*/
 	private String deliveryDate;
+
+	/**
+	* 退款金额
+	*/
+	private Float backMoney=0f;
+
+	/**
+	* 状态
+	* @remark  -10:删除；-2:售后；-1：关闭；0-未付款；1-已付款，未发货；2-已发货；3-未点评；4-已完成
+	*/
+	private String status="0";
 
 }

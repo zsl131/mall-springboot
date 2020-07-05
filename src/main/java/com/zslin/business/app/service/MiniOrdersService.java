@@ -77,6 +77,40 @@ public class MiniOrdersService {
     @Autowired
     private IRemindOrdersDao remindOrdersDao;
 
+    /** 处理售后 */
+    public JsonResult afterSale(String params) {
+        Integer ordersProId = JsonTools.getParamInteger(params, "ordersProId");
+        Float money = Float.parseFloat(JsonTools.getJsonParam(params, "money"));
+
+        //处理订单产品
+        OrdersProduct ordersProduct = ordersProductDao.findOne(ordersProId);
+        Orders orders = ordersDao.findByOrdersNo(ordersProduct.getOrdersNo());
+        ordersProduct.setHasAfterSale("1");
+        ordersProduct.setBackMoney((orders.getBackMoney()==null?0:orders.getBackMoney())+money);
+        ordersProduct.setStatus("-2"); //有售后
+        ordersProductDao.save(ordersProduct);
+
+        //处理订单信息
+        orders.setHasAfterSale("1");
+        orders.setStatus("-2"); //有售后
+        orders.setBackMoney((orders.getBackMoney()==null?0:orders.getBackMoney()) + money);
+        ordersDao.save(orders);
+
+        //TODO 还需要处理提成信息
+        //如果退款金额超过50元，则取消代理提成
+        if(ordersProduct.getBackMoney()>=50) {
+            List<CustomCommissionRecord> recordList = customCommissionRecordDao.findByOrdersNoAndProId(orders.getOrdersNo(), ordersProduct.getProId());
+            for(CustomCommissionRecord ccr : recordList) {
+                ccr.setStatus("-2"); //设置为售后件
+                customCommissionRecordDao.save(ccr);
+            }
+        }
+
+        //TODO 还需要处理退款信息
+
+        return JsonResult.success("退款成功");
+    }
+
     /**
      * 确认收货
      * @param params
@@ -175,6 +209,7 @@ public class MiniOrdersService {
                 ordersDao.save(orders);
 //                ordersDao.updateStatus("1", ordersNo, customDto.getCustomId()); //修改订单状态
                 customCommissionRecordDao.updateStatus("1", ordersNo); //修改提成状态
+                ordersProductDao.updateStatus("1", ordersNo); //修改订单产品状态
 
                 Float discountMoney = orders.getDiscountMoney();
                 discountMoney = (discountMoney == null) ? 0 : discountMoney;

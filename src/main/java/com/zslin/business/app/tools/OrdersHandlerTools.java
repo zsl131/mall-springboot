@@ -243,6 +243,7 @@ public class OrdersHandlerTools {
             op.setSpecsId(dto.getSpecs().getId());
             op.setSpecsName(dto.getSpecs().getName());
             op.setUnionid(custom.getUnionid());
+            op.setStatus("0");
             ordersProductDao.save(op); //保存
             productDao.plusSaleCount(dto.getAmount(), pro.getId()); //增加销量
             minusSpecsCount(dto.getSpecs().getId(), dto.getAmount()); //减少库存
