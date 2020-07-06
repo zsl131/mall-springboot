@@ -111,7 +111,8 @@ public class MiniOrdersService {
         //TODO 还需要处理退款信息
         LoginUserDto userDto = JsonTools.getUser(params);
         //String beanName, String methodName
-        rabbitNormalTools.updateData("payTools", "refund", orders, ordersProduct, userDto, money, reason);
+//        rabbitNormalTools.updateData("payTools", "refund", orders, ordersProduct, userDto, money, reason);
+        payTools.refund(orders, ordersProduct, userDto, money, reason);
 
         return JsonResult.success("退款成功");
     }
