@@ -8,68 +8,65 @@ import java.io.Serializable;
 
 
 /**
- * 提现申请
+ * 退款记录
  * @author 钟述林
  * @data generate on: 2020-07-06
  */
 @Data
 @Entity
-@Table(name = "business_cash_out")
+@Table(name = "business_refund_record")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class CashOut implements Serializable {
+public class RefundRecord implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
+	private String ordersNo;
+
+	private Integer ordersId;
+
+	/**
+	* 退款单号
+	*/
+	private String refundNo;
+
+	private Integer ordersProId;
+
+	private String ordersProTitle;
+
+	private Float backMoney=0f;
+
 	private String createDay;
 
 	private String createTime;
 
 	private Long createLong;
 
-	private Integer agentId;
+	private String agentOpenid;
 
 	private String agentName;
 
 	private String agentPhone;
 
-	private String agentOpenid;
+	/**
+	* 操作员名称
+	*/
+	private String optName;
 
 	/**
-	* 批次号
+	* 操作员用户名
 	*/
-	private String batchNo;
+	private String optUsername;
 
 	/**
-	* 记录条数
+	* 操作员ID
 	*/
-	private Integer amount;
+	private Integer optUserId;
 
 	/**
-	* 总金额
+	* 退款原因
 	*/
-	private Float money;
-
-	/**
-	* 状态
-	* @remark 0-待处理；1-已转款
-	*/
-	private String status="0";
-
-	/**
-	* 转款日期
-	*/
-	private String payDate;
-
-	/**
-	* 转款时间
-	*/
-	private String payTime;
-
-	/**
-	* 转款时间
-	*/
-	private Long payLong;
+	private String reason;
 
 }

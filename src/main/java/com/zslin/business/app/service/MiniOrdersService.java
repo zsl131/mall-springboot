@@ -18,6 +18,7 @@ import com.zslin.business.wx.tools.WxAccountTools;
 import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.dto.JsonResult;
+import com.zslin.core.dto.LoginUserDto;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.dto.WxCustomDto;
 import com.zslin.core.rabbit.RabbitNormalTools;
@@ -81,6 +82,7 @@ public class MiniOrdersService {
     public JsonResult afterSale(String params) {
         Integer ordersProId = JsonTools.getParamInteger(params, "ordersProId");
         Float money = Float.parseFloat(JsonTools.getJsonParam(params, "money"));
+        String reason = JsonTools.getJsonParam(params, "reason"); //退款原因
 
         //处理订单产品
         OrdersProduct ordersProduct = ordersProductDao.findOne(ordersProId);
@@ -107,6 +109,9 @@ public class MiniOrdersService {
         }
 
         //TODO 还需要处理退款信息
+        LoginUserDto userDto = JsonTools.getUser(params);
+        //String beanName, String methodName
+        rabbitNormalTools.updateData("payTools", "refund", orders, ordersProduct, userDto, money, reason);
 
         return JsonResult.success("退款成功");
     }
@@ -180,7 +185,7 @@ public class MiniOrdersService {
                     TemplateMessageTools.field("下单时间", orders.getPayTime()),
                     TemplateMessageTools.field("收货人", ca.getName()),
                     TemplateMessageTools.field("收货人联系方式", ca.getPhone()),
-                    TemplateMessageTools.field("收货人地址", ca.getProvinceName()+ca.getCityName()+ca.getCountyName()+ca.getStreet()),
+                    TemplateMessageTools.field("收货人地址", buildAddress(ca)),
 
                     TemplateMessageTools.field("请核对信息后尽快处理~~"));
             }
@@ -188,6 +193,15 @@ public class MiniOrdersService {
             e.printStackTrace();
         }
         return JsonResult.success("崔单成功");
+    }
+
+    private String buildAddress(CustomAddress ca) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(ca.getProvinceName()==null?"":ca.getProvinceName())
+                .append(ca.getCityName()==null?"":ca.getCityName())
+                .append(ca.getCountyName()==null?"":ca.getCountyName())
+                .append(ca.getStreet()==null?"":ca.getStreet());
+        return sb.toString();
     }
 
     /** 支付成功后回调此接口 */

@@ -2,11 +2,13 @@ package com.zslin.core.dto;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 /**
  * 登陆用户DTO对象
  */
 @Data
-public class LoginUserDto {
+public class LoginUserDto implements Serializable {
 
     private Integer id;
 
