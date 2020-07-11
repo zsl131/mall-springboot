@@ -55,28 +55,35 @@ public class RateTools {
     }
 
     public List<RateDto> buildRates(List<Product> proList, Integer levelId) {
-        List<RateDto> result = new ArrayList<>();
-        for(Product pro:proList) {
-            List<ProductSpecs> specsList = productSpecsDao.findByProId(pro.getId(), SimpleSortBuilder.generateSort("orderNo_a"));
-//            List<AgentLevelSpecsRate> rates = agentLevelSpecsRateDao.findByProduct(pro.getId());
-            for(ProductSpecs spe : specsList) {
-                RateDto rd = new RateDto();
-                rd.setProId(pro.getId());
-                rd.setProTitle(pro.getTitle());
-                rd.setSpecsId(spe.getId());
-                rd.setSpecsName(spe.getName());
-                rd.setUnitName(pro.getUnits());
-                AgentLevelSpecsRate rate = agentLevelSpecsRateDao.getRate(levelId, spe.getId());
-                if(rate==null) {
-                    AgentRateDefault def = agentRateDefaultDao.getRate(levelId);
-                    rd.setRate(def.getAmount());
-                } else {
-                    rd.setRate(rate.getAmount());
+        List<RateDto> result = null;
+        try {
+            result = new ArrayList<>();
+            for(Product pro:proList) {
+                List<ProductSpecs> specsList = productSpecsDao.findByProId(pro.getId(), SimpleSortBuilder.generateSort("orderNo_a"));
+               // System.out.println("=================================");
+                //System.out.println(specsList);
+    //            List<AgentLevelSpecsRate> rates = agentLevelSpecsRateDao.findByProduct(pro.getId());
+                for(ProductSpecs spe : specsList) {
+                    RateDto rd = new RateDto();
+                    rd.setProId(pro.getId());
+                    rd.setProTitle(pro.getTitle());
+                    rd.setSpecsId(spe.getId());
+                    rd.setSpecsName(spe.getName());
+                    rd.setUnitName(pro.getUnits());
+                    AgentLevelSpecsRate rate = agentLevelSpecsRateDao.getRate(levelId, spe.getId());
+                    if(rate==null) {
+                        AgentRateDefault def = agentRateDefaultDao.getRate(levelId);
+                        rd.setRate(def.getAmount());
+                    } else {
+                        rd.setRate(rate.getAmount());
+                    }
+                    result.add(rd);
                 }
-                result.add(rd);
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        //System.out.println(result);
+//        System.out.println(result);
         return result;
     }
 }

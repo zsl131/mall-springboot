@@ -52,7 +52,7 @@ public class MiniAgentLevelSpecsRateService {
                 new SpecificationOperator("status", "eq", "1")),
                 SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
 
-        //System.out.println(res.getContent());
+//        System.out.println(res.getContent());
 
         Integer levelId = JsonTools.getParamInteger(params, "levelId");
         if(levelId==null) { //如果没有传，则默认取自己的
@@ -60,6 +60,8 @@ public class MiniAgentLevelSpecsRateService {
             levelId = agent.getLevelId();
         }
         List<RateDto> rateList = rateTools.buildRates(res.getContent(), levelId);
+        //System.out.println("----------------------");
+        //System.out.println(rateList);
 
 //        return JsonResult.success().set("rateList", rateList);
         result.set("levelList", levelList).set("rateList", rateList).set("levelId", levelId);
