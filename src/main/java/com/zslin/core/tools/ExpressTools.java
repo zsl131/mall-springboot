@@ -81,6 +81,7 @@ public class ExpressTools {
     }
 
     public ExpressResultDto query2DtoByStr(String str) {
+        if(str==null || "".equals(str)) {return null;}
         ExpressResultDto dto = null;
         String status = JsonTools.getJsonParam(str, "status");
         String msg = JsonTools.getJsonParam(str, "msg");

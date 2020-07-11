@@ -50,22 +50,28 @@ public class OrdersExpressService {
 
     /** 查询物流详情 */
     public JsonResult queryDetail(String params) {
+//        System.out.println(params);
         Integer id = JsonTools.getId(params);
-        OrdersExpress oe = ordersExpressDao.findByOrdersId(id);
-        if(canQuery(oe)) { //如果需要重新获取
-            if(oe==null) {
-                Orders orders = ordersDao.findOne(id);
-                oe = new OrdersExpress();
-                oe.setOrdersNo(orders.getOrdersNo());
-                oe.setOrdersId(id);
-                oe.setCustomNickname(orders.getNickname());
-                oe.setCustomId(orders.getCustomId());
+        String expNo = JsonTools.getJsonParam(params, "expNo");
+        Orders orders = ordersDao.findOne(id);
+//        List<OrdersExpress> expressList = ordersExpressDao.fin
+        List<OrdersExpress> expressList = ordersExpressDao.findByOrdersId(id);
+        //System.out.println(expressList);
+        for(OrdersExpress oe : expressList) {
+            if (canQuery(oe)) { //如果需要重新获取
+                if (oe == null) {
+                    oe = new OrdersExpress();
+                    oe.setOrdersNo(orders.getOrdersNo());
+                    oe.setOrdersId(id);
+                    oe.setCustomNickname(orders.getNickname());
+                    oe.setCustomId(orders.getCustomId());
+                }
+                String str = expressTools.query(oe.getExpNo());
+                oe.setExpCon(str);
+                oe.setUpdateTime(NormalTools.curDatetime());
+                oe.setUpdateLong(System.currentTimeMillis());
+                ordersExpressDao.save(oe);
             }
-            String str = expressTools.query(oe.getExpNo());
-            oe.setExpCon(str);
-            oe.setUpdateTime(NormalTools.curDatetime());
-            oe.setUpdateLong(System.currentTimeMillis());
-            ordersExpressDao.save(oe);
         }
 
         QueryTools qt = new QueryTools();
@@ -73,9 +79,22 @@ public class OrdersExpressService {
                 new SpecificationOperator("isRecommend", "eq", "1")),
                 SimplePageBuilder.generate(0, 8, SimpleSortBuilder.generateSort("orderNo_a")));
 
-        return JsonResult.success().set("express", oe)
+        OrdersExpress oe = buildCurrent(expressList, expNo);
+
+        return JsonResult.success().set("expressList", expressList)
                 .set("detail", expressTools.query2DtoByStr(oe.getExpCon()))
-                .set("recommendList", res.getContent());
+                .set("recommendList", res.getContent()).set("orders", orders)
+                .set("express", oe);
+    }
+
+    private OrdersExpress buildCurrent(List<OrdersExpress> expressList, String expNo) {
+        if(expressList==null || expressList.size()<=0) {return null;}
+        if(expNo==null || "".equals(expNo)) {return expressList.get(0);}
+        OrdersExpress oe = null;
+        for(OrdersExpress e : expressList) {
+            if(e.getExpNo().equalsIgnoreCase(expNo)) {oe = e;}
+        }
+        return oe;
     }
 
     private boolean canQuery(OrdersExpress oe) {

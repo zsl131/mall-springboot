@@ -13,7 +13,9 @@ public interface IOrdersExpressDao extends BaseRepository<OrdersExpress, Integer
 
     List<OrdersExpress> findByOrdersNo(String ordersNo);
 
-    OrdersExpress findByOrdersId(Integer ordersId);
+    List<OrdersExpress> findByOrdersId(Integer ordersId);
+
+    //OrdersExpress findByOrdersId(Integer ordersId);
 
     /** 获取产品物流信息 */
     List<OrdersExpress> findByOrdersProId(Integer ordersProId);
