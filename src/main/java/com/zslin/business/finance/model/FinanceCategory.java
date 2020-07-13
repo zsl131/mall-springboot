@@ -19,6 +19,17 @@ public class FinanceCategory {
 
     private String name;
 
+    /** 标记，1-进账；-1：出账 */
+    private String flag;
+
+    public String getFlag() {
+        return flag;
+    }
+
+    public void setFlag(String flag) {
+        this.flag = flag;
+    }
+
     public Integer getId() {
         return id;
     }

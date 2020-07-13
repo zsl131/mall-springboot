@@ -31,11 +31,12 @@ public class FinanceCategoryService {
         QueryListDto qld = QueryTools.buildQueryListDto(params);
         Page<FinanceCategory> res = financeCategoryDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList()),
                 SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
-        return JsonResult.success().set("size", (int)res.getTotalElements()).set("data", res.getContent());
+        return JsonResult.success().set("size", (int) res.getTotalElements()).set("data", res.getContent());
     }
 
     public JsonResult listNoPage(String params) {
-        List<FinanceCategory> list = financeCategoryDao.findAll();
+        String flag = JsonTools.getJsonParam(params, "flag");
+        List<FinanceCategory> list = financeCategoryDao.findByFlag(flag);
         return JsonResult.success().set("list", list);
     }
 
@@ -47,9 +48,10 @@ public class FinanceCategoryService {
 
     public JsonResult addOrUpdate(String params) {
         FinanceCategory obj = JSONObject.toJavaObject(JSON.parseObject(params), FinanceCategory.class);
-        if(obj.getId()!=null && obj.getId()>0) { //修改
+        if (obj.getId() != null && obj.getId() > 0) { //修改
             FinanceCategory cate = financeCategoryDao.getOne(obj.getId());
             cate.setName(obj.getName());
+            cate.setFlag(obj.getFlag());
             financeCategoryDao.save(cate);
         } else {
             financeCategoryDao.save(obj);
