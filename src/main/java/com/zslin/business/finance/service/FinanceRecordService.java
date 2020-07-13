@@ -129,7 +129,7 @@ public class FinanceRecordService {
     }
 
     @AdminAuth(name = "账目审核", orderNum = 2)
-    @TemplateMessageAnnotation(name = "对账单通知", keys = "对账单号-帐单名称-消费笔数-消费金额-生成时间")
+    @TemplateMessageAnnotation(name = "对账单生成通知", keys = "对账单号-账单金额")
     public JsonResult save(String params) {
         String flag = JsonTools.getJsonParam(params, "flag");
         String details = JsonTools.getJsonParam(params, "details");
