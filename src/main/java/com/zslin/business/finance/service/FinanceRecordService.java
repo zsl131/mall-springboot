@@ -121,14 +121,14 @@ public class FinanceRecordService {
     private List<String> buildFinanceOpenids() {
         List<String> res = new ArrayList<>();
         res.add("oy8_QwNcCgN4U8ulmskM6XeW3YWU"); //钟述林
-        res.add("oy8_QwNcCgN4U8ulmskM6XeW3YWU"); //曾淼
+        res.add("oy8_QwBHRRggNYBZqNqQgCQ_mWjc"); //曾淼
         return res;
     }
 
     private List<String> buildVerifyOpenids() {
         List<String> res = new ArrayList<>();
         res.add("oy8_QwNcCgN4U8ulmskM6XeW3YWU"); //钟述林
-        res.add("oy8_QwNcCgN4U8ulmskM6XeW3YWU"); //曾淼
+        res.add("oy8_QwBHRRggNYBZqNqQgCQ_mWjc"); //曾淼
         return res;
     }
 
