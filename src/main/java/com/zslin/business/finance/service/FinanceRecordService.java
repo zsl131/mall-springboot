@@ -11,9 +11,9 @@ import com.zslin.business.finance.model.FinanceRecord;
 import com.zslin.business.finance.model.FinanceTicket;
 import com.zslin.business.finance.tools.MoneyTools;
 import com.zslin.business.finance.tools.TicketNoTools;
+import com.zslin.business.tools.SendTemplateMessageTools;
 import com.zslin.business.wx.annotations.HasTemplateMessage;
 import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
-import com.zslin.business.wx.dto.SendMessageDto;
 import com.zslin.business.wx.tools.TemplateMessageTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.common.NormalTools;
@@ -21,7 +21,6 @@ import com.zslin.core.dao.IAdminUserDao;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.model.AdminUser;
-import com.zslin.core.rabbit.RabbitMQConfig;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
@@ -58,7 +57,7 @@ public class FinanceRecordService {
     private TicketNoTools ticketNoTools;
 
     @Autowired
-    private TemplateMessageTools templateMessageTools;
+    private SendTemplateMessageTools sendTemplateMessageTools;
 
     @Autowired
     private RabbitTemplate rabbitTemplate;
@@ -102,11 +101,16 @@ public class FinanceRecordService {
         if("1".equals(status)) {
             financeRecordDao.updateStatusByPass("1", name, verifyTime, id);
             //审核通过后发送财务通知
-            SendMessageDto smd = new SendMessageDto("对账单生成通知", buildFinanceOpenids(), "#", "有财务账单需要处理",
+            sendTemplateMessageTools.send2Wx(buildFinanceOpenids(), "对账单生成通知", "", "有财务账单需要处理",
                     TemplateMessageTools.field("对账单号", fr.getTicketNo()),
                     TemplateMessageTools.field("账单金额", fr.getAmount()+" 元"),
                     TemplateMessageTools.field("消费笔数："+fr.getDetailCount() + " 笔"));
-            rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, smd);
+
+            /*SendMessageDto smd = new SendMessageDto("对账单生成通知", buildFinanceOpenids(), "#", "有财务账单需要处理",
+                    TemplateMessageTools.field("对账单号", fr.getTicketNo()),
+                    TemplateMessageTools.field("账单金额", fr.getAmount()+" 元"),
+                    TemplateMessageTools.field("消费笔数："+fr.getDetailCount() + " 笔"));
+            rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, smd);*/
         } else {
             financeRecordDao.updateStatusByInvalid("-1", reason, name, phone, verifyTime, id);
         }
@@ -221,11 +225,16 @@ public class FinanceRecordService {
                 TemplateMessageTools.field("生成时间", fr.getCreateTime()),
                 TemplateMessageTools.field("请尽快登陆后台审核"));*/
 
-        SendMessageDto smd = new SendMessageDto("对账单生成通知", buildVerifyOpenids(), "#", "有财务账单需要审核",
+        sendTemplateMessageTools.send2Wx(buildVerifyOpenids(), "对账单生成通知", "", "有财务账单需要审核",
                 TemplateMessageTools.field("对账单号", fr.getTicketNo()),
                 TemplateMessageTools.field("账单金额", fr.getAmount()+" 元"),
                 TemplateMessageTools.field("消费笔数："+fr.getDetailCount() + " 笔\n\n新账单需处理"));
-        rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, smd);
+
+        /*SendMessageDto smd = new SendMessageDto("对账单生成通知", buildVerifyOpenids(), "#", "有财务账单需要审核",
+                TemplateMessageTools.field("对账单号", fr.getTicketNo()),
+                TemplateMessageTools.field("账单金额", fr.getAmount()+" 元"),
+                TemplateMessageTools.field("消费笔数："+fr.getDetailCount() + " 笔\n\n新账单需处理"));
+        rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, smd);*/
 
         return JsonResult.success("保存成功");
     }

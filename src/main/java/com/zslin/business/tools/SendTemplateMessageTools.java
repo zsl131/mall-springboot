@@ -62,6 +62,15 @@ public class SendTemplateMessageTools {
         }
     }
 
+    public void send2Wx(List<String> wxOpenids, String tempName, String url, String title, String ...fields) {
+        //String wxOpenid = gueryWxOpenid(miniOpenid);
+        //System.out.println("-----------------"+wxOpenid);
+        if(wxOpenids!=null && wxOpenids.size()>0) {
+            SendMessageDto smd = new SendMessageDto(tempName, wxOpenids, url, title, fields);
+            rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, smd);
+        }
+    }
+
     /**
      * 向管理员发送模板消息
      * @param type 管理员类型
