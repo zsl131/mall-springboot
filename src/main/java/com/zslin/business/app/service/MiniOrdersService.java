@@ -80,6 +80,7 @@ public class MiniOrdersService {
 
     /** 处理售后 */
     public JsonResult afterSale(String params) {
+System.out.println("-------------MiniOrdersService.afterSale-----------"+params);
         Integer ordersProId = JsonTools.getParamInteger(params, "ordersProId");
         Float money = Float.parseFloat(JsonTools.getJsonParam(params, "money"));
         String reason = JsonTools.getJsonParam(params, "reason"); //退款原因
