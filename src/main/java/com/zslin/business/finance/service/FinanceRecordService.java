@@ -228,13 +228,7 @@ public class FinanceRecordService {
         sendTemplateMessageTools.send2Wx(buildVerifyOpenids(), "对账单生成通知", "", "有财务账单需要审核",
                 TemplateMessageTools.field("对账单号", fr.getTicketNo()),
                 TemplateMessageTools.field("账单金额", fr.getAmount()+" 元"),
-                TemplateMessageTools.field("消费笔数："+fr.getDetailCount() + " 笔\n\n新账单需处理"));
-
-        /*SendMessageDto smd = new SendMessageDto("对账单生成通知", buildVerifyOpenids(), "#", "有财务账单需要审核",
-                TemplateMessageTools.field("对账单号", fr.getTicketNo()),
-                TemplateMessageTools.field("账单金额", fr.getAmount()+" 元"),
-                TemplateMessageTools.field("消费笔数："+fr.getDetailCount() + " 笔\n\n新账单需处理"));
-        rabbitTemplate.convertAndSend(RabbitMQConfig.DIRECT_EXCHANGE, RabbitMQConfig.DIRECT_ROUTING, smd);*/
+                TemplateMessageTools.field("消费笔数："+fr.getDetailCount() + " 笔\\n新账单需处理"));
 
         return JsonResult.success("保存成功");
     }
