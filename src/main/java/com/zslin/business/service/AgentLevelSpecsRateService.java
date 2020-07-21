@@ -75,7 +75,8 @@ public class AgentLevelSpecsRateService {
             return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
         }
 
-        if(obj.getId()!=null && obj.getId()>0) { //修改
+//        if(obj.getId()!=null && obj.getId()>0) { //修改
+        if(agentLevelSpecsRateDao.getRate(obj.getLevelId(), obj.getSpecsId())!=null) { //修改
             AgentLevelSpecsRate old = agentLevelSpecsRateDao.findOne(obj.getId());
             MyBeanUtils.copyProperties(obj, old);
             agentLevelSpecsRateDao.save(old);
