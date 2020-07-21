@@ -42,6 +42,22 @@ public class MediumService {
         }
     }
 
+    @ExplainOperation(name = "修改对象状态", notes = "修改对象状态", params = {
+            @ExplainParam(name = "id", value = "对象ID", type = "int", example = "1")
+    }, back = {
+            @ExplainReturn(field = "message", notes = "结果信息")
+    })
+    public JsonResult updateStatus(String params) {
+        try {
+            Integer id = JsonTools.getId(params);
+            String status = JsonTools.getJsonParam(params, "status");
+            mediumDao.updateStatus(status, id);
+            return JsonResult.success("操作成功");
+        } catch (Exception e) {
+            return JsonResult.error("操作失败");
+        }
+    }
+
     @ExplainOperation(name = "获取对象的媒介信息", notes = "获取对象的媒介信息", params = {
             @ExplainParam(name = "objType", value = "对象类型", type = "String", example = "product")
     }, back = {
@@ -53,6 +69,20 @@ public class MediumService {
         String objType = JsonTools.getJsonParam(params, "objType");
         Sort sort = SimpleSortBuilder.generateSort("orderNo_a");
         List<Medium> list = mediumDao.findByObjClassNameAndObjId(objType, id, sort);
+        return JsonResult.success().set("size", list.size()).set("data", list);
+    }
+
+    @ExplainOperation(name = "获取对象的媒介信息", notes = "获取对象的媒介信息", params = {
+            @ExplainParam(name = "objType", value = "对象类型", type = "String", example = "product")
+    }, back = {
+            @ExplainReturn(field = "size", type = "int", notes = "数据数量"),
+            @ExplainReturn(field = "data", type = "Object", notes = "数据列表")
+    })
+    public JsonResult listProPics(String params) {
+        Integer id = JsonTools.getId(params);
+        String objType = JsonTools.getJsonParam(params, "objType");
+        Sort sort = SimpleSortBuilder.generateSort("orderNo_a");
+        List<Medium> list = mediumDao.findByObjClassNameAndObjIdAndStatus(objType, id, "1", sort);
         return JsonResult.success().set("size", list.size()).set("data", list);
     }
 }

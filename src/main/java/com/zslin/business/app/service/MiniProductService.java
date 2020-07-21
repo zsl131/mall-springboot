@@ -58,7 +58,7 @@ public class MiniProductService {
             Product product = productDao.findOne(id);
             Sort sort = SimpleSortBuilder.generateSort("orderNo");
             List<ProductSpecs> specsList = productSpecsDao.findByProId(id, sort);
-            List<Medium> mediumList = mediumDao.findByObjClassNameAndObjId("Product", id, sort);
+            List<Medium> mediumList = mediumDao.findByObjClassNameAndObjIdAndStatus("Product", id, "1", sort);
             List<Medium> mediumList2 = new ArrayList<>();
             for(Medium m : mediumList) {
                 if(m.getOrderNo()<=5) {mediumList2.add(m);} //前5个为产品详情面顶部轮播图

@@ -23,7 +23,14 @@ public interface IMediumDao extends BaseRepository<Medium, Integer>, JpaSpecific
 
     List<Medium> findByObjClassNameAndObjId(String objClassName, Integer objId, Sort sort);
 
+    List<Medium> findByObjClassNameAndObjIdAndStatus(String objClassName, Integer objId, String status, Sort sort);
+
     Medium findByTicket(String ticket);
+
+    @Query("UPDATE Medium m SET m.status=?1 WHERE m.id=?2")
+    @Modifying
+    @Transactional
+    void updateStatus(String status, Integer id);
 
     List<Medium> findByObjIdAndObjClassNameAndIsFirst(Integer objId, String objClassName, String isFirst, Sort sort);
 

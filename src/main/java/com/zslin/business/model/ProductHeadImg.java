@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 产品头像图
  * @author 钟述林
- * @data generate on: 2020-07-06
+ * @data generate on: 2020-07-21
  */
 @Data
 @Entity
@@ -32,6 +32,11 @@ public class ProductHeadImg implements Serializable {
 	* 图片链接地址
 	*/
 	private String url;
+
+	/**
+	* 状态
+	*/
+	private String status="1";
 
 	/**
 	* 排序序号

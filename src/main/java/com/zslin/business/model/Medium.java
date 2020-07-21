@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 素材
  * @author 钟述林
- * @data generate on: 2020-07-06
+ * @data generate on: 2020-07-21
  */
 @Data
 @Entity
@@ -66,6 +66,11 @@ public class Medium implements Serializable {
 	* 七牛服务器上的key
 	*/
 	private String qiniuKey;
+
+	/**
+	* 状态
+	*/
+	private String status="1";
 
 	/**
 	* 根链接，配合qiniuKey一起使用
