@@ -70,14 +70,16 @@ public class AgentLevelSpecsRateService {
     @Transactional
     public JsonResult addOrUpdateRate(String params) {
         AgentLevelSpecsRate obj = JSONObject.toJavaObject(JSON.parseObject(params), AgentLevelSpecsRate.class);
+        //System.out.println("-------->"+obj);
         ValidationDto vd = ValidationTools.buildValidate(obj);
         if(vd.isHasError()) { //如果有验证异常
             return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
         }
 
+        AgentLevelSpecsRate old = agentLevelSpecsRateDao.getRate(obj.getLevelId(), obj.getSpecsId());
 //        if(obj.getId()!=null && obj.getId()>0) { //修改
-        if(agentLevelSpecsRateDao.getRate(obj.getLevelId(), obj.getSpecsId())!=null) { //修改
-            AgentLevelSpecsRate old = agentLevelSpecsRateDao.findOne(obj.getId());
+        if(old!=null) { //修改
+//            AgentLevelSpecsRate old = agentLevelSpecsRateDao.findOne(obj.getId());
             MyBeanUtils.copyProperties(obj, old);
             agentLevelSpecsRateDao.save(old);
         } else {
