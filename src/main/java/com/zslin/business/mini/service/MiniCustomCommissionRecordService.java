@@ -71,7 +71,9 @@ public class MiniCustomCommissionRecordService {
         return JsonResult.success().set("commissionList", dtoList).set("agent", agent);
     }
 
-    /** 获取明细 */
+    /**
+     * 获取明细
+     */
     @NeedAuth
     public JsonResult list(String params) {
         WxCustomDto customDto = JsonTools.getCustom(params);
@@ -83,14 +85,16 @@ public class MiniCustomCommissionRecordService {
         Page<CustomCommissionRecord> res = customCommissionRecordDao.findAll(QueryTools.getInstance().buildSearch(qld.getConditionDtoList(),
                 new SpecificationOperator("agentId", "eq", agentId, "and"), //代理
                 new SpecificationOperator("money", "gt", 0, "and"), //金额要大于0
-                (status!=null&&!"".equals(status))?new SpecificationOperator("status", "eq", status, "and"):null), //对应状态
+                (status != null && !"".equals(status)) ? new SpecificationOperator("status", "eq", status, "and") : null), //对应状态
                 SimplePageBuilder.generate(qld.getPage(), qld.getSize(), SimpleSortBuilder.generateSort(qld.getSort())));
 
         return JsonResult.getInstance().set("size", (int) res.getTotalElements())
                 .set("data", res.getContent());
     }
 
-    /** 当用户发起提现 */
+    /**
+     * 当用户发起提现
+     */
     @NeedAuth(openid = true)
     @TemplateMessageAnnotation(name = "提现申请通知", keys = "申请人-创建时间-申请金额")
     public JsonResult onCashOut(String params) {
@@ -98,7 +102,7 @@ public class MiniCustomCommissionRecordService {
         String batchNo = RandomTools.genTimeNo(3, 5).toUpperCase(); //批次号
         CashOut co = new CashOut();
         Agent agent = agentDao.findByOpenid(customDto.getOpenid());
-        if(agent!=null && cashOutDao.findByRunningByAgentId(agent.getId())==null) { //不能有在提现中的数据
+        if (agent != null && cashOutDao.findByRunningByAgentId(agent.getId()) == null) { //不能有在提现中的数据
 
             AgentCommissionDto dto = customCommissionRecordDao.queryCountDto("2", agent.getId());
 
@@ -110,20 +114,20 @@ public class MiniCustomCommissionRecordService {
             co.setCreateDay(NormalTools.curDate());
             co.setCreateTime(NormalTools.curDatetime());
             co.setCreateLong(System.currentTimeMillis());
-            co.setAmount((int)dto.getTotalCount());
-            co.setMoney((float)dto.getMoney());
+            co.setAmount((int) dto.getTotalCount());
+            co.setMoney((float) dto.getMoney());
             co.setStatus("0");
 
             cashOutDao.save(co); //保存记录
 
             customCommissionRecordDao.updateBatchNo(batchNo, "3", "2", agent.getId());
 
-            String name = (agent.getName()==null||"".equals(agent.getName()))?agent.getNickname():agent.getName();
+            String name = (agent.getName() == null || "".equals(agent.getName())) ? agent.getNickname() : agent.getName();
             //申请人-创建时间-申请金额
-            sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "提现申请通知", "", name+" 发起了提现申请",
+            sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "提现申请通知", "", name + " 发起了提现申请",
                     TemplateMessageTools.field("申请人", name),
                     TemplateMessageTools.field("创建时间", NormalTools.curDatetime()),
-                    TemplateMessageTools.field("申请金额", co.getMoney()+""),
+                    TemplateMessageTools.field("申请金额", co.getMoney() + ""),
 
                     TemplateMessageTools.field(agent.getPhone()));
 
