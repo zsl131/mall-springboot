@@ -103,7 +103,7 @@ public class CarouselService {
                 return JsonResult.getInstance().failFlag(BusinessException.Code.VALIDATE_ERR, BusinessException.Message.VALIDATE_ERR, vd.getErrors());
             }
             Carousel obj = carouselDao.findOne(o.getId());
-            MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay", "token", "url");
+            MyBeanUtils.copyProperties(o, obj, "id", "createDate", "createTime", "createLong", "createDay", "token");
             carouselDao.save(obj);
             return JsonResult.getInstance().set("obj", obj);
         } catch (Exception e) {

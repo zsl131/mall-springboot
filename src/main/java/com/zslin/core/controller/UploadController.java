@@ -59,7 +59,7 @@ public class UploadController {
      */
     @RequestMapping(value = "normal")
     public UploadResult normalUpload(@RequestParam("files") MultipartFile[] files, String extra) {
-        log.info(extra);
+        //log.info(extra);
         UploadResult result = upload(files, extra);
         return result;
     }
