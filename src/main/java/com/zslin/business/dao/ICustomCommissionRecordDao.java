@@ -31,7 +31,7 @@ public interface ICustomCommissionRecordDao extends BaseRepository<CustomCommiss
     @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.cashOutBatchNo IS NULL ")
     AgentCommissionDto queryCountDto(String status, Integer agentId);
 
-    @Query("UPDATE CustomCommissionRecord c SET c.cashOutBatchNo=?1, c.status=?2 WHERE c.status=?3 AND c.agentId=?4")
+    @Query("UPDATE CustomCommissionRecord c SET c.cashOutBatchNo=?1, c.status=?2 WHERE c.status=?3 AND c.agentId=?4 AND c.cashOutBatchNo IS NULL ")
     @Modifying
     @Transactional
     void updateBatchNo(String batchNo, String newStatus, String oldStatus, Integer agentId);
