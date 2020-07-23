@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 微信小程序关联
  * @author 钟述林
- * @data generate on: 2020-07-21
+ * @data generate on: 2020-07-23
  */
 @Data
 @Entity

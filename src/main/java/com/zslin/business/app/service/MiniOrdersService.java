@@ -95,18 +95,24 @@ System.out.println("-------------MiniOrdersService.afterSale-----------"+params)
 
         //处理订单信息
         orders.setHasAfterSale("1");
-        orders.setStatus("-2"); //有售后
+//        orders.setStatus("-2"); //有售后
+        orders.setSaleFlag("1"); //有售后
         orders.setBackMoney((orders.getBackMoney()==null?0:orders.getBackMoney()) + money);
         ordersDao.save(orders);
 
+        Float tmpMoney = ordersProduct.getPrice()*ordersProduct.getAmount(); //实际支付金额
+        tmpMoney = tmpMoney * 0.12f; //只要退款金额超过实付金额的12%，就不能有提成了
         //TODO 还需要处理提成信息
-        //如果退款金额超过50元，则取消代理提成
-        if(ordersProduct.getBackMoney()>=50) {
-            List<CustomCommissionRecord> recordList = customCommissionRecordDao.findByOrdersNoAndProId(orders.getOrdersNo(), ordersProduct.getProId());
-            for(CustomCommissionRecord ccr : recordList) {
-                ccr.setStatus("-2"); //设置为售后件
-                customCommissionRecordDao.save(ccr);
+        //如果退款金额超过12%，则取消代理提成
+        List<CustomCommissionRecord> recordList = customCommissionRecordDao.findByOrdersNoAndProId(orders.getOrdersNo(), ordersProduct.getProId());
+        for(CustomCommissionRecord ccr : recordList) {
+            if(ordersProduct.getBackMoney()>=tmpMoney) {
+//                ccr.setStatus("-2"); //设置为售后件
+                ccr.setSaleFlag("2"); //售后；不可提现
+            } else {
+                ccr.setSaleFlag("1"); //售后；可提现
             }
+            customCommissionRecordDao.save(ccr);
         }
 
         //TODO 还需要处理退款信息
