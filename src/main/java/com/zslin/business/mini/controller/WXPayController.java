@@ -8,6 +8,7 @@ import com.zslin.business.mini.model.MiniConfig;
 import com.zslin.business.mini.tools.MiniConfigTools;
 import com.zslin.business.mini.tools.MiniUtils;
 import com.zslin.business.mini.tools.PayNotifyTools;
+import com.zslin.business.mini.tools.PayTools;
 import com.zslin.business.model.Orders;
 import com.zslin.business.tools.SendTemplateMessageTools;
 import com.zslin.business.wx.annotations.HasTemplateMessage;
@@ -50,6 +51,9 @@ public class WXPayController {
     @Autowired
     private SendTemplateMessageTools sendTemplateMessageTools;
 
+    @Autowired
+    private PayTools payTools;
+
     /**
      * 支付结果通知地址
      * @param request
@@ -57,7 +61,7 @@ public class WXPayController {
      * @return
      */
     @RequestMapping(value = "notify")
-    @TemplateMessageAnnotation(name = "订单付款成功通知", keys = "订单号-支付时间-支付金额-支付方式")
+    //@TemplateMessageAnnotation(name = "订单付款成功通知", keys = "订单号-支付时间-支付金额-支付方式")
     public String notify(HttpServletRequest request, HttpServletResponse response) {
 
         MiniConfig miniConfig = miniConfigTools.getMiniConfig();
@@ -74,24 +78,33 @@ public class WXPayController {
                     Orders orders = ordersDao.findByOrdersNo(ordersNo);
                     if ("0".equals(orders.getStatus())) { //如果是未支付状态
                         //TODO 通知相关人员，已经付款成功
-                        orders.setPayDay(NormalTools.curDate());
-                        orders.setPayLong(System.currentTimeMillis());
-                        orders.setPayTime(NormalTools.curDatetime());
+                        payTools.hasPayed(orders);
+
+                        /*String payDay = NormalTools.curDate();
+                        String payTime = NormalTools.curDatetime();
+                        Long payLong = System.currentTimeMillis();
+
+                        orders.setPayDay(payDay);
+                        orders.setPayLong(payLong);
+                        orders.setPayTime(payTime);
                         orders.setStatus("1");
-                        ordersDao.save(orders);
-                        customCommissionRecordDao.updateStatus("1", ordersNo);
-                        ordersProductDao.updateStatus("1", ordersNo); //修改订单产品状态
 
                         Float discountMoney = orders.getDiscountMoney();
                         discountMoney = (discountMoney == null) ? 0 : discountMoney;
 
+                        if(orders.getPayMoney()==null) {orders.setPayMoney(orders.getTotalMoney() - discountMoney);}
+
+                        ordersDao.save(orders);
+                        customCommissionRecordDao.updateStatus("1", ordersNo);
+                        ordersProductDao.updatePayDay(payDay, payTime, payLong, ordersNo); //修改订单产品状态
+
                         sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单付款成功通知", "", orders.getProTitles(),
                                 TemplateMessageTools.field("订单号", orders.getOrdersNo()),
                                 TemplateMessageTools.field("支付时间", orders.getPayTime()),
-                                TemplateMessageTools.field("支付金额", (orders.getTotalMoney() - discountMoney)+ " 元"),
+                                TemplateMessageTools.field("支付金额", (orders.getPayMoney())+ " 元"),
                                 TemplateMessageTools.field("支付方式", "在线支付"),
 
-                                TemplateMessageTools.field("请核对信息后尽快处理["+ MiniUtils.buildAgent(orders)+"]"));
+                                TemplateMessageTools.field("请核对信息后尽快处理["+ MiniUtils.buildAgent(orders)+"]"));*/
                     }
                 }
 

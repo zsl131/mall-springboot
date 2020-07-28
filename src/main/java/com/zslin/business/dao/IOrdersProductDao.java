@@ -23,6 +23,11 @@ public interface IOrdersProductDao extends BaseRepository<OrdersProduct, Integer
     @Transactional
     void updateStatus(String status, String ordersNo);
 
+    @Query("UPDATE OrdersProduct o SET o.status='1', o.payDay=?1, o.payTime=?2, o.payLong=?3 WHERE o.ordersNo=?4")
+    @Modifying
+    @Transactional
+    void updatePayDay(String payDay, String payTime, Long payLong, String ordersNo);
+
     @Query("UPDATE OrdersProduct o SET o.status=?1 WHERE o.id=?2 ")
     @Modifying
     @Transactional

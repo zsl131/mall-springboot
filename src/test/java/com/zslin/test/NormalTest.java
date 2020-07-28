@@ -146,6 +146,24 @@ public class NormalTest implements ApplicationContextAware {
     @Autowired
     private IAgentDao agentDao;
 
+    @Autowired
+    private ICashOutDao cashOutDao;
+
+    @Autowired
+    private IRefundRecordDao refundRecordDao;
+
+    @Test
+    public void test49() {
+        RefundRecord rr = refundRecordDao.queryRefundRecord("202007281524041387");
+        System.out.println("--------->"+rr);
+    }
+
+    @Test
+    public void test48() {
+        Double money = cashOutDao.findMoney(0l, 1592925412601l);
+        System.out.println("---->money:: "+money);
+    }
+
     @Test
     public void test47() {
         Agent a = agentDao.findOkByOpenid("123");

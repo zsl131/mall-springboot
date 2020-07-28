@@ -45,6 +45,17 @@ public class NormalTools {
         return res;
     }
 
+    /**
+     * 字段串转long类型
+     * @param time 日期格式的字符串
+     * @param pattern 日期格式
+     * @return
+     */
+    public static Long str2Long(String time, String pattern) {
+        Date date = getDate(time, pattern);
+        return date.getTime();
+    }
+
     public static String getMonth(String pattern) {
         return getMonth(pattern, 0);
     }

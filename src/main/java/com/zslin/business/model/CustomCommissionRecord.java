@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理佣金明细
  * @author 钟述林
- * @data generate on: 2020-07-23
+ * @data generate on: 2020-07-28
  */
 @Data
 @Entity

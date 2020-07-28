@@ -42,4 +42,16 @@ public interface IOrdersDao extends BaseRepository<Orders, Integer>, JpaSpecific
     /** 获取长时间未确认收货的订单 */
     @Query("FROM Orders o WHERE o.status='2' AND o.sendLong<=?1")
     List<Orders> findTimeoutConfirmOrders(Long timeout);
+
+    /** 获取时间段内订单金额总和 */
+    @Query("SELECT SUM(o.totalMoney) FROM Orders o WHERE o.payLong IS NOT NULL AND o.payLong>=?1 AND o.payLong<=?2")
+    Double findMoney(Long startLong, Long endLong);
+
+    /** 获取时间段内订单优惠金额总和 */
+    @Query("SELECT SUM(o.discountMoney) FROM Orders o WHERE o.discountMoney IS NOT NULL AND o.payLong IS NOT NULL AND o.payLong>=?1 AND o.payLong<=?2")
+    Double findDiscountMoney(Long startLong, Long endLong);
+
+    /** 获取时间段内订单退款 */
+    /*@Query("SELECT SUM(o.backMoney) FROM Orders o WHERE o.backMoney IS NOT NULL  AND o.payLong IS NOT NULL AND o.payLong>=?1 AND o.payLong<=?2 ")
+    Double findBackMoney(Long startLong, Long endLong);*/
 }

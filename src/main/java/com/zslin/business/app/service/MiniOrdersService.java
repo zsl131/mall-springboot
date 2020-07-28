@@ -7,6 +7,7 @@ import com.zslin.business.app.dto.SubmitOrdersDto;
 import com.zslin.business.app.tools.OrdersHandlerTools;
 import com.zslin.business.dao.*;
 import com.zslin.business.mini.dto.PaySubmitDto;
+import com.zslin.business.mini.dto.RefundDto;
 import com.zslin.business.mini.tools.MiniUtils;
 import com.zslin.business.mini.tools.PayTools;
 import com.zslin.business.model.*;
@@ -80,48 +81,17 @@ public class MiniOrdersService {
 
     /** 处理售后 */
     public JsonResult afterSale(String params) {
-System.out.println("-------------MiniOrdersService.afterSale-----------"+params);
-        Integer ordersProId = JsonTools.getParamInteger(params, "ordersProId");
-        Float money = Float.parseFloat(JsonTools.getJsonParam(params, "money"));
-        String reason = JsonTools.getJsonParam(params, "reason"); //退款原因
+//System.out.println("-------------MiniOrdersService.afterSale-----------"+params);
 
-        //处理订单产品
-        OrdersProduct ordersProduct = ordersProductDao.findOne(ordersProId);
-        Orders orders = ordersDao.findByOrdersNo(ordersProduct.getOrdersNo());
-        ordersProduct.setHasAfterSale("1");
-        ordersProduct.setBackMoney((orders.getBackMoney()==null?0:orders.getBackMoney())+money);
-        ordersProduct.setStatus("-2"); //有售后
-        ordersProductDao.save(ordersProduct);
-
-        //处理订单信息
-        orders.setHasAfterSale("1");
-//        orders.setStatus("-2"); //有售后
-        orders.setSaleFlag("1"); //有售后
-        orders.setBackMoney((orders.getBackMoney()==null?0:orders.getBackMoney()) + money);
-        ordersDao.save(orders);
-
-        Float tmpMoney = ordersProduct.getPrice()*ordersProduct.getAmount(); //实际支付金额
-        tmpMoney = tmpMoney * 0.12f; //只要退款金额超过实付金额的12%，就不能有提成了
-        //TODO 还需要处理提成信息
-        //如果退款金额超过12%，则取消代理提成
-        List<CustomCommissionRecord> recordList = customCommissionRecordDao.findByOrdersNoAndProId(orders.getOrdersNo(), ordersProduct.getProId());
-        for(CustomCommissionRecord ccr : recordList) {
-            if(ordersProduct.getBackMoney()>=tmpMoney) {
-//                ccr.setStatus("-2"); //设置为售后件
-                ccr.setSaleFlag("2"); //售后；不可提现
-            } else {
-                ccr.setSaleFlag("1"); //售后；可提现
-            }
-            customCommissionRecordDao.save(ccr);
-        }
 
         //TODO 还需要处理退款信息
         LoginUserDto userDto = JsonTools.getUser(params);
         //String beanName, String methodName
 //        rabbitNormalTools.updateData("payTools", "refund", orders, ordersProduct, userDto, money, reason);
-        payTools.refund(orders, ordersProduct, userDto, money, reason);
+//        payTools.refund(orders, ordersProduct, userDto, money, reason);
+        RefundDto dto = payTools.refund(params, userDto);
 
-        return JsonResult.success("退款成功");
+        return JsonResult.success("退款成功").set("res", dto);
     }
 
     /**
@@ -214,7 +184,7 @@ System.out.println("-------------MiniOrdersService.afterSale-----------"+params)
 
     /** 支付成功后回调此接口 */
     @NeedAuth(openid = true)
-    @TemplateMessageAnnotation(name = "订单付款成功通知", keys = "订单号-支付时间-支付金额-支付方式")
+    //@TemplateMessageAnnotation(name = "订单付款成功通知", keys = "订单号-支付时间-支付金额-支付方式")
     public JsonResult payRes(String params) {
         try {
             WxCustomDto customDto = JsonTools.getCustom(params);
@@ -222,27 +192,32 @@ System.out.println("-------------MiniOrdersService.afterSale-----------"+params)
             String flag = JsonTools.getJsonParam(params, "flag");
             if("1".equals(flag)) {
                 //Float money = Float.parseFloat(JsonTools.getJsonParam(params, "payMoney")); //支付金额
-                Orders orders = ordersDao.findByOrdersNoAndCustomId(ordersNo, customDto.getCustomId());
+                payTools.hasPayed(ordersNo); //支付成功
+                /*Orders orders = ordersDao.findByOrdersNoAndCustomId(ordersNo, customDto.getCustomId());
                 orders.setStatus("1");
-                orders.setPayTime(NormalTools.curDatetime());
-                orders.setPayDay(NormalTools.curDate());
-                orders.setPayLong(System.currentTimeMillis());
-                orders.setPayMoney(orders.getTotalMoney()); //totalMoney就是支付金额
-                ordersDao.save(orders);
-//                ordersDao.updateStatus("1", ordersNo, customDto.getCustomId()); //修改订单状态
-                customCommissionRecordDao.updateStatus("1", ordersNo); //修改提成状态
-                ordersProductDao.updateStatus("1", ordersNo); //修改订单产品状态
+                String payDay = NormalTools.curDate();
+                String payTime = NormalTools.curDatetime();
+                Long payLong = System.currentTimeMillis();
+                orders.setPayTime(payTime);
+                orders.setPayDay(payDay);
+                orders.setPayLong(payLong);
 
                 Float discountMoney = orders.getDiscountMoney();
                 discountMoney = (discountMoney == null) ? 0 : discountMoney;
 
+                orders.setPayMoney(orders.getTotalMoney() - discountMoney); //totalMoney就是支付金额
+                ordersDao.save(orders);
+//                ordersDao.updateStatus("1", ordersNo, customDto.getCustomId()); //修改订单状态
+                customCommissionRecordDao.updateStatus("1", ordersNo); //修改提成状态
+                ordersProductDao.updatePayDay(payDay, payTime, payLong, ordersNo); //修改订单产品状态
+
                 sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单付款成功通知", "", orders.getProTitles(),
                         TemplateMessageTools.field("订单号", orders.getOrdersNo()),
                         TemplateMessageTools.field("支付时间", orders.getPayTime()),
-                        TemplateMessageTools.field("支付金额", (orders.getTotalMoney() - discountMoney)+ " 元"),
+                        TemplateMessageTools.field("支付金额", (orders.getPayMoney())+ " 元"),
                         TemplateMessageTools.field("支付方式", "在线支付"),
 
-                        TemplateMessageTools.field("请核对信息后尽快处理["+ MiniUtils.buildAgent(orders)+"]"));
+                        TemplateMessageTools.field("请核对信息后尽快处理["+ MiniUtils.buildAgent(orders)+"]"));*/
             }
             return JsonResult.success("操作成功").set("flag", "1");
         } catch (Exception e) {

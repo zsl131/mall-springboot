@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单产品
  * @author 钟述林
- * @data generate on: 2020-07-23
+ * @data generate on: 2020-07-28
  */
 @Data
 @Entity
@@ -136,10 +136,22 @@ public class OrdersProduct implements Serializable {
 	*/
 	private String deliveryDate;
 
+	private String backDay;
+
+	private String backTime;
+
+	private Long backLong;
+
 	/**
 	* 退款金额
 	*/
 	private Float backMoney=0f;
+
+	private String payDay;
+
+	private String payTime;
+
+	private Long payLong;
 
 	/**
 	* 状态
