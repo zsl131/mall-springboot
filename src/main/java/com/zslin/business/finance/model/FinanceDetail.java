@@ -63,7 +63,7 @@ public class FinanceDetail {
     @Column(name = "invalid_reason")
     private String invalidReason;
 
-    /** 经办人 */
+    /** 申请人，即登陆操作人的信息 */
     private String operator;
 
     /** 设置为作废的人 */
@@ -99,6 +99,18 @@ public class FinanceDetail {
     /** 单据上传张数 */
     @Column(name = "ticket_upload_count")
     private Integer ticketUploadCount = 0;
+
+    /** 经办人 */
+    @Column(name = "handle_name")
+    private String handleName;
+
+    public String getHandleName() {
+        return handleName;
+    }
+
+    public void setHandleName(String handleName) {
+        this.handleName = handleName;
+    }
 
     public Float getPrice() {
         return price;

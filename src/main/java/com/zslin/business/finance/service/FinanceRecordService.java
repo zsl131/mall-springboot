@@ -161,6 +161,7 @@ public class FinanceRecordService {
             Integer count = jsonObj.getInteger("count");
             String recordDate = jsonObj.getString("recordDate").replaceAll("-", "");
             String title = jsonObj.getString("title");
+            String handleName = jsonObj.getString("handleName"); //经办人
             FinanceDetail fd = new FinanceDetail();
             fd.setRecordDate(recordDate);
             fd.setTicketCount(picArray.size());
@@ -169,6 +170,7 @@ public class FinanceRecordService {
             fd.setCateId(cateId);
             fd.setCount(count);
             fd.setFlag(flag);
+            fd.setHandleName(handleName);
             fd.setPrice(price);
             fd.setRecordMonth(recordDate.substring(0, 6));
             fd.setRecordYear(recordDate.substring(0, 4));

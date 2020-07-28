@@ -124,7 +124,7 @@ public class PayTools {
             WXPay wxpay = new WXPay(payConfig);
             Map<String, String> rMap = wxpay.refund(data);
 
-System.out.println("----PayTools----->" + rMap);
+//System.out.println("----PayTools----->" + rMap);
 
             String return_code = rMap.get("return_code");
             String result_code = rMap.get("result_code");

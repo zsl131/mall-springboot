@@ -124,14 +124,15 @@ public class PDFTools {
     }
 
     private PdfPTable buildTable(FinanceRecord record, List<FinanceDetail> detailList) {
-        float [] widths = {56f,220,57.5f,52f,28,52f,49f};
+//        float [] widths = {56f,220,57.5f,52f,28,52f,49f};
+        float [] widths = {56f,210,57.5f,42f,39, 29,53f,28f};
         float totalWidth = 0f;
         for(float w : widths) {totalWidth += w;}
         PdfPTable table = new PdfPTable(widths);
         table.setTotalWidth(totalWidth);
         table.setLockedWidth(true);
         table.setHorizontalAlignment(Element.ALIGN_LEFT);
-        String [] header = {"日期", "摘要（简要说明）", "会计科目", "单价(元)", "数量", "金额(元)", "附单(张)"};
+        String [] header = {"日期", "摘要（简要说明）", "会计科目", "经办人", "单价(元)", "数量", "金额(元)", "附单(张)"};
         for(String h : header) {
             PdfPCell pdfCell = new PdfPCell(); //表格的单元格
             pdfCell.setMinimumHeight(TABLE_HEIGHT);
@@ -148,7 +149,8 @@ public class PDFTools {
             len ++;
             Float total = fd.getAmount(); //小计金额
             Integer count = fd.getTicketCount(); //单据张数
-            String [] data = {rebuildDate(fd.getRecordDate()), fd.getTitle(), fd.getCateName(), formatMoney(fd.getPrice()), fd.getCount()+"", formatMoney(total), count+""};
+            String [] data = {rebuildDate(fd.getRecordDate()), fd.getTitle(), fd.getCateName(), fd.getHandleName(),
+                    formatMoney(fd.getPrice()), fd.getCount()+"", formatMoney(total), count+""};
             totalCount += count; totalMoney += total;
 
             int index = 0;
@@ -162,7 +164,7 @@ public class PDFTools {
                 }
                 pdfCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                 Paragraph paragraph ;
-                if(index == 5) {
+                if(index == 6) {
                     Font f = getFont(12);
                     f.setStyle("bold");
                     paragraph = new Paragraph(h, f);
@@ -176,7 +178,7 @@ public class PDFTools {
         }
 
         for(int i=0;i<(MAX_DETAIL_LEN-len);i++) {
-            String [] data = {"", "", "", "", "", "", ""};
+            String [] data = {"", "", "", "", "", "", "", ""};
 
             int index = 0;
             for(String h : data) {
@@ -189,7 +191,7 @@ public class PDFTools {
                 }
                 pdfCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
                 Paragraph paragraph ;
-                if(index == 5) {
+                if(index == 6) {
                     Font f = getFont(12);
                     f.setStyle("bold");
                     paragraph = new Paragraph(h, f);
@@ -286,7 +288,7 @@ public class PDFTools {
         totalMoney = Float.parseFloat(formatMoney(totalMoney)); //转换成2位小数
         PdfPCell pdfCell = new PdfPCell(); //表格的单元格
         pdfCell.setRowspan(1);
-        pdfCell.setColspan(4);
+        pdfCell.setColspan(5);
         pdfCell.setMinimumHeight(TABLE_HEIGHT);
         pdfCell.setHorizontalAlignment(Element.ALIGN_LEFT);
         pdfCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -332,7 +334,7 @@ public class PDFTools {
     private Paragraph buildNameDateP(String recordDate) {
         Paragraph p = new Paragraph();
         p.setAlignment(Element.ALIGN_LEFT);
-        Chunk c = new Chunk("公司名称：云南奇思教育咨询有限责任公司", getFont(12));
+        Chunk c = new Chunk("公司名称：知满农产品（昭通）有限公司", getFont(12));
         Chunk cb = new Chunk("                                                                 ", getFont(12));
         Chunk cd = new Chunk(buildDate(recordDate), getFont(12));
         p.add(c);
