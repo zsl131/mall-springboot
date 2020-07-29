@@ -36,11 +36,11 @@ public class MiniOrdersTools {
         dto0.setStatus("0"); dto0.setName("未付款");
         result.add(dto0);
 
-        AgentCommissionDto dto1 = customCommissionRecordDao.queryCountDto("1", agentId);
+        AgentCommissionDto dto1 = customCommissionRecordDao.queryCountDtoNoBatchNo("1", agentId);
         dto1.setStatus("1"); dto1.setName("已付款");
         result.add(dto1);
 
-        AgentCommissionDto dto2 = customCommissionRecordDao.queryCountDto("2", agentId);
+        AgentCommissionDto dto2 = customCommissionRecordDao.queryCountDtoNoBatchNo("2", agentId);
         dto2.setStatus("2"); dto2.setName("可提现");
         result.add(dto2);
 

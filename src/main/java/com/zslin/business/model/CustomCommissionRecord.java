@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 代理佣金明细
  * @author 钟述林
- * @data generate on: 2020-07-28
+ * @data generate on: 2020-07-29
  */
 @Data
 @Entity
@@ -154,5 +154,35 @@ public class CustomCommissionRecord implements Serializable {
 	* 提现的批次号
 	*/
 	private String cashOutBatchNo;
+
+	/**
+	* 发起提现日期
+	*/
+	private String cashOutDay;
+
+	/**
+	* 发起提现时间
+	*/
+	private String cashOutTime;
+
+	/**
+	* 发起提现时间
+	*/
+	private Long cashOutLong;
+
+	/**
+	* 提现支付日期
+	*/
+	private String payOutDay;
+
+	/**
+	* 提现支付时间
+	*/
+	private String payOutTime;
+
+	/**
+	* 提现支付时间
+	*/
+	private Long payOutLong;
 
 }

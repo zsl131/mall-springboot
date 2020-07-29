@@ -28,18 +28,39 @@ public interface ICustomCommissionRecordDao extends BaseRepository<CustomCommiss
     List<CustomCommissionRecord> findByOrdersNoAndProId(String ordersNo, Integer proId);
 
     //Integer agentId, String haveType, String status, Float money, Integer totalCount
-    @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.cashOutBatchNo IS NULL ")
+//    @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.cashOutBatchNo IS NULL ")
+    @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 ")
     AgentCommissionDto queryCountDto(String status, Integer agentId);
 
-    @Query("UPDATE CustomCommissionRecord c SET c.cashOutBatchNo=?1, c.status=?2 WHERE c.status=?3 AND c.agentId=?4 AND c.cashOutBatchNo IS NULL ")
-    @Modifying
-    @Transactional
-    void updateBatchNo(String batchNo, String newStatus, String oldStatus, Integer agentId);
+    @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.cashOutBatchNo IS NULL ")
+    AgentCommissionDto queryCountDtoNoBatchNo(String status, Integer agentId);
 
-    @Query("UPDATE CustomCommissionRecord c SET c.status=?1 WHERE c.cashOutBatchNo=?2 AND c.agentId=?3 ")
+    /** 设置本该修改为提现的数据 */
+    /*@Query("UPDATE CustomCommissionRecord c, CashOut o SET " +
+            " c.status=?1, c.cashOutDay=o.createDay, c.cashOutTime=o.createTime, c.cashOutLong=o.createLong WHERE " +
+            " o.batchNo=c.cashOutBatchNo AND c.status='2' AND o.status='0'")
+    void update2CashOut(String status);*/
+
+    /** 设置本该修改为纳入结算的数据 */
+    /*@Query("UPDATE CustomCommissionRecord c, CashOut o SET " +
+            " c.status=?1, c.payOutDay=o.payDate, c.payOutTime=o.payTime, c.payOutLong=o.payLong WHERE " +
+            " o.batchNo=c.cashOutBatchNo AND c.status='3' AND o.status='1'")
+    void update2PayOut(String status);*/
+
+    @Query("UPDATE CustomCommissionRecord c SET c.cashOutBatchNo=?1, c.status=?2," +
+            " c.cashOutDay=?3, c.cashOutTime=?4, c.cashOutLong=?5 WHERE " +
+            " c.status=?6 AND c.agentId=?7 AND c.cashOutBatchNo IS NULL ")
     @Modifying
     @Transactional
-    void updateStatusByBatchNo(String status, String batchNo, Integer agentId);
+    void updateBatchNo(String batchNo, String newStatus, String outDay, String outTime, Long outLong
+            , String oldStatus, Integer agentId);
+
+    @Query("UPDATE CustomCommissionRecord c SET c.status=?1, c.payOutDay=?2, c.payOutTime=?3,c.payOutLong=?4" +
+            " WHERE c.cashOutBatchNo=?5 AND c.agentId=?6 ")
+    @Modifying
+    @Transactional
+    void updateStatusByBatchNo(String status, String payOutDay, String payOutTime, Long payOutLong,
+                               String batchNo, Integer agentId);
 
     //获取排名信息
     //Integer agentId, String agentName, String agentPhone, Integer customId, String customNickname, Long specsCount, Double commissionMoney

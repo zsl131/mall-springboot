@@ -46,15 +46,27 @@ public class CashOutService {
     @TemplateMessageAnnotation(name = "返利到帐提醒", keys = "金额-时间")
     public JsonResult handleCash(String params) {
         try {
+            String payDay = NormalTools.curDate();
+            String payTime = NormalTools.curDatetime();
+            Long payLong = System.currentTimeMillis();
+
             Integer id = JsonTools.getId(params);
             CashOut cashOut = cashOutDao.findOne(id);
             cashOut.setStatus("1");
-            cashOut.setPayLong(System.currentTimeMillis());
-            cashOut.setPayTime(NormalTools.curDatetime());
-            cashOut.setPayDate(NormalTools.curDate());
+            cashOut.setPayLong(payLong);
+            cashOut.setPayTime(payTime);
+            cashOut.setPayDate(payDay);
 
-            customCommissionRecordDao.updateStatusByBatchNo("4", cashOut.getBatchNo(), cashOut.getAgentId());
+//            customCommissionRecordDao.updateStatusByBatchNo("4", payDay, payTime, payLong,
+//                    cashOut.getBatchNo(), cashOut.getAgentId());
+
+            customCommissionRecordDao.updateByHql("UPDATE CustomCommissionRecord c SET c.status=?1, c.payOutDay=?2, c.payOutTime=?3,c.payOutLong=?4" +
+                    " WHERE c.cashOutBatchNo=?5 AND c.agentId=?6 ",
+                    "4", payDay, payTime, payLong, cashOut.getBatchNo(), cashOut.getAgentId());
             cashOutDao.save(cashOut);
+
+            //把之前处理遗漏的数据重新更新一下，将状态修改为4-已转款
+            //customCommissionRecordDao.update2PayOut("4");
 
             //快递公司-快递单号-商品信息-商品数量
             sendTemplateMessageTools.send(cashOut.getAgentOpenid(), "返利到帐提醒", "", "你的提现申请已处理啦",

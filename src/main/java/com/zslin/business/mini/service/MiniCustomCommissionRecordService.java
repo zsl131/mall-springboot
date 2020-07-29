@@ -58,6 +58,7 @@ public class MiniCustomCommissionRecordService {
 
     @NeedAuth(openid = true)
     public JsonResult listOwn(String params) {
+        System.out.println("----MiniCustomCommissionRecordService.listOwn----"+params);
         WxCustomDto customDto = JsonTools.getCustom(params);
 
         Integer sharedId = JsonTools.getParamInteger(params, "shareId");
@@ -106,21 +107,33 @@ public class MiniCustomCommissionRecordService {
 
             AgentCommissionDto dto = customCommissionRecordDao.queryCountDto("2", agent.getId());
 
+            String createDay = NormalTools.curDate();
+            String createTime = NormalTools.curDatetime();
+            Long createLong = System.currentTimeMillis();
+
             co.setAgentId(agent.getId());
             co.setAgentName(agent.getName());
             co.setAgentOpenid(agent.getOpenid());
             co.setAgentPhone(agent.getPhone());
             co.setBatchNo(batchNo);
-            co.setCreateDay(NormalTools.curDate());
-            co.setCreateTime(NormalTools.curDatetime());
-            co.setCreateLong(System.currentTimeMillis());
+            co.setCreateDay(createDay);
+            co.setCreateTime(createTime);
+            co.setCreateLong(createLong);
             co.setAmount((int) dto.getTotalCount());
             co.setMoney((float) dto.getMoney());
             co.setStatus("0");
 
             cashOutDao.save(co); //保存记录
 
-            customCommissionRecordDao.updateBatchNo(batchNo, "3", "2", agent.getId());
+            customCommissionRecordDao.updateByHql("UPDATE CustomCommissionRecord c SET c.cashOutBatchNo=?1, c.status=?2," +
+                    " c.cashOutDay=?3, c.cashOutTime=?4, c.cashOutLong=?5 WHERE " +
+                    " c.status=?6 AND c.agentId=?7 AND c.cashOutBatchNo IS NULL ",
+                    batchNo, "3", createDay, createTime, createLong, "2", agent.getId());
+//            customCommissionRecordDao.updateBatchNo(batchNo, "3", createDay, createTime, createLong,
+//                    "2", agent.getId()); //当发起提现时的操作
+
+            //把之前处理遗漏的数据重新更新一下，将状态修改为3-纳入结算清单
+//            customCommissionRecordDao.update2CashOut("3");
 
             String name = (agent.getName() == null || "".equals(agent.getName())) ? agent.getNickname() : agent.getName();
             //申请人-创建时间-申请金额
