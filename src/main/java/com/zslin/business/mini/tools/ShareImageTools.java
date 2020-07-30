@@ -87,6 +87,10 @@ public class ShareImageTools {
             g.setFont(new Font(fontName, Font.PLAIN, 50));
             g.drawString(price, 40, conStartY+130); //590-460=130
 
+            g.setColor(new Color(255, 0, 0));
+            g.setFont(new Font(fontName, Font.PLAIN, 20));
+            g.drawString("起", 40+140, conStartY+130); //590-460=130
+
             g.setColor(new Color(100,100,100));
             g.setFont(font);
             g.drawString(nickname, 135, conStartY+210); //670-460=210

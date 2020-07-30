@@ -79,6 +79,9 @@ public class MiniOrdersService {
     @Autowired
     private IRemindOrdersDao remindOrdersDao;
 
+    @Autowired
+    private IOrdersExpressDao ordersExpressDao;
+
     /** 处理售后 */
     public JsonResult afterSale(String params) {
 //System.out.println("-------------MiniOrdersService.afterSale-----------"+params);
@@ -259,6 +262,14 @@ public class MiniOrdersService {
                 SimplePageBuilder.generate(0, 8, SimpleSortBuilder.generateSort("orderNo_a")));
 
         return JsonResult.success("获取成功").set("orders", orders).set("proList", proList).set("recommendList", res.getContent());
+    }
+
+    /** 通过佣金获取订单信息 */
+        public JsonResult loadOneByCommission(String params) {
+        Integer id = JsonTools.getId(params); //ordersId
+        Orders orders = ordersDao.findOne(id);
+        List<OrdersExpress> expressList = ordersExpressDao.findByOrdersId(id);
+        return JsonResult.success("获取成功").set("orders", orders).set("expressList", expressList);
     }
 
     /**
