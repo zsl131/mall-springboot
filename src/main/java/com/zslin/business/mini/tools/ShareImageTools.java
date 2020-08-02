@@ -89,7 +89,7 @@ public class ShareImageTools {
 
             g.setColor(new Color(255, 0, 0));
             g.setFont(new Font(fontName, Font.PLAIN, 20));
-            g.drawString("起", 40+140, conStartY+130); //590-460=130
+            g.drawString("起", 40+(buildLen(price)), conStartY+130); //590-460=130
 
             g.setColor(new Color(100,100,100));
             g.setFont(font);
@@ -107,6 +107,13 @@ public class ShareImageTools {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /** 生成“起”字的起始位置 */
+    private int buildLen(String price) {
+        int flag = 32;
+        if(price.contains(".")) {flag = 28;}
+        return price.length()*flag;
     }
 
     /*public BufferedImage createImage(String proTitle, String price, String nickname, String remark,

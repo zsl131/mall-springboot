@@ -28,7 +28,7 @@ public class ImageTest {
     @Test
     public void test04() throws Exception {
         String proTitle = "绥江半边红李子";
-        String price = "￥ 88";
+        String price = "￥ 88.8";
         String nickname = "好友想攀登的胖子";
         String remark = "请君移驾品鉴";
         String fontName = "微软雅黑";
