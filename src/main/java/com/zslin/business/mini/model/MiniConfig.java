@@ -11,7 +11,7 @@ import javax.validation.constraints.NotBlank;
 /**
  * 小程序配置
  * @author 钟述林
- * @data generate on: 2020-07-29
+ * @data generate on: 2020-08-07
  */
 @Data
 @Entity

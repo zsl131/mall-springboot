@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 退款记录
  * @author 钟述林
- * @data generate on: 2020-07-29
+ * @data generate on: 2020-08-07
  */
 @Data
 @Entity
@@ -30,6 +30,8 @@ public class RefundRecord implements Serializable {
 	* 退款单号
 	*/
 	private String refundNo;
+
+	private Integer proId;
 
 	private Integer ordersProId;
 
@@ -84,5 +86,22 @@ public class RefundRecord implements Serializable {
 	* 退款结果信息
 	*/
 	private String resCodeDes;
+
+	/**
+	* 申请类型
+	* @remark 0-后台操作；1-客户操作
+	*/
+	private String type="0";
+
+	/**
+	* 审核标记
+	* @remark 0-未审核；1-通过；2-驳回
+	*/
+	private String verifyFlag="0";
+
+	/**
+	* 审核原因
+	*/
+	private String verfiyReason;
 
 }

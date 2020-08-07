@@ -105,7 +105,7 @@ public class MiniCustomCommissionRecordService {
         Agent agent = agentDao.findByOpenid(customDto.getOpenid());
         if (agent != null && cashOutDao.findByRunningByAgentId(agent.getId()) == null) { //不能有在提现中的数据
 
-            AgentCommissionDto dto = customCommissionRecordDao.queryCountDto("2", agent.getId());
+            AgentCommissionDto dto = customCommissionRecordDao.queryCountDtoNoBatchNo("2", agent.getId());
 
             String createDay = NormalTools.curDate();
             String createTime = NormalTools.curDatetime();

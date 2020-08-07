@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 物流公司
  * @author 钟述林
- * @data generate on: 2020-07-29
+ * @data generate on: 2020-08-07
  */
 @Data
 @Entity

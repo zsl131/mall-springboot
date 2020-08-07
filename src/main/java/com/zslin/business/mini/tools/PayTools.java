@@ -68,6 +68,100 @@ public class PayTools {
     @Autowired
     private ICustomCommissionRecordDao customCommissionRecordDao;
 
+    public RefundDto refund(Integer ordersProId, Float money, String reason, LoginUserDto user, boolean needAddRecord) {
+        RefundDto refundDto = new RefundDto();
+
+        OrdersProduct ordersProduct = ordersProductDao.findOne(ordersProId);
+        Orders orders = ordersDao.findByOrdersNo(ordersProduct.getOrdersNo());
+
+        //获取微信小程序配置文件
+        MiniConfig config = miniConfigTools.getMiniConfig();
+        Map<String, String> data = new HashMap<>();
+
+        String appId = config.getAppid();
+        String apiKey = config.getApiKey();
+
+        String body;
+        String proTitles = orders.getProTitles();
+        if(proTitles==null || "".equals(proTitles.trim())) {
+            body = BODY_PRE+"-"+orders.getSpecsCount()+" 件产品"; //支付名称
+        } else {body = proTitles;}
+
+        //退款单号
+        String refundNo = orders.getId()+"-"+ordersProduct.getId()+"-"+RandomTools.genCodeNew();
+        RefundRecord rr = refundRecordDao.queryRefundRecord(orders.getOrdersNo());
+        if(rr!=null && "-1".equals(rr.getStatus())) { //如果上一次是失败的
+            refundNo = rr.getRefundNo();
+        }
+
+        String nonceStr = RandomTools.randomString(32);
+
+        String sign = PayUtils.buildSign(appId, config.getMchid(), body, apiKey, nonceStr);
+        data.put("appid", appId);
+        data.put("mch_id", config.getMchid());
+        data.put("nonce_str", nonceStr);
+        data.put("sign", sign);
+        data.put("out_trade_no", orders.getOrdersNo());
+        data.put("out_refund_no", refundNo); //TODO 退款单号
+        data.put("total_fee", buildTotalMoney((orders.getTotalMoney()-(orders.getDiscountMoney()==null?0:orders.getDiscountMoney())))); //总金额，分
+        data.put("refund_fee", buildTotalMoney(money));
+
+        try {
+            String certPath = configTools.getFilePath("cert") + "apiclient_cert.p12";
+
+            MyPayConfig payConfig = new MyPayConfig(certPath, config);
+            WXPay wxpay = new WXPay(payConfig);
+            Map<String, String> rMap = wxpay.refund(data);
+
+//System.out.println("----PayTools----->" + rMap);
+
+            String return_code = rMap.get("return_code");
+            String result_code = rMap.get("result_code");
+            String err_code = rMap.get("err_code");
+            String err_code_des = rMap.get("err_code_des");
+
+            refundDto.setErrCode(err_code);
+            refundDto.setErrCodeDes(err_code_des);
+            String status = "-1";
+
+            boolean suc = false;
+            //表示成功
+            if ("SUCCESS".equals(return_code) && return_code.equals(result_code)) {
+                handleRefund(ordersProduct, orders, money);
+                suc = true;
+                status = "0";
+            } else if("订单已全额退款".equals(err_code_des)) {
+                List<OrdersProduct> ordersProductList = ordersProductDao.findByOrdersNo(orders.getOrdersNo());
+                //如果是全额退款，则全部退掉
+                for(OrdersProduct op : ordersProductList) {
+                    Float backMoney = op.getPrice()*op.getAmount() - op.getBackMoney();
+                    if(backMoney>(orders.getTotalMoney()-(orders.getDiscountMoney()==null?0:orders.getDiscountMoney())-orders.getBackMoney())) {
+                        backMoney = orders.getTotalMoney()-(orders.getDiscountMoney()==null?0:orders.getDiscountMoney())-orders.getBackMoney();}
+                    handleRefund(op, orders, backMoney);
+                }
+            }
+            if(needAddRecord) {
+                addRecord(orders, ordersProduct, user, money, refundNo, reason, status, err_code, err_code_des); //保存退款记录
+            }
+
+            refundDto.setStatus(status);
+
+            //订单编号-产品名称-退款金额-退款原因-退款时间
+            sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "退款成功通知", "", suc?"退款成功啦":"退款失败",
+                    TemplateMessageTools.field("订单编号", orders.getOrdersNo()),
+                    TemplateMessageTools.field("产品名称", ordersProduct.getProTitle()),
+                    TemplateMessageTools.field("退款金额", suc?(money+""):"退款失败"),
+                    TemplateMessageTools.field("退款原因", suc?reason:(err_code+":"+err_code_des)),
+                    TemplateMessageTools.field("退款时间", NormalTools.curDatetime()),
+
+                    TemplateMessageTools.field("操作人员【"+user.getNickname()+"】"));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return refundDto;
+    }
+
     /**
      * 退款申请
      * Orders orders, OrdersProduct ordersProduct, LoginUserDto user, Float backMoney, String reason
@@ -76,7 +170,11 @@ public class PayTools {
     public RefundDto refund(String params, LoginUserDto user) {
 //        Orders orders = ordersDao.findByOrdersNo(ordersNo);
 
-        RefundDto refundDto = new RefundDto();
+        Integer ordersProId = JsonTools.getParamInteger(params, "ordersProId");
+        Float money = Float.parseFloat(JsonTools.getJsonParam(params, "money"));
+        String reason = JsonTools.getJsonParam(params, "reason"); //退款原因
+        return refund(ordersProId, money, reason, user, true);
+        /*RefundDto refundDto = new RefundDto();
 
         Integer ordersProId = JsonTools.getParamInteger(params, "ordersProId");
         Float money = Float.parseFloat(JsonTools.getJsonParam(params, "money"));
@@ -168,7 +266,7 @@ public class PayTools {
             e.printStackTrace();
         }
 
-        return refundDto;
+        return refundDto;*/
     }
 
     private void handleRefund(OrdersProduct ordersProduct, Orders orders, Float money) {
@@ -236,6 +334,7 @@ public class PayTools {
         rr.setStatus(status);
         rr.setResCode(resCode);
         rr.setResCodeDes(resCodeDes);
+        rr.setType("0");
 
         refundRecordDao.save(rr);
     }

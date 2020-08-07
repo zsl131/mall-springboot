@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单
  * @author 钟述林
- * @data generate on: 2020-07-29
+ * @data generate on: 2020-08-07
  */
 @Data
 @Entity
@@ -242,5 +242,16 @@ public class Orders implements Serializable {
 	*/
 	@Lob
 	private String proTitles;
+
+	/**
+	* 申请退款标记
+	* @remark  -1：驳回申请；0-未申请；1-申请退款中；2-申请通过；
+	*/
+	private String refundFlag="0";
+
+	/**
+	* 退款申请结果
+	*/
+	private String refundVerifyReason;
 
 }

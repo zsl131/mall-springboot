@@ -1,28 +1,29 @@
 package com.zslin.business.service;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.dao.IOrdersDao;
+import com.zslin.business.dao.IRefundRecordDao;
+import com.zslin.business.mini.tools.PayTools;
+import com.zslin.business.model.Orders;
+import com.zslin.business.model.RefundRecord;
+import com.zslin.business.tools.SendTemplateMessageTools;
+import com.zslin.business.wx.annotations.HasTemplateMessage;
+import com.zslin.business.wx.annotations.TemplateMessageAnnotation;
+import com.zslin.business.wx.tools.TemplateMessageTools;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
 import com.zslin.core.api.ExplainParam;
 import com.zslin.core.api.ExplainReturn;
-import com.zslin.business.dao.IRefundRecordDao;
 import com.zslin.core.dto.JsonResult;
+import com.zslin.core.dto.LoginUserDto;
 import com.zslin.core.dto.QueryListDto;
-import com.zslin.business.model.RefundRecord;
 import com.zslin.core.repository.SimplePageBuilder;
 import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.QueryTools;
-import com.zslin.core.validate.ValidationDto;
-import com.zslin.core.validate.ValidationTools;
-import com.zslin.core.exception.BusinessException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import com.zslin.core.tools.MyBeanUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Created by 钟述林 on 2020-07-06.
@@ -30,10 +31,20 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @AdminAuth(name = "退款记录管理", psn = "销售管理", orderNum = 2, type = "1", url = "/admin/refundRecord")
 @Explain(name = "退款记录管理", notes = "退款记录管理")
+@HasTemplateMessage
 public class RefundRecordService {
 
     @Autowired
     private IRefundRecordDao refundRecordDao;
+
+    @Autowired
+    private IOrdersDao ordersDao;
+
+    @Autowired
+    private SendTemplateMessageTools sendTemplateMessageTools;
+
+    @Autowired
+    private PayTools payTools;
 
     @AdminAuth(name = "退款记录列表", orderNum = 1)
     @ExplainOperation(name = "退款记录列表", notes = "退款记录列表", params= {
@@ -70,5 +81,38 @@ public class RefundRecordService {
         }
     }
 
+    @TemplateMessageAnnotation(name = "退款审核结果通知", keys = "申请时间-原订单编号-退款金额-审核结果")
+    public JsonResult verify(String params) {
+        System.out.println(params);
+        LoginUserDto userDto = JsonTools.getUser(params);
+        Integer id = JsonTools.getId(params);
+        String flag = JsonTools.getJsonParam(params, "flag");
+        String reason = JsonTools.getJsonParam(params, "reason");
+        RefundRecord rr = refundRecordDao.findOne(id);
+        rr.setVerifyFlag(flag);
+        rr.setVerfiyReason(reason);
+        Orders orders = ordersDao.findOne(rr.getOrdersId());
+        orders.setRefundVerifyReason(reason);
+        if("1".equals(flag)) { //通过
+            orders.setRefundFlag("2");
+            //处理退款信息
+            payTools.refund(rr.getOrdersProId(), rr.getBackMoney(), reason, userDto, false);
+        } else { //驳回
+            rr.setVerifyFlag("2"); //驳回
+            orders.setRefundFlag("-1");
 
+            //TODO 驳回时通知
+            sendTemplateMessageTools.send(orders.getOpenid(), "退款审核结果通知", "", "你的退款申请已【"+("1".equals(flag)?"通过":"驳回")+"】",
+                    TemplateMessageTools.field("申请时间", rr.getCreateTime()),
+                    TemplateMessageTools.field("原订单编号", orders.getOrdersNo()),
+                    TemplateMessageTools.field("退款金额", rr.getBackMoney()+" 元"),
+                    TemplateMessageTools.field("审核结果","1".equals(flag)?"通过":"驳回"),
+
+                    TemplateMessageTools.field("审核原因："+reason));
+        }
+        refundRecordDao.save(rr);
+        ordersDao.save(orders);
+
+        return JsonResult.success("操作成功");
+    }
 }

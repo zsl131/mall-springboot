@@ -28,6 +28,7 @@ import com.zslin.core.repository.SimpleSortBuilder;
 import com.zslin.core.repository.SpecificationOperator;
 import com.zslin.core.tools.JsonTools;
 import com.zslin.core.tools.QueryTools;
+import com.zslin.core.tools.RandomTools;
 import com.zslin.core.tools.SecurityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -81,6 +82,9 @@ public class MiniOrdersService {
 
     @Autowired
     private IOrdersExpressDao ordersExpressDao;
+
+    @Autowired
+    private IRefundRecordDao refundRecordDao;
 
     /** 处理售后 */
     public JsonResult afterSale(String params) {
@@ -138,6 +142,77 @@ public class MiniOrdersService {
             return JsonResult.success("订单删除成功");
         } else {
             return JsonResult.success("此订单不可删除");
+        }
+    }
+
+    /** 订单退款 - 客户自行 */
+    @NeedAuth(openid = true)
+    @TemplateMessageAnnotation(name = "退款申请通知", keys = "订单编号-订单金额")
+    public JsonResult refundOrders(String params) {
+        WxCustomDto customDto = JsonTools.getCustom(params);
+        String ordersNo = JsonTools.getJsonParam(params, "ordersNo");
+        String reason = JsonTools.getJsonParam(params, "reason");
+        Orders orders = ordersDao.findByOrdersNoAndCustomId(ordersNo, customDto.getCustomId());
+        String flag = orders.getRefundFlag();
+        if(flag==null || "".equals(flag) || "0".equals(flag) || "-1".equals(flag)) { //如果是 未申请或驳回申请 才能退款
+            //删除订单
+//            ordersDao.updateStatus("-10", ordersNo, customDto.getCustomId());
+//            orders.setStatus("-10");
+
+            String refundNo = orders.getId()+"-"+ RandomTools.genCodeNew();
+
+            //获取产品信息
+            List<OrdersProduct> productList = ordersProductDao.findByOrdersNo(ordersNo);
+            for(OrdersProduct op : productList) {
+
+                RefundRecord rr = new RefundRecord();
+                rr.setType("1");
+                rr.setResCodeDes("");
+                rr.setResCode("");
+                rr.setStatus("0");
+                rr.setReason(reason);
+                rr.setRefundNo(refundNo);
+                rr.setOrdersNo(ordersNo);
+                rr.setOrdersId(orders.getId());
+                rr.setCreateTime(NormalTools.curDatetime());
+                rr.setCreateLong(System.currentTimeMillis());
+                rr.setCreateDay(NormalTools.curDate());
+//                rr.setBackMoney(orders.getTotalMoney() - (orders.getDiscountMoney() == null ? 0 : orders.getDiscountMoney()));
+                rr.setBackMoney(op.getAmount()*op.getPrice());
+                rr.setVerifyFlag("0");
+                rr.setOptUsername("客户自主");
+                rr.setOptName("客户自主");
+                rr.setAgentPhone(orders.getAgentPhone());
+                rr.setAgentOpenid(orders.getAgentOpenid());
+                rr.setAgentName(orders.getAgentName());
+                rr.setProId(op.getProId());
+                rr.setOrdersProId(op.getId());
+                rr.setOrdersProTitle(op.getProTitle());
+                refundRecordDao.save(rr);
+
+                //申请时还不需要修改退款金额
+                /*op.setBackMoney(op.getAmount()*op.getPrice());
+                op.setBackLong(System.currentTimeMillis());
+                op.setBackTime(NormalTools.curDatetime());
+                op.setBackDay(NormalTools.curDate());
+                ordersProductDao.save(op); //修改退款金额*/
+            }
+
+            //申请时还不需要修改退款金额
+            //orders.setBackMoney(orders.getTotalMoney() - (orders.getDiscountMoney() == null ? 0 : orders.getDiscountMoney()));
+            orders.setRefundFlag("1"); //设置退款标记为 申请中
+            ordersDao.save(orders);
+
+            //TODO 通知管理人员
+            sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "退款申请通知", "", "有顾客发起退款申请",
+                    TemplateMessageTools.field("订单编号", ordersNo),
+                    TemplateMessageTools.field("订单金额", orders.getBackMoney()+" 元"),
+
+                    TemplateMessageTools.field("退款原因："+reason));
+
+            return JsonResult.success("退款申请提交成功");
+        } else {
+            return JsonResult.success("此订单不能提交退款申请");
         }
     }
 

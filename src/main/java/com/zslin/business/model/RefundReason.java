@@ -8,28 +8,28 @@ import java.io.Serializable;
 
 
 /**
- * 基金
+ * 退款原因
  * @author 钟述林
  * @data generate on: 2020-08-07
  */
 @Data
 @Entity
-@Table(name = "business_fund")
+@Table(name = "business_refund_reason")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Fund implements Serializable {
+public class RefundReason implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
 	/**
-	* 总基金笔数
+	* 原因
 	*/
-	private Integer totalCount;
+	private String reason;
 
 	/**
-	* 总基金金额
+	* 序号
 	*/
-	private Float totalMoney;
+	private Integer orderNo;
 
 }
