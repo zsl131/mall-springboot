@@ -3,7 +3,9 @@ package com.zslin.business.dao;
 import com.zslin.business.model.Coupon;
 import com.zslin.core.repository.BaseRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,4 +24,9 @@ public interface ICouponDao extends BaseRepository<Coupon, Integer>, JpaSpecific
 
     @Query("FROM Coupon c WHERE c.id in (SELECT d.couponId FROM CouponRuleDetail d, CouponRule r WHERE r.id=d.ruleId AND r.ruleSn=?1) ")
     List<Coupon> findCoupons(String ruleSn);
+
+    @Query("UPDATE Coupon c SET c.surplusCount=c.surplusCount-?1, c.receiveCount=c.receiveCount+?1 WHERE c.id=?2")
+    @Modifying
+    @Transactional
+    void plusAmount(Integer amount, Integer id);
 }

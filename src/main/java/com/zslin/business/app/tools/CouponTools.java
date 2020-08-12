@@ -109,6 +109,8 @@ public class CouponTools {
                     coupon.setEndTime(buildEndTime(c.getDuration()));
                     coupon.setReachMoney(c.getReachMoney());
                     customCouponDao.save(coupon);
+
+                    couponDao.plusAmount(1, c.getId());
                 }
             }
         }
