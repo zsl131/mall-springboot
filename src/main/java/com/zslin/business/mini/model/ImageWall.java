@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 影像墙
  * @author 钟述林
- * @data generate on: 2020-08-07
+ * @data generate on: 2020-08-08
  */
 @Data
 @Entity

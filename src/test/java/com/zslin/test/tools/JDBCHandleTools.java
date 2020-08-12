@@ -26,6 +26,46 @@ public class JDBCHandleTools {
         reallyNos.add("20200801131111302599");
     }
 
+    public void handleProTitle() throws Exception {
+//        JDBCObj local = new JDBCObj("localhost:3306", "zz_mall", "root", "123");
+        JDBCObj local = new JDBCObj("122.14.215.131:13316", "z_mall", "root", "ynzslzsl131**");
+        Connection localCon = getConn(local);
+        Statement localState = localCon.createStatement();
+        String sql = "select * FROM business_orders o WHERE o.pro_titles is NULL";
+        ResultSet localRs = localState.executeQuery(sql);
+        int count = 0;
+        while(localRs.next()) {
+            String ordersNo = localRs.getString("orders_no");
+            Float money = localRs.getFloat("back_money");
+
+            System.out.println("订单号："+ordersNo+"-->退款："+money);
+            String titles = queryTitle(ordersNo, localCon);
+            updateTitle(ordersNo, titles, localCon);
+            count ++;
+            //count += check(serverCon, phone, money);
+        }
+        System.out.println("退款数量：【"+count+"】");
+    }
+
+    private void updateTitle(String ordersNo, String titles, Connection con) throws Exception {
+        Statement localState = con.createStatement();
+        String sql = "update business_orders o SET o.pro_titles='"+titles+"' WHERE o.orders_no='"+ordersNo+"'";
+        localState.executeUpdate(sql);
+    }
+
+    private String queryTitle(String ordersNo,Connection con) throws Exception {
+        Statement localState = con.createStatement();
+        String sql = "select * FROM business_orders_product o WHERE o.orders_no='"+ordersNo+"'";
+        ResultSet localRs = localState.executeQuery(sql);
+        StringBuffer sb = new StringBuffer();
+        while(localRs.next()) {
+            String title = localRs.getString("pro_title");
+            sb.append(title).append("|");
+            //count += check(serverCon, phone, money);
+        }
+        return sb.toString();
+    }
+
     public void run() throws Exception {
         JDBCObj local = new JDBCObj("localhost:3306", "zz_mall", "root", "123");
 //        JDBCObj local = new JDBCObj("122.14.215.131:13316", "z_mall", "root", "ynzslzsl131**");

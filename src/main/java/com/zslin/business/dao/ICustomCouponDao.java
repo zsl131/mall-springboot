@@ -14,7 +14,7 @@ import java.util.List;
  */
 public interface ICustomCouponDao extends BaseRepository<CustomCoupon, Integer>, JpaSpecificationExecutor<CustomCoupon> {
 
-    CustomCoupon findByRuleSnAndReceiveKeyAndCustomId(String ruleSn, String receiveKey, Integer customId);
+    List<CustomCoupon> findByRuleSnAndReceiveKeyAndCustomId(String ruleSn, String receiveKey, Integer customId);
 
     /**
      * 获取用户优惠券

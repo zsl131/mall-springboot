@@ -57,7 +57,8 @@ public class MiniProductService {
             Integer id = JsonTools.getId(params);
             Product product = productDao.findOne(id);
             Sort sort = SimpleSortBuilder.generateSort("orderNo");
-            List<ProductSpecs> specsList = productSpecsDao.findByProId(id, sort);
+            //获取有库存的规格
+            List<ProductSpecs> specsList = productSpecsDao.findByProIdAndAmount(id, sort);
             List<Medium> mediumList = mediumDao.findByObjClassNameAndObjIdAndStatus("Product", id, "1", sort);
             List<Medium> mediumList2 = new ArrayList<>();
             for(Medium m : mediumList) {

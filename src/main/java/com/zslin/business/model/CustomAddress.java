@@ -12,7 +12,7 @@ import org.hibernate.validator.constraints.Length;
 /**
  * 客户收货地址
  * @author 钟述林
- * @data generate on: 2020-08-07
+ * @data generate on: 2020-08-08
  */
 @Data
 @Entity

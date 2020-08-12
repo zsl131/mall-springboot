@@ -8,28 +8,43 @@ import java.io.Serializable;
 
 
 /**
- * 退款原因
+ * 优惠券明细
  * @author 钟述林
  * @data generate on: 2020-08-08
  */
 @Data
 @Entity
-@Table(name = "business_refund_reason")
+@Table(name = "business_coupon_rule_detail")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class RefundReason implements Serializable {
+public class CouponRuleDetail implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
 	/**
-	* 原因
+	* 规则名称
 	*/
-	private String reason;
+	private String ruleName;
 
 	/**
-	* 序号
+	* 规则ID
 	*/
-	private Integer orderNo;
+	private Integer ruleId;
+
+	/**
+	* 规则SN
+	*/
+	private String ruleSn;
+
+	/**
+	* 优惠券ID
+	*/
+	private Integer couponId;
+
+	/**
+	* 优惠券名称
+	*/
+	private String couponName;
 
 }

@@ -13,6 +13,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class JDBCTest {
 
     @Test
+    public void test02() throws Exception {
+        JDBCHandleTools jdbcHandleTools = new JDBCHandleTools();
+        jdbcHandleTools.handleProTitle();
+    }
+
+    @Test
     public void test01() throws Exception {
         JDBCHandleTools jdbcHandleTools = new JDBCHandleTools();
         jdbcHandleTools.run();

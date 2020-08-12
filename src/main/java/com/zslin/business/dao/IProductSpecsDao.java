@@ -25,6 +25,9 @@ public interface IProductSpecsDao extends BaseRepository<ProductSpecs, Integer>,
 
     List<ProductSpecs> findByProId(Integer proId, Sort sort);
 
+    @Query("FROM ProductSpecs p WHERE p.proId=?1 AND p.amount>0 ")
+    List<ProductSpecs> findByProIdAndAmount(Integer proId, Sort sort);
+
     @Query("SELECT MIN(s.price) FROM ProductSpecs s WHERE s.proId=?1")
     Float queryPrice(Integer proId);
 

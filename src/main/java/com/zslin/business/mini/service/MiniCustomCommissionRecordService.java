@@ -58,7 +58,7 @@ public class MiniCustomCommissionRecordService {
 
     @NeedAuth(openid = true)
     public JsonResult listOwn(String params) {
-        System.out.println("----MiniCustomCommissionRecordService.listOwn----"+params);
+        //System.out.println("----MiniCustomCommissionRecordService.listOwn----"+params);
         WxCustomDto customDto = JsonTools.getCustom(params);
 
         Integer sharedId = JsonTools.getParamInteger(params, "shareId");

@@ -125,7 +125,7 @@ public class DatasTools {
     ///判断是否是绑定小程序微信
     private boolean isBindWxMini(String content) {
         try {
-            if(content!=null && content.length()==6) {
+            if(content!=null && content.length()==4) {
                 if(Integer.parseInt(content)>0) {
                     return true;
                 }

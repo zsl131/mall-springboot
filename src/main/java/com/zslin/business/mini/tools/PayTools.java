@@ -154,7 +154,7 @@ public class PayTools {
                     TemplateMessageTools.field("退款原因", suc?reason:(err_code+":"+err_code_des)),
                     TemplateMessageTools.field("退款时间", NormalTools.curDatetime()),
 
-                    TemplateMessageTools.field("操作人员【"+user.getNickname()+"】"));
+                    TemplateMessageTools.field("操作人员【"+user.getNickname()+"】\\n"));
         } catch (Exception e) {
             e.printStackTrace();
         }

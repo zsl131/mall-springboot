@@ -14,6 +14,7 @@ import com.zslin.business.settlement.dto.AgentRewardDto;
 import com.zslin.business.settlement.dto.RankingDto;
 import com.zslin.business.settlement.tools.RankingTools;
 import com.zslin.business.settlement.tools.RewardTools;
+import com.zslin.business.tools.BindCodeTools;
 import com.zslin.business.wx.dto.TemplateMessageDto;
 import com.zslin.business.wx.tools.TemplateMessageAnnotationTools;
 import com.zslin.business.wx.tools.WxMediaTools;
@@ -152,7 +153,16 @@ public class NormalTest implements ApplicationContextAware {
     @Autowired
     private IRefundRecordDao refundRecordDao;
 
+    @Autowired
+    private BindCodeTools bindCodeTools;
+
     @Test
+    public void test50() {
+        String str = bindCodeTools.bindWxMini("4521", "oy8_QwNcCgN4U8ulmskM6XeW3YWU");
+        System.out.println("=========="+str);
+    }
+
+   @Test
     public void test49() {
         RefundRecord rr = refundRecordDao.queryRefundRecord("202007281524041387");
         System.out.println("--------->"+rr);

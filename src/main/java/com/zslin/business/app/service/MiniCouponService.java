@@ -1,8 +1,11 @@
 package com.zslin.business.app.service;
 
+import com.zslin.business.app.tools.CouponTools;
 import com.zslin.business.dao.ICouponDao;
 import com.zslin.business.dao.ICustomCouponDao;
+import com.zslin.business.model.Coupon;
 import com.zslin.business.model.CustomCoupon;
+import com.zslin.core.annotations.NeedAuth;
 import com.zslin.core.dto.JsonResult;
 import com.zslin.core.dto.QueryListDto;
 import com.zslin.core.dto.WxCustomDto;
@@ -14,6 +17,8 @@ import com.zslin.core.tools.QueryTools;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class MiniCouponService {
@@ -40,5 +45,17 @@ public class MiniCouponService {
             e.printStackTrace();
             return JsonResult.error("出错", e.getMessage());
         }
+    }
+
+    /** 小程序获取初关抵价券 */
+    @NeedAuth(openid = true)
+    public JsonResult first(String params) {
+        WxCustomDto customDto = JsonTools.getCustom(params);
+        List<CustomCoupon> customCouponList = customCouponDao.findByRuleSnAndReceiveKeyAndCustomId(CouponTools.FIRST_FOLLOW,
+                customDto.getCustomId()+"", customDto.getCustomId());
+
+        List<Coupon> couponList = couponDao.findCoupons(CouponTools.FIRST_FOLLOW);
+
+        return JsonResult.success("获取成功").set("customCouponList", customCouponList).set("couponList", couponList);
     }
 }

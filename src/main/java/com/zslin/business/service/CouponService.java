@@ -1,9 +1,12 @@
 package com.zslin.business.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.zslin.business.dao.ICouponDao;
+import com.zslin.business.dao.ICouponRuleDetailDao;
 import com.zslin.business.model.Coupon;
+import com.zslin.business.model.CouponRuleDetail;
 import com.zslin.core.annotations.AdminAuth;
 import com.zslin.core.api.Explain;
 import com.zslin.core.api.ExplainOperation;
@@ -36,6 +39,9 @@ public class CouponService {
 
     @Autowired
     private ICouponDao couponDao;
+
+    @Autowired
+    private ICouponRuleDetailDao couponRuleDetailDao;
 
     @AdminAuth(name = "优惠券列表", orderNum = 1)
     @ExplainOperation(name = "优惠券列表", notes = "优惠券列表", params= {
@@ -185,5 +191,35 @@ public class CouponService {
         String name = JsonTools.getJsonParam(params, "name");
         List<Coupon> list = couponDao.searchByName(name);
         return JsonResult.success().set("couponList", list);
+    }
+
+    /** 获取所有抵价券，用于规则分配 */
+    public JsonResult queryCoupon(String params) {
+        Integer ruleId = JsonTools.getId(params); //RuleId
+        List<Coupon> couponList = couponDao.findAll();
+        //已经分配的抵价券ID
+        List<Integer> reallyIds = couponRuleDetailDao.queryIds(ruleId);
+        return JsonResult.success("获取成功").set("couponList", couponList).set("couponIds", reallyIds);
+    }
+
+    /** 授权规则对应的抵价券 */
+    public JsonResult authCoupon(String params) {
+        Integer ruleId = JsonTools.getParamInteger(params, "ruleId");
+        String ruleSn = JsonTools.getJsonParam(params, "ruleSn");
+//        String flag = JsonTools.getJsonParam(params, "flag");
+
+        couponRuleDetailDao.deleteByRuleId(ruleId); //先删除所有权限
+        String cids = JsonTools.getJsonParam(params, "cids"); //CouponIds
+        JSONArray array = JSON.parseArray(cids);
+        for(Integer i=0;i<array.size();i++) {
+            Integer cid = array.getInteger(i);
+            CouponRuleDetail cr = new CouponRuleDetail();
+            cr.setCouponId(cid);
+            cr.setRuleId(ruleId);
+            cr.setRuleSn(ruleSn);
+            couponRuleDetailDao.save(cr);
+        }
+
+        return JsonResult.success("操作成功");
     }
 }
