@@ -52,7 +52,9 @@ public class OrdersTimer {
         orders.setEndTime(curTime);
         orders.setEndLong(System.currentTimeMillis());
 
-        customCommissionRecordDao.updateStatus("2", ordersNo); //修改提成记录状态
+        ordersDao.save(orders);
+
+        customCommissionRecordDao.updateStatusNoBatchNo("2", ordersNo); //修改提成记录状态
 
         sendTemplateMessageTools.send(orders.getOpenid(), "订单确认收货通知", "", "您的订单自动确认收货啦",
                 TemplateMessageTools.field("订单编号", ordersNo),

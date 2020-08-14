@@ -163,7 +163,7 @@ public class NormalTest implements ApplicationContextAware {
 
     @Test
     public void test50() {
-        String str = bindCodeTools.bindWxMini("4521", "oy8_QwNcCgN4U8ulmskM6XeW3YWU");
+        String str = bindCodeTools.bindWxMini("8051", "oy8_QwNcCgN4U8ulmskM6XeW3YWU");
         System.out.println("=========="+str);
     }
 

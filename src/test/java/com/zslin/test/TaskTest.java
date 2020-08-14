@@ -1,5 +1,6 @@
 package com.zslin.test;
 
+import com.zslin.business.timer.OrdersTimer;
 import com.zslin.core.model.BaseTask;
 import com.zslin.core.tasker.CronTaskRegistrar;
 import org.junit.Test;
@@ -9,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest
@@ -18,6 +20,22 @@ public class TaskTest {
 
     @Autowired
     CronTaskRegistrar cronTaskRegistrar;
+
+    @Autowired
+    private OrdersTimer ordersTimer;
+
+    @Test
+    public void testRun() {
+        ordersTimer.confirmOrders();
+    }
+
+    @Test
+    public void testList() {
+        List<BaseTask> list = cronTaskRegistrar.listTask();
+        for(BaseTask bt : list) {
+            System.out.println(bt);
+        }
+    }
 
     @Test
     public void addTask() throws Exception {

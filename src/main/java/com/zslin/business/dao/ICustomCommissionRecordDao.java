@@ -25,6 +25,11 @@ public interface ICustomCommissionRecordDao extends BaseRepository<CustomCommiss
     @Transactional
     void updateStatus(String status, String ordersNo);
 
+    @Query("UPDATE CustomCommissionRecord c SET c.status=?1 WHERE c.ordersNo=?2 AND c.cashOutBatchNo IS NULL ")
+    @Modifying
+    @Transactional
+    void updateStatusNoBatchNo(String status, String ordersNo);
+
     List<CustomCommissionRecord> findByOrdersNoAndProId(String ordersNo, Integer proId);
 
     //Integer agentId, String haveType, String status, Float money, Integer totalCount
