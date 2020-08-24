@@ -1,4 +1,4 @@
-package com.zslin.business.model;
+package com.zslin.business.agent.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -8,26 +8,22 @@ import java.io.Serializable;
 
 
 /**
- * 物流公司
+ * 代理角色关联
  * @author 钟述林
  * @data generate on: 2020-08-22
  */
 @Data
 @Entity
-@Table(name = "business_express_company")
+@Table(name = "agent_agent_role_relation")
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ExpressCompany implements Serializable {
+public class AgentRoleRelation implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 	
-	private String name;
+	private Integer roleId;
 
-	/**
-	* 联系方式等信息
-	*/
-	@Lob
-	private String remark;
+	private Integer agentId;
 
 }

@@ -34,10 +34,10 @@ public interface ICustomCommissionRecordDao extends BaseRepository<CustomCommiss
 
     //Integer agentId, String haveType, String status, Float money, Integer totalCount
 //    @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.cashOutBatchNo IS NULL ")
-    @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 ")
+    @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.saleFlag!='2' ")
     AgentCommissionDto queryCountDto(String status, Integer agentId);
 
-    @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.cashOutBatchNo IS NULL ")
+    @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.saleFlag!='2'  AND c.cashOutBatchNo IS NULL ")
     AgentCommissionDto queryCountDtoNoBatchNo(String status, Integer agentId);
 
     /** 设置本该修改为提现的数据 */

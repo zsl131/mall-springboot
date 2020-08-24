@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单优惠券
  * @author 钟述林
- * @data generate on: 2020-08-08
+ * @data generate on: 2020-08-22
  */
 @Data
 @Entity
