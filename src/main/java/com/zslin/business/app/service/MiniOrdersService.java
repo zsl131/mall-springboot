@@ -363,6 +363,7 @@ public class MiniOrdersService {
             if("basket".equalsIgnoreCase(type)) { //如果是通过购物车购买
                 List<ShoppingBasket> basketList = shoppingBasketDao.findByIds(genBasketIds(ids));
                 Integer [] specsIds = buildProSpecsIds(basketList); //产品规则ID
+
                 specsList = productSpecsDao.findByIds(specsIds);
                 totalMoney = buildTotalMoney(basketList);
                 List<Product> proList = productDao.findByIds(buildProIds(basketList)); //产品列表

@@ -99,8 +99,9 @@ public class OrdersHandlerTools {
         List<OrdersProductDto> productDtoList = generateProducts(ordersDto.getProductData());
 
         boolean isSelf = agent!=null && (custom.getOpenid().equals(agent.getOpenid())); //是否代理就是客户自己
+    System.out.println(agent+"------------------->"+isSelf);
         //如果代理是客户本身，则计算佣金金额
-        List<OrdersCommissionDto> commissionDtoList = commissionTools.buildCommission(agent, buildSpecsIds(productDtoList));
+        List<OrdersCommissionDto> commissionDtoList = isSelf?commissionTools.buildCommission(agent, buildSpecsIds(productDtoList)):null;
 
         List<CustomCommissionRecord> commissionRecordList = buildCommission(agent, custom, level, productDtoList,
                 ordersKey, ordersNo, isSelf, commissionDtoList);
@@ -348,6 +349,7 @@ public class OrdersHandlerTools {
 
     private OrdersCommissionDto queryDto(List<OrdersCommissionDto> commissionDtoList, Integer specsId) {
         OrdersCommissionDto res = null;
+        if(commissionDtoList==null) {return null;}
         for(OrdersCommissionDto dto : commissionDtoList) {if(specsId.equals(dto.getSpecsId())) {res = dto; break;}}
         return res;
     }

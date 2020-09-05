@@ -38,7 +38,7 @@ public interface IProductSpecsDao extends BaseRepository<ProductSpecs, Integer>,
     @Query("SELECT s.amount FROM ProductSpecs s WHERE s.id=?1")
     Integer querySpecsAmount(Integer specsId);
 
-    @Query("FROM ProductSpecs p WHERE p.id in ?1")
+    @Query("FROM ProductSpecs p WHERE p.id in (?1)")
     List<ProductSpecs> findByIds(Integer [] ids);
 
     @Query("UPDATE ProductSpecs p SET p.amount=p.amount-?1 WHERE p.id=?2")
