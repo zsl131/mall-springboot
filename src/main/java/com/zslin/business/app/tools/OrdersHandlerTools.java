@@ -1,5 +1,6 @@
 package com.zslin.business.app.tools;
 
+import com.zslin.business.app.dto.OrdersCommissionDto;
 import com.zslin.business.app.dto.SubmitOrdersDto;
 import com.zslin.business.app.dto.orders.OrdersHandlerDto;
 import com.zslin.business.app.dto.orders.OrdersProductDto;
@@ -70,6 +71,9 @@ public class OrdersHandlerTools {
     @Autowired
     private ICustomerDao customerDao;
 
+    @Autowired
+    private CommissionTools commissionTools;
+
     @Transactional
     @TemplateMessageAnnotation(name = "订单创建成功通知", keys = "订单号-商品数量-商品金额")
     public void addOrders(WxCustomDto custom, SubmitOrdersDto ordersDto) {
@@ -93,14 +97,24 @@ public class OrdersHandlerTools {
         String ordersNo = buildOrdersNo(custom.getCustomId());
         //产品信息列表
         List<OrdersProductDto> productDtoList = generateProducts(ordersDto.getProductData());
-        List<CustomCommissionRecord> commissionRecordList = buildCommission(agent, custom, level, productDtoList, ordersKey, ordersNo);
+
+        boolean isSelf = agent!=null && (custom.getOpenid().equals(agent.getOpenid())); //是否代理就是客户自己
+        //如果代理是客户本身，则计算佣金金额
+        List<OrdersCommissionDto> commissionDtoList = commissionTools.buildCommission(agent, buildSpecsIds(productDtoList));
+
+        List<CustomCommissionRecord> commissionRecordList = buildCommission(agent, custom, level, productDtoList,
+                ordersKey, ordersNo, isSelf, commissionDtoList);
 
         String proTitles = buildProTitles(productDtoList);
 
         OrdersHandlerDto countDto = buildHandlerDto(productDtoList, commissionRecordList);
 
+        //订单自动抵扣的佣金总金额
+        Float commissionTotalMoney = buildTotalCommission(productDtoList, commissionDtoList);
+
 //        System.out.println(ordersDto);
-        Orders orders = addOrders(ordersKey, ordersNo, custom, address, agent, coupon, countDto, ordersDto.getRemark(), proTitles);
+        Orders orders = addOrders(ordersKey, ordersNo, custom, address, agent, coupon, countDto, ordersDto.getRemark(),
+                proTitles, commissionTotalMoney);
         //订单生成后要处理用户优惠券
         buildCoupon(orders, coupon);
         //保存佣金，
@@ -109,7 +123,7 @@ public class OrdersHandlerTools {
             customCommissionRecordDao.save(ccr);
         }
         //保存订单产品
-        saveOrderProducts(orders, agent, level, custom, productDtoList);
+        saveOrderProducts(orders, agent, level, custom, productDtoList, commissionDtoList);
 
         Float discountMoney = orders.getDiscountMoney();
         discountMoney = (discountMoney == null) ? 0 : discountMoney;
@@ -122,14 +136,37 @@ public class OrdersHandlerTools {
                 TemplateMessageTools.field("可以前往后台管理系统查看["+ MiniUtils.buildAgent(orders)+"]"));
     }
 
+    /** 计算订单总佣金金额 */
+    private Float buildTotalCommission(List<OrdersProductDto> productDtoList, List<OrdersCommissionDto> commissionDtoList) {
+        Float result = 0f;
+        if(productDtoList==null || productDtoList.size()<=0 || commissionDtoList==null || commissionDtoList.size()<=0) {return result;}
+        for(OrdersProductDto opd : productDtoList) {
+            result += (buildCommission(commissionDtoList, opd));
+        }
+        return result;
+    }
+
+    /** 获取订单产品的佣金金额 */
+    private Float buildCommission(List<OrdersCommissionDto> commissionDtoList, OrdersProductDto opd) {
+        Float result = 0f;
+        if(commissionDtoList==null || commissionDtoList.size()<=0) {return result;}
+
+        for(OrdersCommissionDto ocd : commissionDtoList) {
+            if(ocd.getSpecsId().equals(opd.getSpecs().getId())) {result = ocd.getRate() * opd.getAmount(); break;}
+        }
+        return result;
+    }
+
     private Orders addOrders(String ordersKey, String ordersNo, WxCustomDto custom, CustomAddress address,
-                           Agent agent, CustomCoupon coupon, OrdersHandlerDto countDto, String remark, String proTitles) {
+                           Agent agent, CustomCoupon coupon, OrdersHandlerDto countDto, String remark,
+                             String proTitles, Float commissionTotalMoney) {
         Orders order = new Orders();
         order.setAddressCon(buildAddressCon(address));
         order.setAddressId(address.getId());
         order.setRemark(remark);
         order.setProTitles(proTitles);
         order.setHasAgent("0"); //默认为没有代理
+        order.setAutoCommissionMoney(commissionTotalMoney); //自动抵扣的佣金金额
 
         if(agent!=null) { //如果有代理信息，则设置
             order.setAgentName(agent.getName());
@@ -211,7 +248,8 @@ public class OrdersHandlerTools {
         return new OrdersHandlerDto(fundMoney, specsCount, totalCommission, totalCount, totalMoney);
     }
 
-    private void saveOrderProducts(Orders order, Agent agent, AgentLevel level, WxCustomDto custom, List<OrdersProductDto> productDtoList) {
+    private void saveOrderProducts(Orders order, Agent agent, AgentLevel level, WxCustomDto custom,
+                                   List<OrdersProductDto> productDtoList, List<OrdersCommissionDto> commissionDtoList) {
         for(OrdersProductDto dto:productDtoList) {
             Product pro = dto.getProduct();
             OrdersProduct op = new OrdersProduct();
@@ -224,6 +262,7 @@ public class OrdersHandlerTools {
                 op.setAgentUnionid(agent.getUnionid());
                 op.setAgentId(agent.getId());
             }
+            op.setAutoCommissionMoney(buildCommission(commissionDtoList, dto)); //自动抵扣的佣金金额
             op.setAmount(dto.getAmount());
             op.setCustomId(custom.getCustomId());
             op.setDeliveryDate(pro.getDeliveryDate());
@@ -271,24 +310,59 @@ public class OrdersHandlerTools {
      * @param ordersNo 订单编号
      * @return
      */
-    private List<CustomCommissionRecord> buildCommission(Agent agent, WxCustomDto custom, AgentLevel level, List<OrdersProductDto> proDtoList, String ordersKey, String ordersNo) {
+    private List<CustomCommissionRecord> buildCommission(Agent agent, WxCustomDto custom, AgentLevel level,
+                                                         List<OrdersProductDto> proDtoList, String ordersKey, String ordersNo,
+                                                         boolean isSelf, List<OrdersCommissionDto> commissionDtoList) {
         List<CustomCommissionRecord> result = new ArrayList<>();
         if(agent==null || level==null) {return result;}
+        /*boolean isSelf = custom.getOpenid().equals(agent.getOpenid()); //是否代理就是客户自己
+        List<OrdersCommissionDto> commissionDtoList = commissionTools.buildCommission(agent, buildSpecsIds(proDtoList));*/
         Agent leaderAgent = null;
         if(agent.getLeaderId()!=null && agent.getLeaderId()>0) {leaderAgent = agentDao.findOne(agent.getLeaderId());} //获取上级代理
         for(OrdersProductDto proDto:proDtoList) {
-            OrdersRateDto rateDto = rateTools.getRate(level.getId(), proDto.getSpecs().getId()); //佣金DTO对象
-            result.add(buildRecord(agent, agent, level, custom, rateDto.getThisAmount()*proDto.getAmount(), ordersKey, ordersNo, proDto));
+            Float thisMoney = 0f, leaderMoney = 0f;
+            if(isSelf) {
+                OrdersCommissionDto commissionDto = queryDto(commissionDtoList, proDto.getSpecs().getId());
+                thisMoney = commissionDto.getRate(); leaderMoney = commissionDto.getLeaderRate();
+            } else {
+                OrdersRateDto rateDto = rateTools.getRate(level.getId(), proDto.getSpecs().getId()); //佣金DTO对象
+                thisMoney = rateDto.getThisAmount(); leaderMoney = rateDto.getLeaderAmount();
+            }
+
+            /*OrdersRateDto rateDto = rateTools.getRate(level.getId(), proDto.getSpecs().getId()); //佣金DTO对象
+            result.add(buildRecord(agent, agent, level, custom, rateDto.getThisAmount()*proDto.getAmount(), ordersKey, ordersNo, proDto, commissionDtoList));
             //TODO 如果有上级代理且上级是 “金牌代理【id为3】”，并且自己不是金牌代理，也添加进去
             if(leaderAgent!=null && leaderAgent.getLevelId()==3 && agent.getLevelId()!=3) {
-                result.add(buildRecord(agent, leaderAgent, level, custom, rateDto.getLeaderAmount()*proDto.getAmount(), ordersKey, ordersNo, proDto));
+                result.add(buildRecord(agent, leaderAgent, level, custom, rateDto.getLeaderAmount()*proDto.getAmount(), ordersKey, ordersNo, proDto, commissionDtoList));
+            }*/
+
+//            OrdersCommissionDto commissionDto = queryDto(commissionDtoList, proDto.getSpecs().getId());
+            result.add(buildRecord(agent, agent, level, custom, thisMoney, ordersKey, ordersNo, proDto, isSelf));
+            //TODO 如果有上级代理且上级是 “金牌代理【id为3】”，并且自己不是金牌代理，也添加进去
+            if(leaderAgent!=null && leaderAgent.getLevelId()==3 && agent.getLevelId()!=3) {
+                result.add(buildRecord(agent, leaderAgent, level, custom, leaderMoney, ordersKey, ordersNo, proDto, isSelf));
             }
         }
         return result;
     }
 
+    private OrdersCommissionDto queryDto(List<OrdersCommissionDto> commissionDtoList, Integer specsId) {
+        OrdersCommissionDto res = null;
+        for(OrdersCommissionDto dto : commissionDtoList) {if(specsId.equals(dto.getSpecsId())) {res = dto; break;}}
+        return res;
+    }
+
+    private Integer[] buildSpecsIds(List<OrdersProductDto> productDtoList) {
+        Integer [] res = new Integer[productDtoList.size()];
+        for(int i=0;i<productDtoList.size();i++) {
+            res[i] = productDtoList.get(i).getSpecs().getId();
+        }
+        return res;
+    }
+
     private CustomCommissionRecord buildRecord(Agent saler, Agent agent, AgentLevel level, WxCustomDto custom, Float money,
-                                               String ordersKey, String ordersNo, OrdersProductDto proDto) {
+                                               String ordersKey, String ordersNo, OrdersProductDto proDto,
+                                               boolean isSelf) {
         CustomCommissionRecord ccr = new CustomCommissionRecord();
 
         //设置具体的销售人员信息
@@ -324,6 +398,7 @@ public class OrdersHandlerTools {
         ccr.setSpecsId(proDto.getSpecs().getId());
         ccr.setSpecsName(proDto.getSpecs().getName());
         ccr.setSpecsCount(proDto.getAmount());
+        ccr.setIsAuto(isSelf?"1":"0"); //是否是自动抵扣
         ccr.setStatus("0"); //默认为0，用户刚下单
         return ccr;
     }

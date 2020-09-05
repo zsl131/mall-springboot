@@ -2,8 +2,10 @@ package com.zslin.business.app.service;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.zslin.business.app.dto.OrdersCommissionDto;
 import com.zslin.business.app.dto.ProductSpecsDto;
 import com.zslin.business.app.dto.SubmitOrdersDto;
+import com.zslin.business.app.tools.CommissionTools;
 import com.zslin.business.app.tools.OrdersHandlerTools;
 import com.zslin.business.dao.*;
 import com.zslin.business.mini.dto.PaySubmitDto;
@@ -85,6 +87,9 @@ public class MiniOrdersService {
 
     @Autowired
     private IRefundRecordDao refundRecordDao;
+
+    @Autowired
+    private CommissionTools commissionTools;
 
     /** 处理售后 */
     public JsonResult afterSale(String params) {
@@ -271,31 +276,6 @@ public class MiniOrdersService {
             if("1".equals(flag)) {
                 //Float money = Float.parseFloat(JsonTools.getJsonParam(params, "payMoney")); //支付金额
                 payTools.hasPayed(ordersNo); //支付成功
-                /*Orders orders = ordersDao.findByOrdersNoAndCustomId(ordersNo, customDto.getCustomId());
-                orders.setStatus("1");
-                String payDay = NormalTools.curDate();
-                String payTime = NormalTools.curDatetime();
-                Long payLong = System.currentTimeMillis();
-                orders.setPayTime(payTime);
-                orders.setPayDay(payDay);
-                orders.setPayLong(payLong);
-
-                Float discountMoney = orders.getDiscountMoney();
-                discountMoney = (discountMoney == null) ? 0 : discountMoney;
-
-                orders.setPayMoney(orders.getTotalMoney() - discountMoney); //totalMoney就是支付金额
-                ordersDao.save(orders);
-//                ordersDao.updateStatus("1", ordersNo, customDto.getCustomId()); //修改订单状态
-                customCommissionRecordDao.updateStatus("1", ordersNo); //修改提成状态
-                ordersProductDao.updatePayDay(payDay, payTime, payLong, ordersNo); //修改订单产品状态
-
-                sendTemplateMessageTools.send2Manager(WxAccountTools.ADMIN, "订单付款成功通知", "", orders.getProTitles(),
-                        TemplateMessageTools.field("订单号", orders.getOrdersNo()),
-                        TemplateMessageTools.field("支付时间", orders.getPayTime()),
-                        TemplateMessageTools.field("支付金额", (orders.getPayMoney())+ " 元"),
-                        TemplateMessageTools.field("支付方式", "在线支付"),
-
-                        TemplateMessageTools.field("请核对信息后尽快处理["+ MiniUtils.buildAgent(orders)+"]"));*/
             }
             return JsonResult.success("操作成功").set("flag", "1");
         } catch (Exception e) {
@@ -373,6 +353,7 @@ public class MiniOrdersService {
         JsonResult result = JsonResult.getInstance();
         try {
             String ids = JsonTools.getJsonParam(params, "ids");
+//            System.out.println(ids);
             String type = JsonTools.getJsonParam(params, "type"); //类型，direct-直接购买；basket-购物车
             Integer addId = JsonTools.getParamInteger(params, "addressId"); //如果是指定收货地址
             WxCustomDto custom = JsonTools.getCustom(params);
@@ -387,7 +368,8 @@ public class MiniOrdersService {
                 List<Product> proList = productDao.findByIds(buildProIds(basketList)); //产品列表
                 List<ProductSpecsDto> resultList = buildDtoListFromBasket(custom.getOpenid(), rebuildBasket(basketList, specsList), proList);
                 proIds = buildProIdsByDto(resultList); //产品ID
-                result.set("productList", resultList);
+                List<OrdersCommissionDto> commissionDtoList = commissionTools.buildCommission(custom.getOpenid(), specsIds);
+                result.set("productList", resultList).set("commissionList", commissionDtoList);
             } else { //如果是直接购买
                 Integer specsId = Integer.parseInt(ids);
                 ProductSpecs specs = productSpecsDao.findOne(specsId);
@@ -399,9 +381,10 @@ public class MiniOrdersService {
                     specsList.add(specs);
                     totalMoney = specs.getPrice();
 
-                /*
-                List<Product> proList = productDao.findByIds(proIds);*/
-                    result.set("productList", dtoList);
+                    /*
+                    List<Product> proList = productDao.findByIds(proIds);*/
+                    List<OrdersCommissionDto> commissionDtoList = commissionTools.buildCommission(custom.getOpenid(), specsId);
+                    result.set("productList", dtoList).set("commissionList", commissionDtoList);
                 } else {
                     result.set("productList", new ArrayList<>());
                 }

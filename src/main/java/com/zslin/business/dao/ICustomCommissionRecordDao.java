@@ -25,6 +25,18 @@ public interface ICustomCommissionRecordDao extends BaseRepository<CustomCommiss
     @Transactional
     void updateStatus(String status, String ordersNo);
 
+    /** 设置非自动抵扣佣金的状态 */
+    @Query("UPDATE CustomCommissionRecord c SET c.status=?1 WHERE c.ordersNo=?2 AND c.isAuto!='1'")
+    @Modifying
+    @Transactional
+    void updateStatusByNormal(String status, String ordersNo);
+
+    /** 设置自动抵扣佣金的状态 */
+    @Query("UPDATE CustomCommissionRecord c SET c.status=?1, c.cashOutBatchNo=?2 WHERE c.ordersNo=?3 AND c.isAuto='1'")
+    @Modifying
+    @Transactional
+    void updateStatusByAuto(String status, String batchNo, String ordersNo);
+
     @Query("UPDATE CustomCommissionRecord c SET c.status=?1 WHERE c.ordersNo=?2 AND c.cashOutBatchNo IS NULL ")
     @Modifying
     @Transactional

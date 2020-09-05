@@ -10,7 +10,7 @@ import java.io.Serializable;
 /**
  * 订单产品
  * @author 钟述林
- * @data generate on: 2020-08-22
+ * @data generate on: 2020-09-04
  */
 @Data
 @Entity
@@ -158,5 +158,11 @@ public class OrdersProduct implements Serializable {
 	* @remark  -10:删除；-2:售后；-1：关闭；0-未付款；1-已付款，未发货；2-已发货；3-未点评；4-已完成
 	*/
 	private String status="0";
+
+	/**
+	* 自动抵扣佣金金额
+	* @remark 当下单则就是代理时，直接抵扣佣金
+	*/
+	private Float autoCommissionMoney=0f;
 
 }
