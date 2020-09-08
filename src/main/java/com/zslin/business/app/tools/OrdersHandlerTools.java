@@ -99,7 +99,7 @@ public class OrdersHandlerTools {
         List<OrdersProductDto> productDtoList = generateProducts(ordersDto.getProductData());
 
         boolean isSelf = agent!=null && (custom.getOpenid().equals(agent.getOpenid())); //是否代理就是客户自己
-    System.out.println(agent+"------------------->"+isSelf);
+//    System.out.println(agent+"------------------->"+isSelf);
         //如果代理是客户本身，则计算佣金金额
         List<OrdersCommissionDto> commissionDtoList = isSelf?commissionTools.buildCommission(agent, buildSpecsIds(productDtoList)):null;
 
@@ -341,7 +341,7 @@ public class OrdersHandlerTools {
             result.add(buildRecord(agent, agent, level, custom, thisMoney, ordersKey, ordersNo, proDto, isSelf));
             //TODO 如果有上级代理且上级是 “金牌代理【id为3】”，并且自己不是金牌代理，也添加进去
             if(leaderAgent!=null && leaderAgent.getLevelId()==3 && agent.getLevelId()!=3) {
-                result.add(buildRecord(agent, leaderAgent, level, custom, leaderMoney, ordersKey, ordersNo, proDto, isSelf));
+                result.add(buildRecord(agent, leaderAgent, level, custom, leaderMoney, ordersKey, ordersNo, proDto, false));
             }
         }
         return result;
