@@ -20,7 +20,8 @@ public interface ICustomCommissionRecordDao extends BaseRepository<CustomCommiss
 
     List<CustomCommissionRecord> findByOrdersId(Integer ordersId);
 
-    @Query("UPDATE CustomCommissionRecord c SET c.status=?1 WHERE c.ordersNo=?2")
+    //TODO 状态为提现成功后不可再修改
+    @Query("UPDATE CustomCommissionRecord c SET c.status=?1 WHERE c.ordersNo=?2 AND c.status!='4'")
     @Modifying
     @Transactional
     void updateStatus(String status, String ordersNo);
@@ -49,7 +50,7 @@ public interface ICustomCommissionRecordDao extends BaseRepository<CustomCommiss
     @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.saleFlag!='2' ")
     AgentCommissionDto queryCountDto(String status, Integer agentId);
 
-    @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.saleFlag!='2'  AND c.cashOutBatchNo IS NULL ")
+    @Query("SELECT new com.zslin.business.mini.dto.AgentCommissionDto(c.agentId, c.haveType, c.status, SUM(c.money), SUM(c.specsCount)) FROM CustomCommissionRecord c WHERE c.status=?1 AND c.agentId=?2 AND c.saleFlag!='2'  AND c.cashOutBatchNo IS NULL AND c.isAuto!='1' ")
     AgentCommissionDto queryCountDtoNoBatchNo(String status, Integer agentId);
 
     /** 设置本该修改为提现的数据 */
