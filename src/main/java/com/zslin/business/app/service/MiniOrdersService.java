@@ -124,7 +124,7 @@ public class MiniOrdersService {
             orders.setEndDay(NormalTools.curDate());
             ordersDao.save(orders);
 
-            customCommissionRecordDao.updateStatus("2", ordersNo); //修改提成状态
+            customCommissionRecordDao.updateStatusNoBatchNo("2", ordersNo); //修改提成状态
             return JsonResult.success("确认成功").set("flag", "1");
         } catch (Exception e) {
             e.printStackTrace();
