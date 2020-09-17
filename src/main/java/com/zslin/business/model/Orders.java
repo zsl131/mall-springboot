@@ -74,7 +74,7 @@ public class Orders implements Serializable {
 	/**
 	* 订单总优惠金额
 	*/
-	private Float discountMoney;
+	private Float discountMoney=0f;
 
 	/**
 	* 优惠原因

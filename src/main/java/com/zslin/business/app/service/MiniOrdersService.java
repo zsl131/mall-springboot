@@ -183,7 +183,7 @@ public class MiniOrdersService {
                 rr.setCreateLong(System.currentTimeMillis());
                 rr.setCreateDay(NormalTools.curDate());
 //                rr.setBackMoney(orders.getTotalMoney() - (orders.getDiscountMoney() == null ? 0 : orders.getDiscountMoney()));
-                rr.setBackMoney(op.getAmount()*op.getPrice());
+                rr.setBackMoney(op.getAmount()*op.getPrice() - (orders.getDiscountMoney() == null ? 0 : orders.getDiscountMoney())- (op.getAutoCommissionMoney()==null?0:op.getAutoCommissionMoney()));
                 rr.setVerifyFlag("0");
                 rr.setOptUsername("客户自主");
                 rr.setOptName("客户自主");
