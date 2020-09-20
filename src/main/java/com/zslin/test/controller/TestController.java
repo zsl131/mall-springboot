@@ -1,5 +1,6 @@
 package com.zslin.test.controller;
 
+import com.zslin.business.wx.tools.KfTools;
 import com.zslin.core.common.NormalTools;
 import com.zslin.core.model.BaseTask;
 import com.zslin.core.tasker.CronTaskRegistrar;
@@ -25,7 +26,21 @@ public class TestController {
     @Autowired
     private CronTaskRegistrar cronTaskRegistrar;
 
-    @GetMapping(value = "index")
+    @Autowired
+    private KfTools kfTools;
+
+    @GetMapping(value = "listAllKf")
+    private String listAllKf() {
+        String res = kfTools.listAll();
+        return res;
+    }
+
+    public String send(String account, String nick, String nickname, String id, String touser, String content) {
+        String res = kfTools.sendMsg(account, nick, nickname, id, touser, content);
+        return res;
+    }
+
+    /*@GetMapping(value = "index")
     public String index(String msg, HttpServletRequest request) {
         String res = msg + request.getRequestedSessionId()+ "  test in TestController => " + NormalTools.curDatetime();
         log.info(res);
@@ -63,7 +78,7 @@ public class TestController {
     public String remove(String name) {
         cronTaskRegistrar.removeByUuid(name);
         return "删除成功";
-    }
+    }*/
 
     /*@GetMapping(value = "rabbit")
     public String rabbit(String msg, HttpServletRequest request) {
