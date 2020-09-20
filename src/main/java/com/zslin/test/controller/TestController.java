@@ -35,6 +35,7 @@ public class TestController {
         return res;
     }
 
+    @GetMapping(value = "send")
     public String send(String account, String nick, String nickname, String id, String touser, String content) {
         String res = kfTools.sendMsg(account, nick, nickname, id, touser, content);
         return res;
