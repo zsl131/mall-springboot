@@ -338,10 +338,10 @@ public class OrdersHandlerTools {
             }*/
 
 //            OrdersCommissionDto commissionDto = queryDto(commissionDtoList, proDto.getSpecs().getId());
-            result.add(buildRecord(agent, agent, level, custom, thisMoney, ordersKey, ordersNo, proDto, isSelf));
+            result.add(buildRecord(agent, agent, level, custom, thisMoney*proDto.getAmount(), ordersKey, ordersNo, proDto, isSelf));
             //TODO 如果有上级代理且上级是 “金牌代理【id为3】”，并且自己不是金牌代理，也添加进去
             if(leaderAgent!=null && leaderAgent.getLevelId()==3 && agent.getLevelId()!=3) {
-                result.add(buildRecord(agent, leaderAgent, level, custom, leaderMoney, ordersKey, ordersNo, proDto, false));
+                result.add(buildRecord(agent, leaderAgent, level, custom, leaderMoney*proDto.getAmount(), ordersKey, ordersNo, proDto, false));
             }
         }
         return result;
