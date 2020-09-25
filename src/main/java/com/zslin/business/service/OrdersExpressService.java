@@ -196,26 +196,6 @@ public class OrdersExpressService {
             }
         }
 
-        /*List<OrdersExpress> expressList = ordersExpressDao.findByOrdersNo(ordersNo);
-        OrdersExpress express = null;
-        if(express==null) {
-            express = new OrdersExpress();
-            express.setCustomId(orders.getCustomId());
-            express.setCustomNickname(orders.getNickname());
-            express.setAddressCon(addressCon);
-            express.setOpenid(orders.getOpenid());
-            express.setOrdersId(orders.getId());
-            express.setOrdersNo(ordersNo);
-            express.setUpdateLong(System.currentTimeMillis());
-            express.setUpdateTime(NormalTools.curDatetime());
-        }
-
-        express.setExpId(expId);
-        express.setExpName(expName);
-        express.setExpNo(buildNo(expNo, addressCon, expName));
-
-        ordersExpressDao.save(express); //保存*/
-
 //        ordersDao.updateStatus("2", ordersNo, orders.getCustomId()); //修改状态为已发货
         if(size>0) {
             orders.setStatus("2");//修改状态为已发货
@@ -236,7 +216,7 @@ public class OrdersExpressService {
                     TemplateMessageTools.field("商品信息", ordersProduct.getProTitle()),
                     TemplateMessageTools.field("商品数量", expNoArray.length + " 件"),
 
-                    TemplateMessageTools.field("您可以在“满山晴”小程序中查看物流信息"));
+                    TemplateMessageTools.field(addressCon+"。可在“满山晴”小程序中查看物流信息"));
         }
 
         return JsonResult.success("保存成功");
